@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<rdf:RDF xml:lang="en"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+
+<rdfs:Class rdf:ID="Person">
+  <rdfs:comment>The class of people.</rdfs:comment>
+  <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/03/example/classes#Animal"/>
+</rdfs:Class>
+
+<rdf:Property ID="maritalStatus">
+  <rdfs:range rdf:resource="#MaritalStatus"/>
+  <rdfs:domain rdf:resource="#Person"/>
+</rdf:Property>
+
+<rdf:Property ID="ssn">
+  <rdfs:comment>Social Security Number</rdfs:comment>
+  <rdfs:range rdf:resource="http://www.w3.org/2000/03/example/classes#Integer"/>
+  <rdfs:domain rdf:resource="#Person"/>
+</rdf:Property>
+
+<rdf:Property ID="age">
+  <rdfs:range rdf:resource="http://www.w3.org/2000/03/example/classes#Integer"/>
+  <rdfs:domain rdf:resource="#Person"/>
+</rdf:Property>
+
+<rdfs:Class rdf:ID="MaritalStatus"/>
+
+<MaritalStatus rdf:ID="Married"/>
+<MaritalStatus rdf:ID="Divorced"/>
+<MaritalStatus rdf:ID="Single"/>
+<MaritalStatus rdf:ID="Widowed"/>
+
+</rdf:RDF>
