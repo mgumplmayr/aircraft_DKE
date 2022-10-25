@@ -61,7 +61,7 @@ public class Main {
 
             JSONArray states = (JSONArray) data_obj.get("states"); //States der Flugzeuge ermitteln
             System.out.println(states);
-            System.out.println("test");
+            System.out.println("test2");
 
         }
         catch(Exception e){
