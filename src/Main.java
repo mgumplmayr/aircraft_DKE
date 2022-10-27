@@ -2,6 +2,10 @@ import com.opencsv.CSVReader;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,6 +24,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+
         System.out.println("Test");
         Dataset ds = DatasetFactory.createTxnMem();
         FusekiServer server = FusekiServer.create()
@@ -69,7 +74,16 @@ public class Main {
             e.printStackTrace();
         }
 
+        String icao = "http://hostname/rdf/tutorial/abcd";
+        String name = "TestName";
+        Model model = ModelFactory.createDefaultModel();
+        final Property hasname = model.createProperty("http://www.w3.org/","hasname");
 
+
+        Resource flugzeug = model.createResource(icao)
+                .addProperty(hasname,name);
+
+        model.write(System.out);
 
     }
 }
