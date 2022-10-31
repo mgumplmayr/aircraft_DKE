@@ -3,7 +3,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.VCARD;
+import org.apache.jena.vocabulary.RDF;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -27,9 +27,9 @@ public class Main {
         DataInitiator initiator = new DataInitiator();
         JSONArray staticData = initiator.getStaticDataJSON();
         JSONArray dynamicData = initiator.getDynamicData();
-        System.out.println(staticData);
+        //System.out.println(staticData);
         System.out.println("-------------------------------------------");
-        System.out.println(dynamicData);
+        //System.out.println(dynamicData);
 
         JSONObject x = (JSONObject) staticData.get(3);
         System.out.println(x.get("icao24"));
@@ -39,46 +39,23 @@ public class Main {
 
         //define general URIS
         String startURI = "http://host/";
-        String vocabularyURI = startURI + "vocabulary#";
+        model.setNsPrefix("voc",VOC.getURI());
+        model.setNsPrefix("rdf",RDF.getURI());
+
 
         //create static Aircraft Properties
         String aircraftURI = startURI + "aircraft/";
+        model.setNsPrefix("aircraft",aircraftURI);
         String manufacturerURI = startURI + "manufacturer/";
+        model.setNsPrefix("manufacturer",manufacturerURI);
         String modelURI = startURI + "model/";
+        model.setNsPrefix("model",modelURI);
         String operatorURI = startURI + "operator/";
+        model.setNsPrefix("operator",operatorURI);
         String ownerURI = startURI + "owner/";
+        model.setNsPrefix("owner",ownerURI);
         String categoryURI = startURI + "Category/";
-
-        //Aircraft vocabulary
-        Property icao24 = model.createProperty(vocabularyURI + "icao24");
-        Property registration = model.createProperty(vocabularyURI + "hasRegistration");
-        Property serialNumber = model.createProperty(vocabularyURI + "serialNumber");
-        Property lineNumber = model.createProperty(vocabularyURI + "lineNumber");
-        Property builtDate = model.createProperty(vocabularyURI + "buildDate");
-        Property registeredDate = model.createProperty(vocabularyURI + "registeredDate");
-        Property firstFlightDate = model.createProperty(vocabularyURI + "firstFlightDate");
-
-        //Manufacturer vocabulary
-        Property manufacturerIcao = model.createProperty(vocabularyURI+"hasManufacturerIcao");
-        Property manufacturerName = model.createProperty(vocabularyURI+"hasManufacturerName");
-
-        //Model vocabulary
-        Property modelName = model.createProperty(vocabularyURI+"model");
-        Property typecode = model.createProperty(vocabularyURI+"hasTypecode");
-        Property engines = model.createProperty(vocabularyURI+"engines");
-        Property icaoAircraftType = model.createProperty(vocabularyURI+"icaoAircraftType");
-
-        //Operator Vocabulary
-        Property operatorIcao = model.createProperty(vocabularyURI+"operatorIcao");
-        Property operator = model.createProperty(vocabularyURI+"operator");
-        Property operatorCallsign = model.createProperty(vocabularyURI+"operatorCallsign");
-        Property operatorIata = model.createProperty(vocabularyURI+"operatorIata");
-
-        //Owner Vocabulary
-        Property owner = model.createProperty(vocabularyURI+"owner");
-
-        //Category Vocabulary
-        Property categoryDescription = model.createProperty(vocabularyURI+"category");
+        model.setNsPrefix("category",categoryURI);
 
 
         for(Object o: staticData){
@@ -96,57 +73,87 @@ public class Main {
             String thisFirstFlightDate = aircraft.get("firstflightdate").toString();
 
             //Manufacturer properties
-            String thisManufacturerURI = manufacturerURI+aircraft.get("manufacturericao");
+            String thisManufacturerURI = manufacturerURI+aircraft.get("manufacturericao").toString().replace(" ","_");
             String thisManufacturer = aircraft.get("manufacturericao").toString(); //for aircraft
             String thisManufacturerName = aircraft.get("manufacturername").toString();
 
             //Model properties
-            String thisModelURI = modelURI+aircraft.get("model");
+            String thisModelURI = modelURI+aircraft.get("model").toString().replace(" ","_");;
             String thisModel = aircraft.get("model").toString();
             String thisTypecode = aircraft.get("typecode").toString();
             String thisEngines = aircraft.get("engines").toString();
             String thisIcaoAircraftType = aircraft.get("icaoaircrafttype").toString();
 
             //Operator properties
-            String thisOperatorURI = operatorURI+aircraft.get("operatoricao");
+            String thisOperatorURI = operatorURI+aircraft.get("operatoricao").toString().replace(" ","_");;
             String thisOperatorIcao = aircraft.get("operatoricao").toString();
             String thisOperator = aircraft.get("operator").toString();
             String thisOperatorCallsign = aircraft.get("operatorcallsign").toString();
             String thisOperatorIata = aircraft.get("operatoriata").toString();
 
             //Owner properies
-            String thisOwnerURI = ownerURI+aircraft.get("owner");
+            String thisOwnerURI = ownerURI+aircraft.get("owner").toString().replace(" ","_");;
             String thisOwner = aircraft.get("owner").toString();
 
             //CategoryDescription properties
-            String thisCategoryURI = categoryURI+aircraft.get("categoryDescription");
+            String thisCategoryURI = categoryURI+aircraft.get("categoryDescription").toString().replace(" ","_");;
             String thisCategoryDescription = aircraft.get("categoryDescription").toString();
 
 
             Resource aircraftToAdd = model.createResource(thisAircraftURI)
-                    .addProperty(icao24,thisIcao24)
-                    .addProperty(registration,thisRegistration)
-                    .addProperty(serialNumber,thisSerialNumber)
-                    .addProperty(lineNumber,thisLineNumber)
-                    .addProperty(builtDate,thisBuiltDate)
-                    .addProperty(registeredDate,thisRegisteredDate)
-                    .addProperty(firstFlightDate,thisFirstFlightDate)
-                    .addProperty(manufacturerIcao,thisManufacturer)
-                    .addProperty(modelName,thisModel)
-                    .addProperty(operatorIcao,thisOperatorIcao)
-                    .addProperty(owner,thisOwner)
-                    .addProperty(categoryDescription,thisCategoryDescription);
+                    .addProperty(VOC.icao24,thisIcao24)
+                    .addProperty(VOC.registration,thisRegistration)
+                    .addProperty(VOC.serialNumber,thisSerialNumber)
+                    .addProperty(VOC.lineNumber,thisLineNumber)
+                    .addProperty(VOC.builtDate,thisBuiltDate)
+                    .addProperty(VOC.registeredDate,thisRegisteredDate)
+                    .addProperty(VOC.firstFlightDate,thisFirstFlightDate)
+                    .addProperty(RDF.type,"Aircraft");
 
-            Resource manufacturerToAdd = model.createResource(thisManufacturerURI)
-                    .addProperty(manufacturerIcao,thisManufacturer)
-                    .addProperty(manufacturerName,thisManufacturerName);
 
-            //TODO: Rework JSON to Java objects? Manufacturers would be multiples in JSON format. -> Delete duplicates
+            if(!thisManufacturer.isEmpty()) {
+                aircraftToAdd.addProperty(VOC.manufacturerIcao,thisManufacturer);
+                Resource manufacturerToAdd = model.createResource(thisManufacturerURI)
+                        .addProperty(VOC.manufacturerIcao, thisManufacturer)
+                        .addProperty(VOC.manufacturerName, thisManufacturerName)
+                        .addProperty(RDF.type,"Manufacturer");
+                //TODO: should we add property "hasAircraft"?
+            }
+            if (!thisModel.isEmpty()){
+                aircraftToAdd.addProperty(VOC.modelName,thisModel);
+                Resource modelToAdd = model.createResource(thisModelURI)
+                        .addProperty(VOC.modelName,thisModel)
+                        .addProperty(VOC.typecode,thisTypecode)
+                        .addProperty(VOC.engines,thisEngines)
+                        .addProperty(VOC.icaoAircraftType,thisIcaoAircraftType)
+                        .addProperty(RDF.type,"Model");
+            }
+            if(!thisOperatorIcao.isEmpty()){
+                aircraftToAdd.addProperty(VOC.operatorIcao,thisOperatorIcao);
+                Resource operatorToAdd = model.createResource(thisOperatorURI)
+                        .addProperty(VOC.operatorIcao,thisOperatorIcao)
+                        .addProperty(VOC.operator,thisOperator)
+                        .addProperty(VOC.operatorCallsign,thisOperatorCallsign)
+                        .addProperty(VOC.operatorIata,thisOperatorIata)
+                        .addProperty(RDF.type,"Operator");
+            }
+            if(!thisOwner.isEmpty()){
+                aircraftToAdd.addProperty(VOC.owner,thisOwner);
+                Resource ownerToAdd = model.createResource(thisOwnerURI)
+                        .addProperty(VOC.owner,thisOwner)
+                        .addProperty(RDF.type,"Owner");
+            }
+            if (!thisCategoryDescription.isEmpty()){
+                aircraftToAdd.addProperty(VOC.categoryDescription,thisCategoryDescription);
+                Resource categoryDescriptionToAdd = model.createResource(thisCategoryURI)
+                        .addProperty(VOC.categoryDescription,thisCategoryDescription)
+                        .addProperty(RDF.type,"Category");
+            }
         }
 
         //Output RDF Data
         try {
-            model.write(new FileOutputStream("staticRDF.txt"));
+            model.write(new FileOutputStream("staticRDF.ttl"),"TTL");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

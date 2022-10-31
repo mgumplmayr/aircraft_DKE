@@ -16,7 +16,11 @@ public class DataInitiator {
         try {
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
             List<String[]> data = reader.readAll();
-            //data.forEach(x -> System.out.println(Arrays.toString(x)));
+            /*data.forEach(x -> {
+                for (String string : x) {
+                    string.replaceAll(" ", "_");
+                }
+            });*/
             return data;
 
         } catch (Exception e) {
@@ -26,7 +30,7 @@ public class DataInitiator {
         }
     }
 
-    public JSONArray getStaticDataJSON(){
+    public JSONArray getStaticDataJSON() {
         List<String[]> data = getStaticData();
         JSONArray result = new JSONArray();
         String[] description = data.get(0);
@@ -40,8 +44,8 @@ public class DataInitiator {
         return result;
     }
 
-    public JSONArray getDynamicData(){
-        try{ //dynamische Daten
+    public JSONArray getDynamicData() {
+        try { //dynamische Daten
             URL url = new URL("https://opensky-network.org/api/states/all?lamin=46.3688&lomin=9.4897&lamax=49.0067&lomax=17.0987");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -61,14 +65,12 @@ public class DataInitiator {
             JSONArray states = (JSONArray) data_obj.get("states"); //States der Flugzeuge ermitteln
             //System.out.println(states);
             return states;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Fehler beim laden der dynamischen Daten: ");
             e.printStackTrace();
             return null;
         }
     }
-
 
 
 }
