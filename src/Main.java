@@ -44,6 +44,7 @@ public class Main {
 
 
         //create static Aircraft Properties
+        //TODO: delete special chacarters from URIs
         String aircraftURI = startURI + "aircraft/";
         model.setNsPrefix("aircraft",aircraftURI);
         String manufacturerURI = startURI + "manufacturer/";
@@ -61,7 +62,6 @@ public class Main {
         for(Object o: staticData){
             JSONObject aircraft = (JSONObject) o;
 
-            //TODO: add custom prefix for URIS (ex: voc = vocabulary)
             //Static Aircraft properties
             String thisAircraftURI = aircraftURI+aircraft.get("icao24");
             String thisIcao24 = aircraft.get("icao24").toString();
