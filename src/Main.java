@@ -44,7 +44,6 @@ public class Main {
 
 
         //create static Aircraft Properties
-        //TODO: delete special chacarters from URIs
         String aircraftURI = startURI + "aircraft/";
         model.setNsPrefix("aircraft",aircraftURI);
         String manufacturerURI = startURI + "manufacturer/";
@@ -73,30 +72,30 @@ public class Main {
             String thisFirstFlightDate = aircraft.get("firstflightdate").toString();
 
             //Manufacturer properties
-            String thisManufacturerURI = manufacturerURI+aircraft.get("manufacturericao").toString().replace(" ","_");
+            String thisManufacturerURI = manufacturerURI+aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]","");
             String thisManufacturer = aircraft.get("manufacturericao").toString(); //for aircraft
             String thisManufacturerName = aircraft.get("manufacturername").toString();
 
             //Model properties
-            String thisModelURI = modelURI+aircraft.get("model").toString().replace(" ","_");;
+            String thisModelURI = modelURI+aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]","");
             String thisModel = aircraft.get("model").toString();
             String thisTypecode = aircraft.get("typecode").toString();
             String thisEngines = aircraft.get("engines").toString();
             String thisIcaoAircraftType = aircraft.get("icaoaircrafttype").toString();
 
             //Operator properties
-            String thisOperatorURI = operatorURI+aircraft.get("operatoricao").toString().replace(" ","_");;
+            String thisOperatorURI = operatorURI+aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]","");
             String thisOperatorIcao = aircraft.get("operatoricao").toString();
             String thisOperator = aircraft.get("operator").toString();
             String thisOperatorCallsign = aircraft.get("operatorcallsign").toString();
             String thisOperatorIata = aircraft.get("operatoriata").toString();
 
             //Owner properies
-            String thisOwnerURI = ownerURI+aircraft.get("owner").toString().replace(" ","_");;
+            String thisOwnerURI = ownerURI+aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]","");
             String thisOwner = aircraft.get("owner").toString();
 
             //CategoryDescription properties
-            String thisCategoryURI = categoryURI+aircraft.get("categoryDescription").toString().replace(" ","_");;
+            String thisCategoryURI = categoryURI+aircraft.get("categoryDescription").toString().replaceAll("[^A-Za-z0-9]","");
             String thisCategoryDescription = aircraft.get("categoryDescription").toString();
 
 
