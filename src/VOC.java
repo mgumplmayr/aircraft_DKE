@@ -4,7 +4,7 @@ import org.apache.jena.rdf.model.Property;
 
 
 public class VOC {
-    public static final String vocabularyURI = "<http://example.org/vocabulary#";
+    public static final String vocabularyURI = "http://example.org/vocabulary#";
     private static final Model m = ModelFactory.createDefaultModel();
 
     public static final Property aircraft;
