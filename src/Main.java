@@ -31,14 +31,14 @@ public class Main {
         System.out.println("-------------------------------------------");
         //System.out.println(dynamicData);
 
-        JSONObject x = (JSONObject) staticData.get(3);
-        System.out.println(x.get("icao24"));
+        //JSONObject x = (JSONObject) staticData.get(3);
+        //System.out.println(x.get("icao24"));
 
         //create RDF Model
         Model model = ModelFactory.createDefaultModel();
 
         //define general URIS
-        String startURI = "http://host/";
+        String startURI = "http://example.org/";
         model.setNsPrefix("voc",VOC.getURI());
         model.setNsPrefix("rdf",RDF.getURI());
 
@@ -101,52 +101,59 @@ public class Main {
 
             Resource aircraftToAdd = model.createResource(thisAircraftURI)
                     .addProperty(VOC.icao24,thisIcao24)
-                    .addProperty(VOC.registration,thisRegistration)
-                    .addProperty(VOC.serialNumber,thisSerialNumber)
-                    .addProperty(VOC.lineNumber,thisLineNumber)
-                    .addProperty(VOC.builtDate,thisBuiltDate)
-                    .addProperty(VOC.registeredDate,thisRegisteredDate)
-                    .addProperty(VOC.firstFlightDate,thisFirstFlightDate)
-                    .addProperty(RDF.type,"Aircraft");
-
+                    .addProperty(RDF.type,VOC.aircraft);
+            if(!thisRegistration.isEmpty()) aircraftToAdd.addProperty(VOC.registration,thisRegistration); //TODO: Hier addProperty oder addLiteral?
+            if(!thisSerialNumber.isEmpty()) aircraftToAdd.addProperty(VOC.serialNumber,thisSerialNumber);
+            if(!thisLineNumber.isEmpty()) aircraftToAdd.addProperty(VOC.lineNumber,thisLineNumber);
+            if(!thisBuiltDate.isEmpty()) aircraftToAdd.addProperty(VOC.builtDate,thisBuiltDate);
+            if(!thisRegisteredDate.isEmpty()) aircraftToAdd.addProperty(VOC.registeredDate,thisRegisteredDate);
+            if(!thisFirstFlightDate.isEmpty()) aircraftToAdd.addProperty(VOC.firstFlightDate,thisFirstFlightDate);
 
             if(!thisManufacturer.isEmpty()) {
-                aircraftToAdd.addProperty(VOC.manufacturerIcao,thisManufacturer);
                 Resource manufacturerToAdd = model.createResource(thisManufacturerURI)
                         .addProperty(VOC.manufacturerIcao, thisManufacturer)
-                        .addProperty(VOC.manufacturerName, thisManufacturerName)
-                        .addProperty(RDF.type,"Manufacturer");
-                //TODO: should we add property "hasAircraft"?
+                        .addProperty(RDF.type,VOC.manufacturer);
+                if(!thisManufacturerName.isEmpty()) manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
+
+                aircraftToAdd.addProperty(VOC.hasManufacturer,manufacturerToAdd);
             }
+
             if (!thisModel.isEmpty()){
-                aircraftToAdd.addProperty(VOC.modelName,thisModel);
                 Resource modelToAdd = model.createResource(thisModelURI)
                         .addProperty(VOC.modelName,thisModel)
-                        .addProperty(VOC.typecode,thisTypecode)
-                        .addProperty(VOC.engines,thisEngines)
-                        .addProperty(VOC.icaoAircraftType,thisIcaoAircraftType)
-                        .addProperty(RDF.type,"Model");
+                        .addProperty(RDF.type,VOC.model);
+                if(!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode,thisTypecode);
+                if(!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines,thisEngines);
+                if(!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType,thisIcaoAircraftType);
+
+                aircraftToAdd.addProperty(VOC.hasModel,modelToAdd);
             }
+
             if(!thisOperatorIcao.isEmpty()){
-                aircraftToAdd.addProperty(VOC.operatorIcao,thisOperatorIcao);
                 Resource operatorToAdd = model.createResource(thisOperatorURI)
                         .addProperty(VOC.operatorIcao,thisOperatorIcao)
-                        .addProperty(VOC.operator,thisOperator)
-                        .addProperty(VOC.operatorCallsign,thisOperatorCallsign)
-                        .addProperty(VOC.operatorIata,thisOperatorIata)
-                        .addProperty(RDF.type,"Operator");
+                        .addProperty(RDF.type,VOC.operator);
+                if(!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator,thisOperator);
+                if(!thisOperatorCallsign.isEmpty()) operatorToAdd.addProperty(VOC.operatorCallsign,thisOperatorCallsign);
+                if(!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata,thisOperatorIata);
+
+                aircraftToAdd.addProperty(VOC.hasOperator,operatorToAdd);
             }
+
             if(!thisOwner.isEmpty()){
-                aircraftToAdd.addProperty(VOC.owner,thisOwner);
                 Resource ownerToAdd = model.createResource(thisOwnerURI)
-                        .addProperty(VOC.owner,thisOwner)
-                        .addProperty(RDF.type,"Owner");
+                        .addProperty(VOC.ownerName,thisOwner)
+                        .addProperty(RDF.type,VOC.owner);
+
+                aircraftToAdd.addProperty(VOC.hasOwner,ownerToAdd);
             }
+
             if (!thisCategoryDescription.isEmpty()){
-                aircraftToAdd.addProperty(VOC.categoryDescription,thisCategoryDescription);
                 Resource categoryDescriptionToAdd = model.createResource(thisCategoryURI)
-                        .addProperty(VOC.categoryDescription,thisCategoryDescription)
-                        .addProperty(RDF.type,"Category");
+                        .addProperty(VOC.categoryDescriptionName,thisCategoryDescription)
+                        .addProperty(RDF.type,VOC.categoryDescription);
+
+                aircraftToAdd.addProperty(VOC.hasCategoryDescription,categoryDescriptionToAdd);
             }
         }
 
