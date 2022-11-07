@@ -1,24 +1,21 @@
-import com.opencsv.CSVReader;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.shacl.ShaclValidator;
+import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-
-
+import java.nio.file.Paths;
 
 
 public class Main {
@@ -100,62 +97,74 @@ public class Main {
 
 
             Resource aircraftToAdd = model.createResource(thisAircraftURI)
-                    .addProperty(VOC.icao24,thisIcao24)
-                    .addProperty(VOC.registration,thisRegistration)
-                    .addProperty(VOC.serialNumber,thisSerialNumber)
-                    .addProperty(VOC.lineNumber,thisLineNumber)
-                    .addProperty(VOC.builtDate,thisBuiltDate)
-                    .addProperty(VOC.registeredDate,thisRegisteredDate)
-                    .addProperty(VOC.firstFlightDate,thisFirstFlightDate)
+                    .addProperty(VOC.ICAO24,thisIcao24)
+                    .addProperty(VOC.REGISTRATION,thisRegistration)
+                    .addProperty(VOC.SERIALNUMBER,thisSerialNumber)
+                    .addProperty(VOC.LINENUMBER,thisLineNumber)
+                    .addProperty(VOC.BUILT_DATE,thisBuiltDate)
+                    .addProperty(VOC.REGISTERED_DATE,thisRegisteredDate)
+                    .addProperty(VOC.FIRST_FLIGHT_DATE,thisFirstFlightDate)
                     .addProperty(RDF.type,"Aircraft");
 
 
             if(!thisManufacturer.isEmpty()) {
-                aircraftToAdd.addProperty(VOC.manufacturerIcao,thisManufacturer);
+                aircraftToAdd.addProperty(VOC.MANUFACTURER_ICAO,thisManufacturer);
                 Resource manufacturerToAdd = model.createResource(thisManufacturerURI)
-                        .addProperty(VOC.manufacturerIcao, thisManufacturer)
-                        .addProperty(VOC.manufacturerName, thisManufacturerName)
+                        .addProperty(VOC.MANUFACTURER_ICAO, thisManufacturer)
+                        .addProperty(VOC.MANUFACTURER_NAME, thisManufacturerName)
                         .addProperty(RDF.type,"Manufacturer");
                 //TODO: should we add property "hasAircraft"?
             }
             if (!thisModel.isEmpty()){
-                aircraftToAdd.addProperty(VOC.modelName,thisModel);
+                aircraftToAdd.addProperty(VOC.MODEL_NAME,thisModel);
                 Resource modelToAdd = model.createResource(thisModelURI)
-                        .addProperty(VOC.modelName,thisModel)
-                        .addProperty(VOC.typecode,thisTypecode)
-                        .addProperty(VOC.engines,thisEngines)
-                        .addProperty(VOC.icaoAircraftType,thisIcaoAircraftType)
+                        .addProperty(VOC.MODEL_NAME,thisModel)
+                        .addProperty(VOC.TYPECODE,thisTypecode)
+                        .addProperty(VOC.ENGINES,thisEngines)
+                        .addProperty(VOC.ICAO_AIRCRAFT_TYPE,thisIcaoAircraftType)
                         .addProperty(RDF.type,"Model");
             }
             if(!thisOperatorIcao.isEmpty()){
-                aircraftToAdd.addProperty(VOC.operatorIcao,thisOperatorIcao);
+                aircraftToAdd.addProperty(VOC.OPERATOR_ICAO,thisOperatorIcao);
                 Resource operatorToAdd = model.createResource(thisOperatorURI)
-                        .addProperty(VOC.operatorIcao,thisOperatorIcao)
-                        .addProperty(VOC.operator,thisOperator)
-                        .addProperty(VOC.operatorCallsign,thisOperatorCallsign)
-                        .addProperty(VOC.operatorIata,thisOperatorIata)
+                        .addProperty(VOC.OPERATOR_ICAO,thisOperatorIcao)
+                        .addProperty(VOC.OPERATOR,thisOperator)
+                        .addProperty(VOC.OPERATOR_CALLSIGN,thisOperatorCallsign)
+                        .addProperty(VOC.OPERATOR_IATA,thisOperatorIata)
                         .addProperty(RDF.type,"Operator");
             }
             if(!thisOwner.isEmpty()){
-                aircraftToAdd.addProperty(VOC.owner,thisOwner);
+                aircraftToAdd.addProperty(VOC.OWNER,thisOwner);
                 Resource ownerToAdd = model.createResource(thisOwnerURI)
-                        .addProperty(VOC.owner,thisOwner)
+                        .addProperty(VOC.OWNER,thisOwner)
                         .addProperty(RDF.type,"Owner");
             }
             if (!thisCategoryDescription.isEmpty()){
-                aircraftToAdd.addProperty(VOC.categoryDescription,thisCategoryDescription);
+                aircraftToAdd.addProperty(VOC.CATEGORY_DESCRIPTION,thisCategoryDescription);
                 Resource categoryDescriptionToAdd = model.createResource(thisCategoryURI)
-                        .addProperty(VOC.categoryDescription,thisCategoryDescription)
+                        .addProperty(VOC.CATEGORY_DESCRIPTION,thisCategoryDescription)
                         .addProperty(RDF.type,"Category");
             }
         }
+        //write RDF to file
+        final String OUTPUT_NAME = "staticRDF.ttl";
 
-        //Output RDF Data
         try {
-            model.write(new FileOutputStream("staticRDF.ttl"),"TTL");
+            model.write(new FileOutputStream(OUTPUT_NAME),"TTL");
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        //validate with SHACL
+        Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
+        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+
+        Shapes shape = Shapes.parse(shapeGraph);
+        ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
+        System.out.println("---------------------------------------");
+        ShLib.printReport(report);
+        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+
 
     }
 }

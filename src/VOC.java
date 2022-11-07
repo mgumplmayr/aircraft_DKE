@@ -4,66 +4,66 @@ import org.apache.jena.rdf.model.Property;
 
 
 public class VOC {
-    public static final String vocabularyURI = "http://host/vocabulary#";
-    private static final Model model = ModelFactory.createDefaultModel();
+    public static final String VOCABULARY_URI = "http://host/vocabulary#";
+    private static final Model MODEL = ModelFactory.createDefaultModel();
 
-    public static final Property icao24;
-    public static final Property registration;
-    public static final Property serialNumber;
-    public static final Property lineNumber;
-    public static final Property builtDate;
-    public static final Property registeredDate;
-    public static final Property firstFlightDate;
-    public static final Property manufacturerIcao;
-    public static final Property manufacturerName;
-    public static final Property modelName;
-    public static final Property typecode;
-    public static final Property engines;
-    public static final Property icaoAircraftType;
-    public static final Property operatorIcao;
-    public static final Property operator;
-    public static final Property operatorCallsign;
-    public static final Property operatorIata;
-    public static final Property owner;
-    public static final Property categoryDescription;
+    public static final Property ICAO24;
+    public static final Property REGISTRATION;
+    public static final Property SERIALNUMBER;
+    public static final Property LINENUMBER;
+    public static final Property BUILT_DATE;
+    public static final Property REGISTERED_DATE;
+    public static final Property FIRST_FLIGHT_DATE;
+    public static final Property MANUFACTURER_ICAO;
+    public static final Property MANUFACTURER_NAME;
+    public static final Property MODEL_NAME;
+    public static final Property TYPECODE;
+    public static final Property ENGINES;
+    public static final Property ICAO_AIRCRAFT_TYPE;
+    public static final Property OPERATOR_ICAO;
+    public static final Property OPERATOR;
+    public static final Property OPERATOR_CALLSIGN;
+    public static final Property OPERATOR_IATA;
+    public static final Property OWNER;
+    public static final Property CATEGORY_DESCRIPTION;
 
     public VOC(){
 
     }
 
-    public static String getURI() { return vocabularyURI; }
+    public static String getURI() { return VOCABULARY_URI; }
 
     static {
         //Aircraft vocabulary
-        icao24 = model.createProperty(vocabularyURI + "icao24");
-        registration = model.createProperty(vocabularyURI + "hasRegistration");
-        serialNumber = model.createProperty(vocabularyURI + "serialNumber");
-        lineNumber = model.createProperty(vocabularyURI + "lineNumber");
-        builtDate = model.createProperty(vocabularyURI + "buildDate");
-        registeredDate = model.createProperty(vocabularyURI + "registeredDate");
-        firstFlightDate = model.createProperty(vocabularyURI + "firstFlightDate");
+        ICAO24 = MODEL.createProperty(VOCABULARY_URI + "icao24");
+        REGISTRATION = MODEL.createProperty(VOCABULARY_URI + "hasRegistration");
+        SERIALNUMBER = MODEL.createProperty(VOCABULARY_URI + "serialNumber");
+        LINENUMBER = MODEL.createProperty(VOCABULARY_URI + "lineNumber");
+        BUILT_DATE = MODEL.createProperty(VOCABULARY_URI + "buildDate");
+        REGISTERED_DATE = MODEL.createProperty(VOCABULARY_URI + "registeredDate");
+        FIRST_FLIGHT_DATE = MODEL.createProperty(VOCABULARY_URI + "firstFlightDate");
 
         //Manufacturer vocabulary
-        manufacturerIcao = model.createProperty(vocabularyURI+"hasManufacturerIcao");
-        manufacturerName = model.createProperty(vocabularyURI+"hasManufacturerName");
+        MANUFACTURER_ICAO = MODEL.createProperty(VOCABULARY_URI +"hasManufacturerIcao");
+        MANUFACTURER_NAME = MODEL.createProperty(VOCABULARY_URI +"hasManufacturerName");
 
         //Model vocabulary
-        modelName = model.createProperty(vocabularyURI+"model");
-        typecode = model.createProperty(vocabularyURI+"hasTypecode");
-        engines = model.createProperty(vocabularyURI+"engines");
-        icaoAircraftType = model.createProperty(vocabularyURI+"icaoAircraftType");
+        MODEL_NAME = MODEL.createProperty(VOCABULARY_URI +"model");
+        TYPECODE = MODEL.createProperty(VOCABULARY_URI +"hasTypecode");
+        ENGINES = MODEL.createProperty(VOCABULARY_URI +"engines");
+        ICAO_AIRCRAFT_TYPE = MODEL.createProperty(VOCABULARY_URI +"icaoAircraftType");
 
         //Operator Vocabulary
-        operatorIcao = model.createProperty(vocabularyURI+"operatorIcao");
-        operator = model.createProperty(vocabularyURI+"operator");
-        operatorCallsign = model.createProperty(vocabularyURI+"operatorCallsign");
-        operatorIata = model.createProperty(vocabularyURI+"operatorIata");
+        OPERATOR_ICAO = MODEL.createProperty(VOCABULARY_URI +"operatorIcao");
+        OPERATOR = MODEL.createProperty(VOCABULARY_URI +"operator");
+        OPERATOR_CALLSIGN = MODEL.createProperty(VOCABULARY_URI +"operatorCallsign");
+        OPERATOR_IATA = MODEL.createProperty(VOCABULARY_URI +"operatorIata");
 
         //Owner Vocabulary
-        owner = model.createProperty(vocabularyURI+"owner");
+        OWNER = MODEL.createProperty(VOCABULARY_URI +"owner");
 
         //Category Vocabulary
-        categoryDescription = model.createProperty(vocabularyURI+"category");
+        CATEGORY_DESCRIPTION = MODEL.createProperty(VOCABULARY_URI +"category");
 
     }
 }
