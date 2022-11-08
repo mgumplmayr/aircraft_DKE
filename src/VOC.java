@@ -45,7 +45,7 @@ public class VOC {
 
     }
 
-    public static String getURI() { return VOCABULARY_URI; }
+    public static String getURI() { return vocabularyURI; }
 
     static {
         //Aircraft vocabulary
