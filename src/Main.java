@@ -12,7 +12,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.file.Paths;
@@ -165,6 +164,7 @@ public class Main {
         //validate with SHACL
         Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
