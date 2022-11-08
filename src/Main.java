@@ -1,24 +1,21 @@
-import com.opencsv.CSVReader;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.shacl.ShaclValidator;
+import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.ValidationReport;
+import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-
-
+import java.nio.file.Paths;
 
 
 public class Main {
@@ -156,13 +153,25 @@ public class Main {
                 aircraftToAdd.addProperty(VOC.hasCategoryDescription,categoryDescriptionToAdd);
             }
         }
+        //write RDF to file
+        final String OUTPUT_NAME = "staticRDF.ttl";
 
-        //Output RDF Data
         try {
-            model.write(new FileOutputStream("staticRDF.ttl"),"TTL");
+            model.write(new FileOutputStream(OUTPUT_NAME),"TTL");
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        //validate with SHACL
+        Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
+        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+
+        Shapes shape = Shapes.parse(shapeGraph);
+        ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
+        System.out.println("---------------------------------------");
+        ShLib.printReport(report);
+        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+
 
     }
 }

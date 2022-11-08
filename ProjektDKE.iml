@@ -12,5 +12,6 @@
     <orderEntry type="library" name="googlecode.json.simple" level="project" />
     <orderEntry type="library" name="apache.poi" level="project" />
     <orderEntry type="library" name="opencsv" level="project" />
+    <orderEntry type="library" name="apache.jena.shacl" level="project" />
   </component>
 </module>
