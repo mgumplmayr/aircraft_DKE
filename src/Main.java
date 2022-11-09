@@ -35,30 +35,30 @@ public class Main {
 
         //define general URIS
         String startURI = "http://example.org/";
-        model.setNsPrefix("voc",VOC.getURI());
-        model.setNsPrefix("rdf",RDF.getURI());
+        model.setNsPrefix("voc", VOC.getURI());
+        model.setNsPrefix("rdf", RDF.getURI());
 
 
         //create static Aircraft Properties
         String aircraftURI = startURI + "aircraft/";
-        model.setNsPrefix("aircraft",aircraftURI);
+        model.setNsPrefix("aircraft", aircraftURI);
         String manufacturerURI = startURI + "manufacturer/";
-        model.setNsPrefix("manufacturer",manufacturerURI);
+        model.setNsPrefix("manufacturer", manufacturerURI);
         String modelURI = startURI + "model/";
-        model.setNsPrefix("model",modelURI);
+        model.setNsPrefix("model", modelURI);
         String operatorURI = startURI + "operator/";
-        model.setNsPrefix("operator",operatorURI);
+        model.setNsPrefix("operator", operatorURI);
         String ownerURI = startURI + "owner/";
-        model.setNsPrefix("owner",ownerURI);
+        model.setNsPrefix("owner", ownerURI);
         String categoryURI = startURI + "Category/";
-        model.setNsPrefix("category",categoryURI);
+        model.setNsPrefix("category", categoryURI);
 
 
-        for(Object o: staticData){
+        for (Object o : staticData) {
             JSONObject aircraft = (JSONObject) o;
 
             //Static Aircraft properties
-            String thisAircraftURI = aircraftURI+aircraft.get("icao24");
+            String thisAircraftURI = aircraftURI + aircraft.get("icao24");
             String thisIcao24 = aircraft.get("icao24").toString();
             String thisRegistration = aircraft.get("registration").toString();
             String thisSerialNumber = aircraft.get("serialnumber").toString();
@@ -68,96 +68,112 @@ public class Main {
             String thisFirstFlightDate = aircraft.get("firstflightdate").toString();
 
             //Manufacturer properties
-            String thisManufacturerURI = manufacturerURI+aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]","");
+            String thisManufacturerURI = manufacturerURI + aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisManufacturer = aircraft.get("manufacturericao").toString(); //for aircraft
             String thisManufacturerName = aircraft.get("manufacturername").toString();
 
             //Model properties
-            String thisModelURI = modelURI+aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]","");
+            String thisModelURI = modelURI + aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisModel = aircraft.get("model").toString();
             String thisTypecode = aircraft.get("typecode").toString();
             String thisEngines = aircraft.get("engines").toString();
             String thisIcaoAircraftType = aircraft.get("icaoaircrafttype").toString();
 
             //Operator properties
-            String thisOperatorURI = operatorURI+aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]","");
+            String thisOperatorURI = operatorURI + aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisOperatorIcao = aircraft.get("operatoricao").toString();
             String thisOperator = aircraft.get("operator").toString();
             String thisOperatorCallsign = aircraft.get("operatorcallsign").toString();
             String thisOperatorIata = aircraft.get("operatoriata").toString();
 
             //Owner properies
-            String thisOwnerURI = ownerURI+aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]","");
+            String thisOwnerURI = ownerURI + aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisOwner = aircraft.get("owner").toString();
 
             //CategoryDescription properties
-            String thisCategoryURI = categoryURI+aircraft.get("categoryDescription").toString().replaceAll("[^A-Za-z0-9]","");
+            String thisCategoryURI = categoryURI + aircraft.get("categoryDescription").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisCategoryDescription = aircraft.get("categoryDescription").toString();
 
-
+            //create aircraft resource
             Resource aircraftToAdd = model.createResource(thisAircraftURI)
-                    .addProperty(VOC.icao24,thisIcao24)
-                    .addProperty(RDF.type,VOC.aircraft);
-            if(!thisRegistration.isEmpty()) aircraftToAdd.addProperty(VOC.registration,thisRegistration); //TODO: Hier addProperty oder addLiteral?
-            if(!thisSerialNumber.isEmpty()) aircraftToAdd.addProperty(VOC.serialNumber,thisSerialNumber);
-            if(!thisLineNumber.isEmpty()) aircraftToAdd.addProperty(VOC.lineNumber,thisLineNumber);
-            if(!thisBuiltDate.isEmpty()) aircraftToAdd.addProperty(VOC.builtDate,thisBuiltDate);
-            if(!thisRegisteredDate.isEmpty()) aircraftToAdd.addProperty(VOC.registeredDate,thisRegisteredDate);
-            if(!thisFirstFlightDate.isEmpty()) aircraftToAdd.addProperty(VOC.firstFlightDate,thisFirstFlightDate);
+                    .addProperty(VOC.icao24, thisIcao24)
+                    .addProperty(RDF.type, VOC.aircraft);
+            if (!thisRegistration.isEmpty())
+                aircraftToAdd.addProperty(VOC.registration, thisRegistration); //TODO: Hier addProperty oder addLiteral?
+            if (!thisSerialNumber.isEmpty()) aircraftToAdd.addProperty(VOC.serialNumber, thisSerialNumber);
+            if (!thisLineNumber.isEmpty()) aircraftToAdd.addProperty(VOC.lineNumber, thisLineNumber);
+            if (!thisBuiltDate.isEmpty()) aircraftToAdd.addProperty(VOC.builtDate, thisBuiltDate);
+            if (!thisRegisteredDate.isEmpty()) aircraftToAdd.addProperty(VOC.registeredDate, thisRegisteredDate);
+            if (!thisFirstFlightDate.isEmpty()) aircraftToAdd.addProperty(VOC.firstFlightDate, thisFirstFlightDate);
 
-            if(!thisManufacturer.isEmpty()) {
-                Resource manufacturerToAdd = model.createResource(thisManufacturerURI)
-                        .addProperty(VOC.manufacturerIcao, thisManufacturer)
-                        .addProperty(RDF.type,VOC.manufacturer);
-                if(!thisManufacturerName.isEmpty()) manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
+            //create manufacturer resource
+            Resource manufacturerToAdd;
+            if (!thisManufacturer.isEmpty()) manufacturerToAdd = model.createResource(thisManufacturerURI)
+                    .addProperty(VOC.manufacturerIcao, thisManufacturer);
+            else manufacturerToAdd = model.createResource();
 
-                aircraftToAdd.addProperty(VOC.hasManufacturer,manufacturerToAdd);
-            }
+            manufacturerToAdd.addProperty(RDF.type, VOC.manufacturer);
+            if (!thisManufacturerName.isEmpty())
+                manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
 
-            if (!thisModel.isEmpty()){
-                Resource modelToAdd = model.createResource(thisModelURI)
-                        .addProperty(VOC.modelName,thisModel)
-                        .addProperty(RDF.type,VOC.model);
-                if(!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode,thisTypecode);
-                if(!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines,thisEngines);
-                if(!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType,thisIcaoAircraftType);
+            aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
 
-                aircraftToAdd.addProperty(VOC.hasModel,modelToAdd);
-            }
+            //create model resource
+            Resource modelToAdd;
+            if (!thisModel.isEmpty()) modelToAdd = model.createResource(thisModelURI)
+                    .addProperty(VOC.modelName, thisModel);
+            else modelToAdd = model.createResource();
 
-            if(!thisOperatorIcao.isEmpty()){
-                Resource operatorToAdd = model.createResource(thisOperatorURI)
-                        .addProperty(VOC.operatorIcao,thisOperatorIcao)
-                        .addProperty(RDF.type,VOC.operator);
-                if(!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator,thisOperator);
-                if(!thisOperatorCallsign.isEmpty()) operatorToAdd.addProperty(VOC.operatorCallsign,thisOperatorCallsign);
-                if(!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata,thisOperatorIata);
+            modelToAdd.addProperty(RDF.type, VOC.model);
+            if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
+            if (!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines, thisEngines);
+            if (!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType, thisIcaoAircraftType);
 
-                aircraftToAdd.addProperty(VOC.hasOperator,operatorToAdd);
-            }
+            aircraftToAdd.addProperty(VOC.hasModel, modelToAdd);
 
-            if(!thisOwner.isEmpty()){
-                Resource ownerToAdd = model.createResource(thisOwnerURI)
-                        .addProperty(VOC.ownerName,thisOwner)
-                        .addProperty(RDF.type,VOC.owner);
+            //create operator resource
+            Resource operatorToAdd;
+            if (!thisOperatorIcao.isEmpty()) operatorToAdd = model.createResource(thisOperatorURI)
+                    .addProperty(VOC.operatorIcao, thisOperatorIcao);
+            else operatorToAdd = model.createResource();
 
-                aircraftToAdd.addProperty(VOC.hasOwner,ownerToAdd);
-            }
+            operatorToAdd.addProperty(RDF.type, VOC.operator);
+            if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
+            if (!thisOperatorCallsign.isEmpty())
+                operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
+            if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
 
-            if (!thisCategoryDescription.isEmpty()){
-                Resource categoryDescriptionToAdd = model.createResource(thisCategoryURI)
-                        .addProperty(VOC.categoryDescriptionName,thisCategoryDescription)
-                        .addProperty(RDF.type,VOC.categoryDescription);
+            aircraftToAdd.addProperty(VOC.hasOperator, operatorToAdd);
 
-                aircraftToAdd.addProperty(VOC.hasCategoryDescription,categoryDescriptionToAdd);
-            }
+            //create owner resource
+            Resource ownerToAdd;
+            if (!thisOwner.isEmpty()) ownerToAdd = model.createResource(thisOwnerURI)
+                    .addProperty(VOC.ownerName, thisOwner);
+            else ownerToAdd = model.createResource();
+
+            ownerToAdd.addProperty(RDF.type, VOC.owner);
+
+            aircraftToAdd.addProperty(VOC.hasOwner, ownerToAdd);
+
+            //create category resource
+            Resource categoryDescriptionToAdd;
+            if (!thisCategoryDescription.isEmpty()) categoryDescriptionToAdd = model.createResource(thisCategoryURI)
+                    .addProperty(VOC.categoryDescriptionName, thisCategoryDescription);
+            else categoryDescriptionToAdd = model.createResource();
+
+            categoryDescriptionToAdd.addProperty(RDF.type, VOC.categoryDescription);
+
+            aircraftToAdd.addProperty(VOC.hasCategoryDescription, categoryDescriptionToAdd);
+
         }
+
         //write RDF to file
         final String OUTPUT_NAME = "staticRDF.ttl";
 
         try {
-            model.write(new FileOutputStream(OUTPUT_NAME),"TTL");
-        } catch (FileNotFoundException e) {
+            model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+        } catch (
+                FileNotFoundException e) {
             e.printStackTrace();
         }
 
