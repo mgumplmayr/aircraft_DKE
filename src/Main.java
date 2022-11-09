@@ -171,13 +171,17 @@ public class Main {
         final String OUTPUT_NAME = "staticRDF.ttl";
 
         try {
+            System.out.println("Printing " + model.size() + " resources");
             model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+            System.out.println("---------------------------------------");
         } catch (
                 FileNotFoundException e) {
             e.printStackTrace();
         }
 
         //validate with SHACL
+        System.out.println("Checking " + model.size() + " resources");
         Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
 
