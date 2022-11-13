@@ -1,9 +1,10 @@
 @prefix aircraft:     <http://example.org/aircraft/> .
-@prefix category:     <http://example.org/Category/> .
+@prefix category:     <http://example.org/category/> .
 @prefix manufacturer: <http://example.org/manufacturer/> .
 @prefix model:        <http://example.org/model/> .
 @prefix operator:     <http://example.org/operator/> .
 @prefix owner:        <http://example.org/owner/> .
+@prefix position:     <http://example.org/position/> .
 @prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix voc:          <http://example.org/vocabulary#> .
 
@@ -1366,10 +1367,6 @@ aircraft:44030a  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:NoADSBEmitterCategoryInformation ;
         voc:icao24                  "44030a" .
 
-category:NoADSBEmitterCategoryInformation
-        rdf:type      voc:Category ;
-        voc:category  "No ADS-B Emitter Category Information" .
-
 aircraft:44490b  rdf:type    voc:Aircraft ;
         voc:hasModel         model:Nucleon ;
         voc:hasOwner         owner:Private ;
@@ -1592,9 +1589,6 @@ aircraft:44071e  rdf:type           voc:Aircraft ;
         voc:icao24                  "44071e" ;
         voc:serialNumber            "4353" .
 
-category:Rotorcraft  rdf:type  voc:Category ;
-        voc:category  "Rotorcraft" .
-
 aircraft:440487  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:Light15500lbs ;
         voc:hasManufacturer         manufacturer:VANS ;
@@ -1815,10 +1809,6 @@ aircraft:4408e3  rdf:type           voc:Aircraft ;
         voc:hasRegistration         "OE-9331" ;
         voc:icao24                  "4408e3" ;
         voc:serialNumber            "23045" .
-
-category:Large75000to300000lbs
-        rdf:type      voc:Category ;
-        voc:category  "Large (75000 to 300000 lbs)" .
 
 aircraft:440424  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:Light15500lbs ;
@@ -2259,6 +2249,10 @@ aircraft:440313  rdf:type    voc:Aircraft ;
 
 owner:Austriamthssta  rdf:type  voc:Owner ;
         voc:owner  "Austria  \tmthssta" .
+
+category:Lighterthanair
+        rdf:type      voc:Category ;
+        voc:category  "Lighter-than-air" .
 
 aircraft:444914  rdf:type    voc:Aircraft ;
         voc:hasModel         model:Rbus ;
@@ -2828,6 +2822,10 @@ aircraft:4446d3  rdf:type    voc:Aircraft ;
 owner:K5aviationGmbh  rdf:type  voc:Owner ;
         voc:owner  "K5-aviation Gmbh" .
 
+category:NoADSBEmitterCategoryInformation
+        rdf:type      voc:Category ;
+        voc:category  "No ADS-B Emitter Category Information" .
+
 aircraft:44046a  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:Light15500lbs ;
         voc:hasManufacturer         manufacturer:CESSNA ;
@@ -2905,10 +2903,6 @@ aircraft:440695  rdf:type           voc:Aircraft ;
 
 owner:Private  rdf:type  voc:Owner ;
         voc:owner  "Private" .
-
-category:Small15500to75000lbs
-        rdf:type      voc:Category ;
-        voc:category  "Small (15500 to 75000 lbs)" .
 
 model:BD700Global5000
         rdf:type              voc:Model ;
@@ -5486,10 +5480,6 @@ aircraft:447ca6  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:NoADSBEmitterCategoryInformation ;
         voc:icao24                  "447ca6" .
 
-category:Glidersailplane
-        rdf:type      voc:Category ;
-        voc:category  "Glider / sailplane" .
-
 aircraft:44012d  rdf:type    voc:Aircraft ;
         voc:hasManufacturer  manufacturer:CESSNA ;
         voc:hasModel         model:CessnaT303Crusader ;
@@ -5642,10 +5632,6 @@ model:CitationXLS  rdf:type   voc:Model ;
         voc:icaoAircraftType  "L2J" ;
         voc:model             "Citation XLS" , "Citation XLS+" ;
         voc:typecode          "C56X" .
-
-category:SurfaceVehicleEmergencyVehicle
-        rdf:type      voc:Category ;
-        voc:category  "Surface Vehicle \uFFFD Emergency Vehicle" .
 
 aircraft:4405aa  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:Small15500to75000lbs ;
@@ -6499,6 +6485,10 @@ owner:AviationAcademyAustria
         rdf:type   voc:Owner ;
         voc:owner  "Aviation Academy Austria" .
 
+category:Small15500to75000lbs
+        rdf:type      voc:Category ;
+        voc:category  "Small (15500 to 75000 lbs)" .
+
 aircraft:4407de  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:Ultralighthanggliderparaglider ;
         voc:icao24                  "4407de" .
@@ -7053,6 +7043,10 @@ aircraft:44484c  rdf:type    voc:Aircraft ;
         voc:icao24           "44484c" ;
         voc:serialNumber     "P07896" .
 
+category:Glidersailplane
+        rdf:type      voc:Category ;
+        voc:category  "Glider / sailplane" .
+
 manufacturer:PANHA  rdf:type  voc:Manufacturer ;
         voc:ManufacturerIcao  "PANHA" ;
         voc:ManufacturerName  "Bell" , "Agusta-bell" .
@@ -7184,6 +7178,10 @@ aircraft:440938  rdf:type           voc:Aircraft ;
         voc:hasRegistration         "OE-XCE" ;
         voc:icao24                  "440938" ;
         voc:serialNumber            "57319" .
+
+category:Large75000to300000lbs
+        rdf:type      voc:Category ;
+        voc:category  "Large (75000 to 300000 lbs)" .
 
 model:Learjet40  rdf:type     voc:Model ;
         voc:icaoAircraftType  "L2J" ;
@@ -8053,6 +8051,10 @@ aircraft:440880  rdf:type    voc:Aircraft ;
         voc:icao24           "440880" ;
         voc:serialNumber     "7528" .
 
+aircraft:440169  rdf:type           voc:Aircraft ;
+        voc:hasCategoryDescription  category:Light15500lbs ;
+        voc:icao24                  "440169" .
+
 aircraft:4401b1  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:NoADSBEmitterCategoryInformation ;
         voc:hasManufacturer         manufacturer:FOKKER ;
@@ -8062,9 +8064,9 @@ aircraft:4401b1  rdf:type           voc:Aircraft ;
         voc:icao24                  "4401b1" ;
         voc:serialNumber            "11406" .
 
-aircraft:440169  rdf:type           voc:Aircraft ;
-        voc:hasCategoryDescription  category:Light15500lbs ;
-        voc:icao24                  "440169" .
+category:Ultralighthanggliderparaglider
+        rdf:type      voc:Category ;
+        voc:category  "Ultralight / hang-glider / paraglider" .
 
 model:R22BetaII  rdf:type     voc:Model ;
         voc:icaoAircraftType  "H1P" ;
@@ -9894,6 +9896,11 @@ model:73748ESF  rdf:type      voc:Model ;
         voc:model             "737 48ESF" ;
         voc:typecode          "B734" .
 
+model:F4U4Corsair  rdf:type   voc:Model ;
+        voc:icaoAircraftType  "L1P" ;
+        voc:model             "F4U-4 Corsair" ;
+        voc:typecode          "CORS" .
+
 aircraft:440871  rdf:type    voc:Aircraft ;
         voc:hasManufacturer  manufacturer:CESSNA ;
         voc:hasModel         model:CessnaCitationCJ2 ;
@@ -9902,10 +9909,9 @@ aircraft:440871  rdf:type    voc:Aircraft ;
         voc:icao24           "440871" ;
         voc:serialNumber     "525A0029" .
 
-model:F4U4Corsair  rdf:type   voc:Model ;
-        voc:icaoAircraftType  "L1P" ;
-        voc:model             "F4U-4 Corsair" ;
-        voc:typecode          "CORS" .
+category:Light15500lbs
+        rdf:type      voc:Category ;
+        voc:category  "Light (< 15500 lbs)" .
 
 aircraft:44458e  rdf:type    voc:Aircraft ;
         voc:hasModel         model:NucleonWRC ;
@@ -11249,6 +11255,9 @@ model:Challenger604  rdf:type  voc:Model ;
         voc:model     "Challenger 604" ;
         voc:typecode  "CL64" .
 
+category:Rotorcraft  rdf:type  voc:Category ;
+        voc:category  "Rotorcraft" .
+
 aircraft:4402c5  rdf:type           voc:Aircraft ;
         voc:hasCategoryDescription  category:NoADSBEmitterCategoryInformation ;
         voc:icao24                  "4402c5" .
@@ -12532,10 +12541,6 @@ model:RV6  rdf:type           voc:Model ;
         voc:model             "RV-6" ;
         voc:typecode          "RV6" .
 
-category:UnmannedAerialVehicle
-        rdf:type      voc:Category ;
-        voc:category  "Unmanned Aerial Vehicle" .
-
 aircraft:440014  rdf:type  voc:Aircraft ;
         voc:icao24  "440014" .
 
@@ -13015,6 +13020,10 @@ aircraft:44064e  rdf:type    voc:Aircraft ;
         voc:hasRegistration  "OE-FJW" ;
         voc:icao24           "44064e" ;
         voc:serialNumber     "42.N118" .
+
+category:SurfaceVehicleServiceVehicle
+        rdf:type      voc:Category ;
+        voc:category  "Surface Vehicle \uFFFD Service Vehicle" .
 
 aircraft:440423  rdf:type    voc:Aircraft ;
         voc:hasManufacturer  manufacturer:DIAMOND ;
@@ -13712,10 +13721,6 @@ model:737NG7JUWBBJ  rdf:type  voc:Model ;
         voc:icaoAircraftType  "L2J" ;
         voc:model             "737NG 7JU/W BBJ" ;
         voc:typecode          "B737" .
-
-category:SurfaceVehicleServiceVehicle
-        rdf:type      voc:Category ;
-        voc:category  "Surface Vehicle \uFFFD Service Vehicle" .
 
 model:182PSkylane  rdf:type   voc:Model ;
         voc:icaoAircraftType  "L1P" ;
@@ -15387,6 +15392,10 @@ aircraft:44056b  rdf:type           voc:Aircraft ;
         voc:lineNumber              "U28664" ;
         voc:serialNumber            "3720" .
 
+category:SurfaceVehicleEmergencyVehicle
+        rdf:type      voc:Category ;
+        voc:category  "Surface Vehicle \uFFFD Emergency Vehicle" .
+
 aircraft:440340  rdf:type    voc:Aircraft ;
         voc:hasManufacturer  manufacturer:SSH ;
         voc:hasModel         model:JungmannT131PA ;
@@ -15497,10 +15506,6 @@ aircraft:444835  rdf:type    voc:Aircraft ;
         voc:hasRegistration  "OO-2AU" ;
         voc:icao24           "444835" ;
         voc:serialNumber     "288-25-477" .
-
-category:Light15500lbs
-        rdf:type      voc:Category ;
-        voc:category  "Light (< 15500 lbs)" .
 
 owner:AerowaysGmbh  rdf:type  voc:Owner ;
         voc:owner  "Aeroways Gmbh" .
@@ -16523,9 +16528,6 @@ model:Nucleon29Orange
         voc:model     "Nucleon 29 Orange" ;
         voc:typecode  "PARA" .
 
-category:Reserved  rdf:type  voc:Category ;
-        voc:category  "Reserved" .
-
 aircraft:4400cb  rdf:type    voc:Aircraft ;
         voc:hasManufacturer  manufacturer:FOKKER ;
         voc:hasModel         model:FokkerF100 ;
@@ -16598,6 +16600,9 @@ aircraft:44474e  rdf:type    voc:Aircraft ;
         voc:hasRegistration  "OO-1ZN" ;
         voc:icao24           "44474e" ;
         voc:serialNumber     "P06851" .
+
+category:Reserved  rdf:type  voc:Category ;
+        voc:category  "Reserved" .
 
 model:RF1  rdf:type   voc:Model ;
         voc:model     "RF-1" ;
@@ -16892,10 +16897,6 @@ model:Kougar2  rdf:type  voc:Model ;
 model:Snake20  rdf:type  voc:Model ;
         voc:model     "Snake 20" ;
         voc:typecode  "PARA" .
-
-category:Ultralighthanggliderparaglider
-        rdf:type      voc:Category ;
-        voc:category  "Ultralight / hang-glider / paraglider" .
 
 model:C42Cyclone  rdf:type    voc:Model ;
         voc:icaoAircraftType  "L1P" ;
@@ -17774,10 +17775,6 @@ aircraft:44096b  rdf:type    voc:Aircraft ;
         voc:icao24           "44096b" ;
         voc:serialNumber     "5798" .
 
-category:Lighterthanair
-        rdf:type      voc:Category ;
-        voc:category  "Lighter-than-air" .
-
 model:WT9DynamicLSA  rdf:type  voc:Model ;
         voc:icaoAircraftType  "L1P" ;
         voc:model             "WT9 Dynamic LSA" ;
@@ -17965,6 +17962,10 @@ aircraft:4444d9  rdf:type    voc:Aircraft ;
         voc:hasRegistration  "OO-1FY" ;
         voc:icao24           "4444d9" ;
         voc:serialNumber     "T07618" .
+
+category:UnmannedAerialVehicle
+        rdf:type      voc:Category ;
+        voc:category  "Unmanned Aerial Vehicle" .
 
 model:HB212400Hobbylifter
         rdf:type      voc:Model ;
