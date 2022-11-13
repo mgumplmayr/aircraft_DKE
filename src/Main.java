@@ -17,11 +17,15 @@ import java.io.FileOutputStream;
 
 
 public class Main {
+    DataInitiator initiator;
+    String positionURI;
+    Model model;
 
     public static void main(String[] args) {
         DataInitiator initiator = new DataInitiator();
         JSONArray staticData = initiator.getStaticDataJSON();
-        JSONObject dynamicData = initiator.getDynamicData();
+
+
         //System.out.println(staticData);
         System.out.println("-------------------------------------------");
         //System.out.println(dynamicData);
@@ -170,6 +174,53 @@ public class Main {
 
         }
 
+        JSONObject dynamicData = initiator.getDynamicData();
+        JSONArray states = (JSONArray) dynamicData.get("states");
+        String time = dynamicData.get("time").toString();
+
+        for (int i = 0; i < states.size(); i++) {
+            JSONArray stateToAdd = (JSONArray) states.get(i);
+            String icao24Pos = String.valueOf(stateToAdd.get(0));
+            String callsign = String.valueOf(stateToAdd.get(1));
+            String originCountry = String.valueOf(stateToAdd.get(2));
+            String timePosition = String.valueOf(stateToAdd.get(3));
+            String lastContact = String.valueOf(stateToAdd.get(4));
+            String longitude = String.valueOf(stateToAdd.get(5));
+            String latitude = String.valueOf(stateToAdd.get(6));
+            String baroAltitude = String.valueOf(stateToAdd.get(7));
+            String onGround = String.valueOf(stateToAdd.get(8));
+            String velocity = String.valueOf(stateToAdd.get(9));
+            String trueTrack = String.valueOf(stateToAdd.get(10));
+            String verticalRate = String.valueOf(stateToAdd.get(11));
+            String sensors = String.valueOf(stateToAdd.get(12));
+            String geoAltitude = String.valueOf(stateToAdd.get(13));
+            String squawk = String.valueOf(stateToAdd.get(14));
+            String spi = String.valueOf(stateToAdd.get(15));
+            String positionSource = String.valueOf(stateToAdd.get(16));
+
+            String thisPositionURI = positionURI+icao24Pos + "_" + time; //TODO: Slash possible?
+            Resource positionToAdd = model.createResource(thisPositionURI)
+                    .addProperty(VOC.icao24, icao24Pos)
+                    .addProperty(RDF.type, VOC.position);
+
+            if (!callsign.isEmpty()) positionToAdd.addProperty(VOC.callsign, callsign);
+            if (!originCountry.isEmpty()) positionToAdd.addProperty(VOC.originCountry, originCountry);
+            if (!timePosition.isEmpty()) positionToAdd.addProperty(VOC.timePosition, timePosition);
+            if (!lastContact.isEmpty()) positionToAdd.addProperty(VOC.lastContact, lastContact);
+            if (!longitude.isEmpty()) positionToAdd.addProperty(VOC.longitude, longitude);
+            if (!latitude.isEmpty()) positionToAdd.addProperty(VOC.latitude, latitude);
+            if (!baroAltitude.isEmpty()) positionToAdd.addProperty(VOC.baroAltitude, baroAltitude);
+            if (!onGround.isEmpty()) positionToAdd.addProperty(VOC.onGround, onGround);
+            if (!velocity.isEmpty()) positionToAdd.addProperty(VOC.velocity, velocity);
+            if (!trueTrack.isEmpty()) positionToAdd.addProperty(VOC.trueTrack, trueTrack);
+            if (!verticalRate.isEmpty()) positionToAdd.addProperty(VOC.verticalRate, verticalRate);
+            if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
+            if (!geoAltitude.isEmpty()) positionToAdd.addProperty(VOC.geoAltitude, geoAltitude);
+            if (!squawk.isEmpty()) positionToAdd.addProperty(VOC.squawk, squawk);
+            if (!spi.isEmpty()) positionToAdd.addProperty(VOC.spi, spi);
+            if (!positionSource.isEmpty()) positionToAdd.addProperty(VOC.positionSource, positionSource);
+        }
+
         //write RDF to file
         final String OUTPUT_NAME = "staticRDF.ttl";
 
@@ -182,6 +233,8 @@ public class Main {
                 FileNotFoundException e) {
             e.printStackTrace();
         }
+
+
 
         //validate with SHACL
         System.out.println("Checking " + model.size() + " resources");
@@ -196,6 +249,12 @@ public class Main {
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
 
 
+
     }
+
+    public static void loadDynamicData(){
+        //dynamic data
+
+    };
 
 }
