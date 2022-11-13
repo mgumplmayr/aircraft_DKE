@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.nio.file.Paths;
 
 
 public class Main {
@@ -22,7 +21,7 @@ public class Main {
     public static void main(String[] args) {
         DataInitiator initiator = new DataInitiator();
         JSONArray staticData = initiator.getStaticDataJSON();
-        JSONArray dynamicData = initiator.getDynamicData();
+        JSONObject dynamicData = initiator.getDynamicData();
         //System.out.println(staticData);
         System.out.println("-------------------------------------------");
         //System.out.println(dynamicData);
@@ -50,8 +49,12 @@ public class Main {
         model.setNsPrefix("operator", operatorURI);
         String ownerURI = startURI + "owner/";
         model.setNsPrefix("owner", ownerURI);
-        String categoryURI = startURI + "Category/";
+        String categoryURI = startURI + "category/";
         model.setNsPrefix("category", categoryURI);
+
+        //create dynamic Aircraft Properties
+        String positionURI = startURI + "position/";
+        model.setNsPrefix("position", positionURI);
 
 
         for (Object o : staticData) {
@@ -194,4 +197,5 @@ public class Main {
 
 
     }
+
 }

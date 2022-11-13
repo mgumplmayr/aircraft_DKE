@@ -1,5 +1,5 @@
 @prefix aircraft:     <http://host/aircraft/> .
-@prefix category:     <http://host/Category/> .
+@prefix category:     <http://host/category/> .
 @prefix manufacturer: <http://host/manufacturer/> .
 @prefix model:        <http://host/model/> .
 @prefix operator:     <http://host/operator/> .
@@ -128,6 +128,7 @@ voc:JS_id_Shape  rdf:type  sh:NodeShape ;
         sh:targetClass  voc:JS_id .
 
 voc:aircraft_Shape  rdf:type  sh:NodeShape ;
+        sh:closed true;
         sh:property     [ sh:node  voc:owner_Shape ;
                           sh:path  voc:owner
                         ] ;
@@ -150,7 +151,7 @@ voc:aircraft_Shape  rdf:type  sh:NodeShape ;
                           sh:path      voc:registration
                         ] ;
         sh:property     [ sh:datatype   xsd:string ;
-                          sh:maxLength  6 ;
+                          sh:maxLength  1 ;
                           sh:minCount   1 ;
                           sh:minLength  6 ;
                           sh:path       voc:icao24
@@ -170,7 +171,7 @@ voc:aircraft_Shape  rdf:type  sh:NodeShape ;
         sh:property     [ sh:datatype  xsd:integer ;
                           sh:path      voc:firstflightdate
                         ] ;
-        sh:targetClass  voc:aircraft .
+        sh:targetClass  voc:Aircraft .
 
 voc:origincountry_Shape
         rdf:type        sh:NodeShape ;

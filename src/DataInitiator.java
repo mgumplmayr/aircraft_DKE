@@ -44,7 +44,7 @@ public class DataInitiator {
         return result;
     }
 
-    public JSONArray getDynamicData() {
+    public JSONObject getDynamicData() {
         try { //dynamische Daten
             URL url = new URL("https://opensky-network.org/api/states/all?lamin=46.3688&lomin=9.4897&lamax=49.0067&lomax=17.0987");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -52,19 +52,18 @@ public class DataInitiator {
             conn.connect(); //mit API verbinden
             int responseCode = conn.getResponseCode();
             if (responseCode != 200) throw new RuntimeException("HttpResponseCode: " + responseCode);
-            String data = "";
+            StringBuilder data = new StringBuilder();
             Scanner scanner = new Scanner(url.openStream()); //Stream von API verarbeiten
             while (scanner.hasNext()) {
-                data += scanner.nextLine();
+                data.append(scanner.nextLine());
             }
             scanner.close();
 
-            JSONParser parse = new JSONParser(); //String zu JSON parsen
-            JSONObject data_obj = (JSONObject) parse.parse(data);
+            JSONParser parser = new JSONParser(); //String zu JSON parsen
+            JSONObject dataObject = (JSONObject) parser.parse(String.valueOf(data));
 
-            JSONArray states = (JSONArray) data_obj.get("states"); //States der Flugzeuge ermitteln
-            //System.out.println(states);
-            return states;
+            System.out.println(dataObject);
+            return dataObject;
         } catch (Exception e) {
             System.out.println("Fehler beim laden der dynamischen Daten: ");
             e.printStackTrace();

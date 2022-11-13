@@ -41,6 +41,26 @@ public class VOC {
     public static final Property categoryDescription;
     public static final Property categoryDescriptionName;
 
+    //dynamic properties
+    public static final Property position;
+    public static final Property callsign;
+    public static final Property originCountry;
+    public static final Property timePosition;
+    public static final Property lastContact;
+    public static final Property longitude;
+    public static final Property latitude;
+    public static final Property baroAltitude;
+    public static final Property onGround;
+    public static final Property velocity;
+    public static final Property trueTrack;
+    public static final Property  verticalRate;
+    public static final Property sensors;
+    public static final Property geoAltitude;
+    public static final Property squawk;
+    public static final Property spi;
+    public static final Property positionSource;
+
+
     public VOC(){
 
     }
@@ -89,6 +109,26 @@ public class VOC {
         //Category Vocabulary
         categoryDescription = m.createProperty(vocabularyURI+"Category");
         categoryDescriptionName = m.createProperty(vocabularyURI+"category");
+
+        //Position Vocabulary
+        position = m.createProperty(vocabularyURI+"Position");
+        callsign= m.createProperty(vocabularyURI+"callsign");
+        originCountry= m.createProperty(vocabularyURI+"originCountry");
+        timePosition= m.createProperty(vocabularyURI+"timePosition");
+        lastContact= m.createProperty(vocabularyURI+"lastContact");
+        longitude= m.createProperty(vocabularyURI+"longitude");
+        latitude= m.createProperty(vocabularyURI+"latitude");
+        baroAltitude= m.createProperty(vocabularyURI+"baroAltitude");
+        onGround= m.createProperty(vocabularyURI+"onGround");
+        velocity= m.createProperty(vocabularyURI+"velocity");
+        trueTrack= m.createProperty(vocabularyURI+"trueTrack");
+        verticalRate= m.createProperty(vocabularyURI+"verticalRate");
+        sensors= m.createProperty(vocabularyURI+"sensors");
+        geoAltitude= m.createProperty(vocabularyURI+"geoAltitude");
+        squawk= m.createProperty(vocabularyURI+"squawk");
+        spi= m.createProperty(vocabularyURI+"spi");
+        positionSource= m.createProperty(vocabularyURI+"positionSource");
+
 
     }
 }
