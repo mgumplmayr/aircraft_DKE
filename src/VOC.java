@@ -59,6 +59,7 @@ public class VOC {
     public static final Property squawk;
     public static final Property spi;
     public static final Property positionSource;
+    public static final Property time;
 
 
     public VOC(){
@@ -128,6 +129,7 @@ public class VOC {
         squawk= m.createProperty(vocabularyURI+"squawk");
         spi= m.createProperty(vocabularyURI+"spi");
         positionSource= m.createProperty(vocabularyURI+"positionSource");
+        time = m.createProperty(vocabularyURI+"time");
 
 
     }

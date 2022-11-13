@@ -172,6 +172,8 @@ public class Main {
 
             aircraftToAdd.addProperty(VOC.hasCategoryDescription, categoryDescriptionToAdd);
 
+
+            //todo link positions (dynamic first, then static)
         }
 
         JSONObject dynamicData = initiator.getDynamicData();
@@ -198,11 +200,13 @@ public class Main {
             String spi = String.valueOf(stateToAdd.get(15));
             String positionSource = String.valueOf(stateToAdd.get(16));
 
-            String thisPositionURI = positionURI+icao24Pos + "_" + time; //TODO: Slash possible?
+            String thisPositionURI = positionURI + icao24Pos + "_" + time; //TODO: Slash possible?
             Resource positionToAdd = model.createResource(thisPositionURI)
                     .addProperty(VOC.icao24, icao24Pos)
-                    .addProperty(RDF.type, VOC.position);
+                    .addProperty(RDF.type, VOC.position)
+                    .addProperty(VOC.time, time);
 
+            //todo check for "null"
             if (!callsign.isEmpty()) positionToAdd.addProperty(VOC.callsign, callsign);
             if (!originCountry.isEmpty()) positionToAdd.addProperty(VOC.originCountry, originCountry);
             if (!timePosition.isEmpty()) positionToAdd.addProperty(VOC.timePosition, timePosition);
@@ -235,7 +239,6 @@ public class Main {
         }
 
 
-
         //validate with SHACL
         System.out.println("Checking " + model.size() + " resources");
         Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
@@ -249,12 +252,13 @@ public class Main {
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
 
 
+    }
+
+    public static void loadDynamicData() {
+        //dynamic data
 
     }
 
-    public static void loadDynamicData(){
-        //dynamic data
-
-    };
+    ;
 
 }
