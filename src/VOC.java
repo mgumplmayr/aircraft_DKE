@@ -20,6 +20,7 @@ public class VOC {
     public static final Property hasOperator;
     public static final Property hasOwner;
     public static final Property hasCategoryDescription;
+    public static final Property hasPosition;
 
     public static final Property manufacturer;
     public static final Property manufacturerIcao;
@@ -83,6 +84,7 @@ public class VOC {
         hasOperator = m.createProperty(vocabularyURI + "hasOperator");
         hasOwner = m.createProperty(vocabularyURI + "hasOwner");
         hasCategoryDescription = m.createProperty(vocabularyURI + "hasCategoryDescription");
+        hasPosition = m.createProperty(vocabularyURI+"hasPosition");
 
         //Manufacturer vocabulary
         manufacturer = m.createProperty(vocabularyURI+"Manufacturer");

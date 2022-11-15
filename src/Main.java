@@ -1,6 +1,7 @@
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -17,50 +18,104 @@ import java.io.FileOutputStream;
 
 
 public class Main {
-    DataInitiator initiator;
-    String positionURI;
-    Model model;
+    static DataInitiator initiator = new DataInitiator();
+    //create model
+    static Model model = ModelFactory.createDefaultModel();
+
+    //define general URIS
+    static final String startURI = "http://example.org/";
+
+
+    static         String aircraftURI = startURI + "aircraft/";
+
+    static String manufacturerURI = startURI + "manufacturer/";
+    static String modelURI = startURI + "model/";
+    static String operatorURI = startURI + "operator/";
+    static String ownerURI = startURI + "owner/";
+    static String categoryURI = startURI + "category/";
+    static String positionURI = startURI + "position/";
+
 
     public static void main(String[] args) {
-        DataInitiator initiator = new DataInitiator();
-        JSONArray staticData = initiator.getStaticDataJSON();
 
-
-        //System.out.println(staticData);
-        System.out.println("-------------------------------------------");
-        //System.out.println(dynamicData);
-
-        //JSONObject x = (JSONObject) staticData.get(3);
-        //System.out.println(x.get("icao24"));
-
-        //create RDF Model
-        Model model = ModelFactory.createDefaultModel();
-
-        //define general URIS
-        String startURI = "http://example.org/";
+        //create vocabulary prefixes
         model.setNsPrefix("voc", VOC.getURI());
         model.setNsPrefix("rdf", RDF.getURI());
 
-
-        //create static Aircraft Properties
-        String aircraftURI = startURI + "aircraft/";
+        //create static Aircraft Prefixes
         model.setNsPrefix("aircraft", aircraftURI);
-        String manufacturerURI = startURI + "manufacturer/";
         model.setNsPrefix("manufacturer", manufacturerURI);
-        String modelURI = startURI + "model/";
         model.setNsPrefix("model", modelURI);
-        String operatorURI = startURI + "operator/";
         model.setNsPrefix("operator", operatorURI);
-        String ownerURI = startURI + "owner/";
         model.setNsPrefix("owner", ownerURI);
-        String categoryURI = startURI + "category/";
         model.setNsPrefix("category", categoryURI);
 
-        //create dynamic Aircraft Properties
-        String positionURI = startURI + "position/";
+        //create dynamic Aircraft Prefixes
         model.setNsPrefix("position", positionURI);
 
+        loadDynamicData();
+        loadStaticData();
+        linkPositions();
 
+
+        //todo link positions (dynamic first, then static)
+
+        //write RDF to file
+        final String OUTPUT_NAME = "staticRDF.ttl";
+
+        try {
+            System.out.println("Printing " + model.size() + " resources");
+            model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+            System.out.println("---------------------------------------");
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        //validate with SHACL
+        System.out.println("Checking " + model.size() + " resources");
+        Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
+        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+
+
+        Shapes shape = Shapes.parse(shapeGraph);
+        ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
+        System.out.println("---------------------------------------");
+        ShLib.printReport(report);
+        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+
+
+    }
+
+    private static void linkPositions() {
+        System.out.println("Linking Positions");
+        ResIterator positionIterator = model.listSubjectsWithProperty(RDF.type, VOC.position);
+        int positionCounter = 0;
+        int linkedCounter = 0;
+        while (positionIterator.hasNext()) {
+            Resource pos = positionIterator.nextResource();
+
+            ResIterator aircraftIterator = model.listSubjectsWithProperty(RDF.type, VOC.aircraft);
+            while (aircraftIterator.hasNext()) {
+                Resource aircraft = aircraftIterator.nextResource();
+                if (pos.getProperty(VOC.icao24).toString().equals(aircraft.getProperty(VOC.icao24).toString())) {
+                    aircraft.addProperty(VOC.hasPosition, pos);
+                    System.out.println("Aircraft: " + aircraft.getURI() + "linked");
+                    linkedCounter++;
+
+                }
+            }
+            positionCounter++;
+        }
+        System.out.println(positionCounter + " Positions available");
+        System.out.println(linkedCounter + " Positions linked");
+    }
+
+    private static void loadStaticData() {
+        System.out.println("Loading Static Data");
+        JSONArray staticData = initiator.getStaticDataJSON();
         for (Object o : staticData) {
             JSONObject aircraft = (JSONObject) o;
 
@@ -173,15 +228,18 @@ public class Main {
             aircraftToAdd.addProperty(VOC.hasCategoryDescription, categoryDescriptionToAdd);
 
 
-            //todo link positions (dynamic first, then static)
         }
+        System.out.println("Static Data loaded");
+    }
 
+    private static void loadDynamicData() {
+        System.out.println("Loading Dynamic Data");
         JSONObject dynamicData = initiator.getDynamicData();
         JSONArray states = (JSONArray) dynamicData.get("states");
         String time = dynamicData.get("time").toString();
 
-        for (int i = 0; i < states.size(); i++) {
-            JSONArray stateToAdd = (JSONArray) states.get(i);
+        for (Object state : states) {
+            JSONArray stateToAdd = (JSONArray) state;
             String icao24Pos = String.valueOf(stateToAdd.get(0));
             String callsign = String.valueOf(stateToAdd.get(1));
             String originCountry = String.valueOf(stateToAdd.get(2));
@@ -200,7 +258,7 @@ public class Main {
             String spi = String.valueOf(stateToAdd.get(15));
             String positionSource = String.valueOf(stateToAdd.get(16));
 
-            String thisPositionURI = positionURI + icao24Pos + "_" + time; //TODO: Slash possible?
+            String thisPositionURI = positionURI + icao24Pos + "_" + time;
             Resource positionToAdd = model.createResource(thisPositionURI)
                     .addProperty(VOC.icao24, icao24Pos)
                     .addProperty(RDF.type, VOC.position)
@@ -224,41 +282,7 @@ public class Main {
             if (!spi.isEmpty()) positionToAdd.addProperty(VOC.spi, spi);
             if (!positionSource.isEmpty()) positionToAdd.addProperty(VOC.positionSource, positionSource);
         }
-
-        //write RDF to file
-        final String OUTPUT_NAME = "staticRDF.ttl";
-
-        try {
-            System.out.println("Printing " + model.size() + " resources");
-            model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
-            System.out.println("Printed to: " + OUTPUT_NAME);
-            System.out.println("---------------------------------------");
-        } catch (
-                FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-        //validate with SHACL
-        System.out.println("Checking " + model.size() + " resources");
-        Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
-        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
-
-
-        Shapes shape = Shapes.parse(shapeGraph);
-        ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
-        System.out.println("---------------------------------------");
-        ShLib.printReport(report);
-        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
-
-
+        System.out.println("Dynamic Data Loaded");
     }
-
-    public static void loadDynamicData() {
-        //dynamic data
-
-    }
-
-    ;
 
 }
