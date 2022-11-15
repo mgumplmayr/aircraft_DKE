@@ -46,7 +46,8 @@ public class DataInitiator {
 
     public JSONObject getDynamicData() {
         try { //dynamische Daten
-            URL url = new URL("https://opensky-network.org/api/states/all?lamin=46.3688&lomin=9.4897&lamax=49.0067&lomax=17.0987");
+            //URL url = new URL("https://opensky-network.org/api/states/all?lamin=46.3688&lomin=9.4897&lamax=49.0067&lomax=17.0987");
+            URL url = new URL("https://opensky-network.org/api/states/all?lamin=46.3688&lomin=5.4897&lamax=50.0067&lomax=17.0987");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect(); //mit API verbinden
@@ -62,7 +63,7 @@ public class DataInitiator {
             JSONParser parser = new JSONParser(); //String zu JSON parsen
             JSONObject dataObject = (JSONObject) parser.parse(String.valueOf(data));
 
-            System.out.println(dataObject);
+            //System.out.println(dataObject);
             return dataObject;
         } catch (Exception e) {
             System.out.println("Fehler beim laden der dynamischen Daten: ");

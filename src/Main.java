@@ -91,7 +91,7 @@ public class Main {
 
     private static void linkPositions() {
         System.out.println("Linking Positions");
-        ResIterator positionIterator = model.listSubjectsWithProperty(RDF.type, VOC.position);
+        ResIterator positionIterator = model.listSubjectsWithProperty(RDF.type, VOC.position); //todo: only iterate over positions in current dynamic data load cycle (timestamp), add function into loadDynamicData to get timestamp
         int positionCounter = 0;
         int linkedCounter = 0;
         while (positionIterator.hasNext()) {
@@ -100,9 +100,10 @@ public class Main {
             ResIterator aircraftIterator = model.listSubjectsWithProperty(RDF.type, VOC.aircraft);
             while (aircraftIterator.hasNext()) {
                 Resource aircraft = aircraftIterator.nextResource();
-                if (pos.getProperty(VOC.icao24).toString().equals(aircraft.getProperty(VOC.icao24).toString())) {
+                //System.out.println("pos: "+ pos.getProperty(VOC.icao24).getObject().toString() + "  Aircraft: " + aircraft.getProperty(VOC.icao24).getObject().toString());
+                if (pos.getProperty(VOC.icao24).getObject().equals(aircraft.getProperty(VOC.icao24).getObject())) {
                     aircraft.addProperty(VOC.hasPosition, pos);
-                    System.out.println("Aircraft: " + aircraft.getURI() + "linked");
+                    System.out.println("Aircraft: " + aircraft.getURI() + " linked");
                     linkedCounter++;
 
                 }
