@@ -19,7 +19,7 @@ public class VOC {
     public static final Property hasModel;
     public static final Property hasOperator;
     public static final Property hasOwner;
-    public static final Property hasCategoryDescription;
+    public static final Property hasCategory;
     public static final Property hasPosition;
 
     public static final Property manufacturer;
@@ -39,8 +39,8 @@ public class VOC {
     public static final Property operatorIata;
     public static final Property owner;
     public static final Property ownerName;
+    public static final Property category;
     public static final Property categoryDescription;
-    public static final Property categoryDescriptionName;
 
     //dynamic properties
     public static final Property position;
@@ -83,7 +83,7 @@ public class VOC {
         hasModel = m.createProperty(vocabularyURI + "hasModel");
         hasOperator = m.createProperty(vocabularyURI + "hasOperator");
         hasOwner = m.createProperty(vocabularyURI + "hasOwner");
-        hasCategoryDescription = m.createProperty(vocabularyURI + "hasCategoryDescription");
+        hasCategory = m.createProperty(vocabularyURI + "hasCategory");
         hasPosition = m.createProperty(vocabularyURI+"hasPosition");
 
         //Manufacturer vocabulary
@@ -110,8 +110,8 @@ public class VOC {
         ownerName = m.createProperty(vocabularyURI+"owner");
 
         //Category Vocabulary
-        categoryDescription = m.createProperty(vocabularyURI+"Category");
-        categoryDescriptionName = m.createProperty(vocabularyURI+"category");
+        category = m.createProperty(vocabularyURI+"Category");
+        categoryDescription = m.createProperty(vocabularyURI+"category");
 
         //Position Vocabulary
         position = m.createProperty(vocabularyURI+"Position");

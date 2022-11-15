@@ -26,7 +26,7 @@ public class Main {
     static final String startURI = "http://example.org/";
 
 
-    static         String aircraftURI = startURI + "aircraft/";
+    static String aircraftURI = startURI + "aircraft/";
 
     static String manufacturerURI = startURI + "manufacturer/";
     static String modelURI = startURI + "model/";
@@ -53,12 +53,9 @@ public class Main {
         //create dynamic Aircraft Prefixes
         model.setNsPrefix("position", positionURI);
 
-        loadDynamicData();
+        //loadDynamicData();
         loadStaticData();
-        linkPositions();
-
-
-        //todo link positions (dynamic first, then static)
+        //linkPositions();
 
         //write RDF to file
         final String OUTPUT_NAME = "staticRDF.ttl";
@@ -105,7 +102,6 @@ public class Main {
                     aircraft.addProperty(VOC.hasPosition, pos);
                     System.out.println("Aircraft: " + aircraft.getURI() + " linked");
                     linkedCounter++;
-
                 }
             }
             positionCounter++;
@@ -159,7 +155,7 @@ public class Main {
 
             //create aircraft resource
             Resource aircraftToAdd = model.createResource(thisAircraftURI)
-                    .addProperty(VOC.icao24, thisIcao24)
+                    .addLiteral(VOC.icao24, thisIcao24)
                     .addProperty(RDF.type, VOC.aircraft);
             if (!thisRegistration.isEmpty())
                 aircraftToAdd.addProperty(VOC.registration, thisRegistration); //TODO: Hier addProperty oder addLiteral?
@@ -219,14 +215,14 @@ public class Main {
             aircraftToAdd.addProperty(VOC.hasOwner, ownerToAdd);
 
             //create category resource
-            Resource categoryDescriptionToAdd;
+            Resource categoryDescriptionToAdd; //todo: rebuild to category (with numbers from API)
             if (!thisCategoryDescription.isEmpty()) categoryDescriptionToAdd = model.createResource(thisCategoryURI)
-                    .addProperty(VOC.categoryDescriptionName, thisCategoryDescription);
+                    .addProperty(VOC.categoryDescription, thisCategoryDescription);
             else categoryDescriptionToAdd = model.createResource();
 
-            categoryDescriptionToAdd.addProperty(RDF.type, VOC.categoryDescription);
+            categoryDescriptionToAdd.addProperty(RDF.type, VOC.category);
 
-            aircraftToAdd.addProperty(VOC.hasCategoryDescription, categoryDescriptionToAdd);
+            aircraftToAdd.addProperty(VOC.hasCategory, categoryDescriptionToAdd);
 
 
         }

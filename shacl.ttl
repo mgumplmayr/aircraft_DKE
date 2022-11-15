@@ -1,193 +1,163 @@
-@prefix aircraft:     <http://host/aircraft/> .
-@prefix category:     <http://host/category/> .
-@prefix manufacturer: <http://host/manufacturer/> .
-@prefix model:        <http://host/model/> .
-@prefix operator:     <http://host/operator/> .
-@prefix owner:        <http://host/owner/> .
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix position:     <http://example.org/position/> .
 @prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
 @prefix sh:           <http://www.w3.org/ns/shacl#> .
-@prefix voc:          <http://host/vocabulary#> .
-@prefix xsd:          <http://www.w3.org/2001/XMLSchena#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 
-voc:model_Shape  rdf:type  sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:engines
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:icaoaircrafttype
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:typecode
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:model
-                        ] ;
-        sh:targetClass  voc:model .
+voc:aircraft_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:IRI ;
+    sh:targetClass voc:Aircraft ;
+    sh:property    [ sh:node     voc:owner_Shape ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:hasOwner ] ;
+    sh:property    [ sh:node     voc:category_Shape ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:hasCategory ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:serialnumber ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:registered ] ;
+    sh:property    [ sh:node     voc:operator_Shape ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:hasOperator ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:built ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:registration ] ;
+    sh:property    [ sh:datatype  xsd:string ;
+                     sh:maxLength 6 ;
+                     sh:minCount  1 ;
+                     sh:maxCount  1 ;
+                     sh:minLength 6 ;
+                     sh:path      voc:icao24 ] ;
+    sh:property    [ sh:node     voc:manufacturer_Shape ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:hasManufacturer ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:linenumber ] ;
+    sh:property    [ sh:node voc:position_Shape ;
+                     sh:path voc:hasPosition ] ;
+    sh:property    [ sh:node     voc:model_Shape ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:hasModel ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:firstflightdate ] ;
+.
 
-voc:owner_Shape  rdf:type  sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:owner
-                        ] ;
-        sh:targetClass  voc:owner .
+voc:model_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:engines ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:icaoaircrafttype ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:typecode ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:model ] ;
+    sh:targetClass voc:Model .
 
-voc:categoryDescription_Shape
-        rdf:type        sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:categoryDescription
-                        ] ;
-        sh:targetClass  voc:categoryDescription .
+voc:owner_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:owner ] ;
+    sh:targetClass voc:Owner .
 
-voc:operator_Shape  rdf:type  sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:operatoriata
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:operatorcallsign
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:operator
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:operatoricao
-                        ] ;
-        sh:targetClass  voc:operator .
+voc:category_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:category ] ;
+    sh:targetClass voc:Category .
+
+voc:operator_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:operatoriata ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:operatorcallsign ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:operator ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:operatoricao ] ;
+    sh:targetClass voc:Operator .
 
 voc:positionsource_Shape
-        rdf:type        sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:description
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:minCount  1 ;
-                          sh:path      voc:id
-                        ] ;
-        sh:targetClass  voc:positionsource .
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind     sh:IRI;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:description ] ;
+    sh:property    [ sh:datatype xsd:integer ;
+                     sh:minCount 1 ;
+                     sh:path     voc:id ] ;
+    sh:targetClass voc:Positionsource ;
+    sh:deactivated true .
 
-voc:aircraftposition_Shape
-        rdf:type        sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:callsign
-                        ] ;
-        sh:property     [ sh:node  voc:positionsource_Shape ;
-                          sh:path  voc:positionsource
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:squawk
-                        ] ;
-        sh:property     [ sh:node  voc:origincountry_Shape ;
-                          sh:path  voc:origincountry
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:truetrack
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:icao24
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:baroaltitude
-                        ] ;
-        sh:property     [ sh:datatype  xsd:boolean ;
-                          sh:path      voc:onground
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      voc:lastcontact
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:longitude
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:verticalrate
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:latitude
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:geoaltitude
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      voc:timeposition
-                        ] ;
-        sh:property     [ sh:datatype  xsd:boolean ;
-                          sh:path      voc:spi
-                        ] ;
-        sh:property     [ sh:datatype  xsd:decimal ;
-                          sh:path      voc:velocity
-                        ] ;
-        sh:targetClass  voc:aircraftposition .
-
-voc:JS_id_Shape  rdf:type  sh:NodeShape ;
-        sh:property     [ sh:minCount  1 ;
-                          sh:node      voc:aircraft_Shape ;
-                          sh:path      voc:aircraft
-                        ] ;
-        sh:targetClass  voc:JS_id .
-
-voc:aircraft_Shape  rdf:type  sh:NodeShape ;
-        sh:closed true;
-        sh:property     [ sh:node  voc:owner_Shape ;
-                          sh:path  voc:owner
-                        ] ;
-        sh:property     [ sh:node  voc:categoryDescription_Shape ;
-                          sh:path  voc:categoryDescription
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:serialnumber
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      voc:registered
-                        ] ;
-        sh:property     [ sh:node  voc:operator_Shape ;
-                          sh:path  voc:operator
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      voc:built
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:registration
-                        ] ;
-        sh:property     [ sh:datatype   xsd:string ;
-                          sh:maxLength  1 ;
-                          sh:minCount   1 ;
-                          sh:minLength  6 ;
-                          sh:path       voc:icao24
-                        ] ;
-        sh:property     [ sh:node  voc:manufacturer_Shape ;
-                          sh:path  voc:manufacturer
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:linenumber
-                        ] ;
-        sh:property     [ sh:node  voc:aircraftposition_Shape ;
-                          sh:path  voc:aircraftposition
-                        ] ;
-        sh:property     [ sh:node  voc:model_Shape ;
-                          sh:path  voc:model
-                        ] ;
-        sh:property     [ sh:datatype  xsd:integer ;
-                          sh:path      voc:firstflightdate
-                        ] ;
-        sh:targetClass  voc:Aircraft .
+voc:position_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind     sh:IRI;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:callsign ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:squawk ] ;
+    sh:property    [ sh:node voc:origincountry_Shape ;
+                     sh:path voc:origincountry ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:truetrack ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
+                     sh:path     voc:icao24 ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:baroaltitude ] ;
+    sh:property    [ sh:datatype xsd:boolean ;
+                     sh:path     voc:onground ] ;
+    sh:property    [ sh:datatype xsd:integer ;
+                     sh:path     voc:lastcontact ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:longitude ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:verticalrate ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:latitude ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:geoaltitude ] ;
+    sh:property    [ sh:datatype xsd:integer ;
+                     sh:path     voc:timeposition ] ;
+    sh:property    [ sh:datatype xsd:boolean ;
+                     sh:path     voc:spi ] ;
+    sh:property    [ sh:datatype xsd:decimal ;
+                     sh:path     voc:velocity ] ;
+    sh:targetClass voc:Position ;
+    sh:deactivated true .
 
 voc:origincountry_Shape
-        rdf:type        sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:name
-                        ] ;
-        sh:targetClass  voc:origincountry .
+    rdf:type       sh:NodeShape ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
+                     sh:path     voc:name ] ;
+    sh:targetClass voc:origincountry ;
+    sh:deactivated true .
 
 voc:manufacturer_Shape
-        rdf:type        sh:NodeShape ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:path      voc:manufacturername
-                        ] ;
-        sh:property     [ sh:datatype  xsd:string ;
-                          sh:minCount  1 ;
-                          sh:path      voc:manufacturericao
-                        ] ;
-        sh:targetClass  voc:manufacturer .
+    rdf:type       sh:NodeShape ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:path     voc:manufacturername ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
+                     sh:path     voc:manufacturericao ] ;
+    sh:targetClass voc:manufacturer ;
+    sh:deactivated true .
