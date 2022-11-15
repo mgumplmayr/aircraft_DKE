@@ -243,7 +243,7 @@ public class Main {
             JSONArray stateToAdd = (JSONArray) state;
             String icao24Pos = String.valueOf(stateToAdd.get(0));
             String callsign = String.valueOf(stateToAdd.get(1));
-            String originCountry = String.valueOf(stateToAdd.get(2));
+            String originCountry = String.valueOf(stateToAdd.get(2)); //todo: implement in voc:aircraft? (UML)
             String timePosition = String.valueOf(stateToAdd.get(3));
             String lastContact = String.valueOf(stateToAdd.get(4));
             String longitude = String.valueOf(stateToAdd.get(5));
