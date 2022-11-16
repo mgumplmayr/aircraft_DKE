@@ -3,6 +3,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
@@ -83,6 +85,14 @@ public class Main {
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
 
+        //upload to Fuseki
+        System.out.println("---------------------------------------");
+        String connectionURL = "http://localhost:3030/aircraft/";
+        System.out.println("Uploading file "+OUTPUT_NAME+" to endpoint "+connectionURL);
+        try (RDFConnection conn = RDFConnectionFactory.connect(connectionURL)) {
+            conn.put(OUTPUT_NAME);
+        }
+        System.out.println("Upload complete");
 
     }
 
