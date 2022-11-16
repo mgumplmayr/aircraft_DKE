@@ -1756,13 +1756,13 @@ icao24,registration,manufacturericao,manufacturername,model,typecode,serialnumbe
 44013a,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Light (< 15500 lbs)
 447c9d,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,No ADS-B Emitter Category Information
 4407de,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Ultralight / hang-glider / paraglider
-447c51,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Surface Vehicle – Emergency Vehicle
+447c51,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Surface Vehicle ï¿½ Emergency Vehicle
 440096,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Large (75000 to 300000 lbs)
 4403f9,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Light (< 15500 lbs)
 4400d6,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,No ADS-B Emitter Category Information
 440192,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Small (15500 to 75000 lbs)
 447c8a,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,No ADS-B Emitter Category Information
-4478bc,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Surface Vehicle – Service Vehicle
+4478bc,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Surface Vehicle ï¿½ Service Vehicle
 4409c2,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Light (< 15500 lbs)
 440bc6,OE-LNJ,BOEING,,,B752,,,L2J,European Air Transport,EUROTRANS,BCS,QY,,,,,,,,,,FALSCH,FALSCH,FALSCH,,
 440ca9,,,,,,,,,,,,,,,,,,,,,,FALSCH,FALSCH,FALSCH,,Large (75000 to 300000 lbs)

@@ -1,0 +1,51 @@
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+
+
+aircraft:44088b
+    rdf:type                   voc:Aircraft ;
+    voc:hasCategoryDescription category:NoADSBEmitterCategoryInformation ;
+    voc:icao24                 "440389" .
+
+aircraft:440959
+    rdf:type                   voc:Aircraft ;
+    voc:hasCategoryDescription [ rdf:type voc:Category ] ;
+    voc:hasManufacturer        manufacturer:PIPER ;
+    voc:hasModel               model:PA32301TTurboSaratoga ;
+    voc:hasOperator            [ rdf:type voc:Operator ] ;
+    voc:hasOwner               owner:Private ;
+    voc:hasRegistration        "OE-KAT" ;
+    voc:icao24                 "440959" ;
+    voc:serialNumber           "32-8024011" .
+
+aircraft:440769
+    rdf:type                   voc:Aircraft ;
+    voc:hasCategoryDescription [ rdf:type voc:Category ] ;
+    voc:hasManufacturer        manufacturer:HARBIN ;
+    voc:hasModel               model:EC120BColibri ;
+    voc:hasOperator            [ rdf:type voc:Operator ] ;
+    voc:hasOwner               owner:Private ;
+    voc:hasRegistration        "OE-XAA" ;
+    voc:icao24                 "440769" ;
+    voc:serialNumber           "1045" .
+
+aircraft:440389
+    rdf:type                   voc:Aircraft ;
+    voc:hasCategoryDescription category:NoADSBEmitterCategoryInformation ;
+    voc:hasManufacturer        manufacturer:AEROTREK ;
+    voc:hasModel               model:EuroFox ;
+    voc:hasOperator            [ rdf:type voc:Operator ] ;
+    voc:hasOwner               owner:Private ;
+    voc:hasRegistration        "OE-7120" ;
+    voc:icao24                 "440389" ;
+    voc:serialNumber           "25308" .
+
+owner:Private rdf:type voc:Owner;
+              voc:owner  "Private" .

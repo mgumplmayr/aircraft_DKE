@@ -5,6 +5,8 @@ import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFactory;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
@@ -37,6 +39,7 @@ public class Main {
     static String categoryURI = startURI + "category/";
     static String positionURI = startURI + "position/";
 
+    static final String OUTPUT_NAME = "staticRDF.ttl";
 
     public static void main(String[] args) {
 
@@ -60,19 +63,31 @@ public class Main {
         //linkPositions();
 
         //write RDF to file
-        final String OUTPUT_NAME = "staticRDF.ttl";
+        writeRDF();
+        //validateData();
+        uploadGraph();
 
-        try {
-            System.out.println("Printing " + model.size() + " resources");
-            model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
-            System.out.println("Printed to: " + OUTPUT_NAME);
-            System.out.println("---------------------------------------");
-        } catch (
-                FileNotFoundException e) {
-            e.printStackTrace();
+    }
+
+    private static void uploadGraph() {
+        //upload to Fuseki
+        System.out.println("---------------------------------------");
+        String connectionURL = "http://localhost:3030/aircraft/";
+        System.out.println("Uploading file " + OUTPUT_NAME + " to endpoint " + connectionURL);
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(connectionURL);
+
+        try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
+            conn.delete();
+            conn.delete("http://example.org/aircraft/testSet");
+            conn.put(model); // put -> set content, load -> add/append
+            conn.put("http://example.org/aircraft/testSet","testRDF.ttl");
+            conn.load("http://example.org/aircraft/testSett","testRDF.ttl");
+
         }
+        System.out.println("Upload complete");
+    }
 
-
+    private static void validateData() {
         //validate with SHACL
         System.out.println("Checking " + model.size() + " resources");
         Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
@@ -84,16 +99,18 @@ public class Main {
         System.out.println("---------------------------------------");
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+    }
 
-        //upload to Fuseki
-        System.out.println("---------------------------------------");
-        String connectionURL = "http://localhost:3030/aircraft/";
-        System.out.println("Uploading file "+OUTPUT_NAME+" to endpoint "+connectionURL);
-        try (RDFConnection conn = RDFConnectionFactory.connect(connectionURL)) {
-            conn.put(OUTPUT_NAME);
+    private static void writeRDF() {
+        try {
+            System.out.println("Printing " + model.size() + " resources");
+            model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+            System.out.println("---------------------------------------");
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
         }
-        System.out.println("Upload complete");
-
     }
 
     private static void linkPositions() {
