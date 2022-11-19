@@ -4,12 +4,11 @@ import org.apache.jena.query.DatasetFactory;
 
 public class FusekiInitiator {
 
-    public void start(){
+    public void start(Dataset ds){
         System.out.println("Starting Fuseki Server");
-        Dataset ds = DatasetFactory.createTxnMem();
-        FusekiServer server = FusekiServer.create()
-                .port(3333)
-                .add("/rdf", ds)
+                FusekiServer server = FusekiServer.create()
+                .port(3030)
+                .add("/aircraft", ds)
                 .build() ;
         server.start() ;
         System.out.println("Fuseki Server started");

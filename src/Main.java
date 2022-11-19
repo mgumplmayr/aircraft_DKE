@@ -17,8 +17,11 @@ import org.apache.jena.vocabulary.RDF;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.Buffer;
+import java.util.concurrent.TimeUnit;
 
 
 public class Main {
@@ -28,7 +31,6 @@ public class Main {
 
     //define general URIS
     static final String startURI = "http://example.org/";
-
 
     static String aircraftURI = startURI + "aircraft/";
 
@@ -42,6 +44,8 @@ public class Main {
     static final String OUTPUT_NAME = "staticRDF.ttl";
 
     public static void main(String[] args) {
+        //starting fuseki
+        runFuseki();
 
         //create vocabulary prefixes
         model.setNsPrefix("voc", VOC.getURI());
@@ -65,8 +69,37 @@ public class Main {
         //write RDF to file
         writeRDF();
         //validateData();
+
+        //upload Graph to Fuseki
         uploadGraph();
 
+        //opening Dataset in Browser
+        openDatasetQuery();
+
+
+    }
+
+    private static void openDatasetQuery(){
+
+        URI uri = null;
+        try {
+            uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
+            java.awt.Desktop.getDesktop().browse(uri);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void runFuseki(){
+        try{
+            Runtime r = Runtime.getRuntime();
+            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd src\\fuseki && start fuseki-server.bat\" ");
+            TimeUnit.SECONDS.sleep(3);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     private static void uploadGraph() {
@@ -77,12 +110,9 @@ public class Main {
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(connectionURL);
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.delete();
-            conn.delete("http://example.org/aircraft/testSet");
             conn.put(model); // put -> set content, load -> add/append
             conn.put("http://example.org/aircraft/testSet","testRDF.ttl");
             conn.load("http://example.org/aircraft/testSett","testRDF.ttl");
-
         }
         System.out.println("Upload complete");
     }
@@ -92,7 +122,6 @@ public class Main {
         System.out.println("Checking " + model.size() + " resources");
         Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
-
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
