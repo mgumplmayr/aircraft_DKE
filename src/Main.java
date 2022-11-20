@@ -68,7 +68,7 @@ public class Main {
 
         //write RDF to file
         writeRDF();
-        //validateData();
+        validateData();
 
         //upload Graph to Fuseki
         //uploadGraph();
@@ -308,8 +308,8 @@ public class Main {
                 aircraftToAdd.addProperty(VOC.hasCategory, noCategory);
             }
 
-
         }
+
         System.out.println("Static Data loaded");
     }
 
