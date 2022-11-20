@@ -4,7 +4,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.Lang;
@@ -14,20 +13,20 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.Buffer;
 import java.util.concurrent.TimeUnit;
 
 
 public class Main {
     static DataInitiator initiator = new DataInitiator();
     //create model
-    static Model model = ModelFactory.createDefaultModel();
+    static Model staticModel = ModelFactory.createDefaultModel();
+    static Model dynamicModel = ModelFactory.createDefaultModel();
 
     //define general URIS
     static final String startURI = "http://example.org/";
@@ -41,37 +40,47 @@ public class Main {
     static String categoryURI = startURI + "category/";
     static String positionURI = startURI + "position/";
 
-    static final String OUTPUT_NAME = "staticRDF.ttl";
+    static final String OUTPUT_NAME = "RDFData.ttl";
+    static final String connectionURL = "http://localhost:3030/aircraft/";
+    static String dynamicModelTime;
 
     public static void main(String[] args) {
         //starting fuseki
         //runFuseki();
 
         //create vocabulary prefixes
-        model.setNsPrefix("voc", VOC.getURI());
-        model.setNsPrefix("rdf", RDF.getURI());
+        staticModel.setNsPrefix("voc", VOC.getURI());
+        staticModel.setNsPrefix("rdf", RDF.getURI());
+        staticModel.setNsPrefix("xsd", XSD.getURI());
+
+        dynamicModel.setNsPrefix("voc", VOC.getURI());
+        dynamicModel.setNsPrefix("rdf", RDF.getURI());
+        dynamicModel.setNsPrefix("xsd", XSD.getURI());
 
         //create static Aircraft Prefixes
-        model.setNsPrefix("aircraft", aircraftURI);
-        model.setNsPrefix("manufacturer", manufacturerURI);
-        model.setNsPrefix("model", modelURI);
-        model.setNsPrefix("operator", operatorURI);
-        model.setNsPrefix("owner", ownerURI);
-        model.setNsPrefix("category", categoryURI);
+        staticModel.setNsPrefix("aircraft", aircraftURI);
+        staticModel.setNsPrefix("manufacturer", manufacturerURI);
+        staticModel.setNsPrefix("model", modelURI);
+        staticModel.setNsPrefix("operator", operatorURI);
+        staticModel.setNsPrefix("owner", ownerURI);
+        staticModel.setNsPrefix("category", categoryURI);
 
         //create dynamic Aircraft Prefixes
-        model.setNsPrefix("position", positionURI);
+        dynamicModel.setNsPrefix("position", positionURI);
+        dynamicModel.setNsPrefix("aircraft", aircraftURI);
 
-        //loadDynamicData();
+        //load data into models
         loadStaticData();
-        //linkPositions();
+        loadDynamicData();
+
+        //validate models
+        validateData();
 
         //write RDF to file
         writeRDF();
-        validateData();
 
-        //upload Graph to Fuseki
-        //uploadGraph();
+        //upload both Graphs to Fuseki
+        uploadGraph();
 
         //opening Dataset in Browser
         //openDatasetQuery();
@@ -94,32 +103,47 @@ public class Main {
     private static void runFuseki() { //fuseki in src? why 2 cmd windows?
         try {
             Runtime r = Runtime.getRuntime();
-            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd src\\fuseki && start fuseki-server.bat\" ");
+            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd apache-jena-fuseki-4.6.1 && start fuseki-server.bat\" ");
             TimeUnit.SECONDS.sleep(3);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void uploadGraph() { //todo upload static graph to aircraft default, make new graph for dynamic data with uri of timestamp
+    private static void uploadGraph() {
         //upload to Fuseki
+        uploadStaticGraph();
+        uploadDynamicGraph();
+    }
+
+    private static void uploadStaticGraph(){
         System.out.println("---------------------------------------");
-        String connectionURL = "http://localhost:3030/aircraft/";
-        System.out.println("Uploading file " + OUTPUT_NAME + " to endpoint " + connectionURL);
-        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination(connectionURL);
+        System.out.println("Uploading static Graph data to endpoint " + connectionURL);
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(model); // put -> set content, load -> add/append
-            conn.put("http://example.org/aircraft/testSet", "testRDF.ttl");
-            conn.load("http://example.org/aircraft/testSett", "testRDF.ttl");
+            conn.put(staticModel); // put -> set content, load -> add/append
         }
-        System.out.println("Upload complete");
+        System.out.println("Upload of static Graph data complete");
+    }
+    private static void uploadDynamicGraph(){
+        System.out.println("---------------------------------------");
+        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+dynamicModelTime);
+
+        try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
+            conn.put(connectionURL+dynamicModelTime, dynamicModel);
+        }
+        System.out.println("Upload of dynamic Graph data complete");
     }
 
     private static void validateData() {
         //validate with SHACL
-        System.out.println("Checking " + model.size() + " resources");
-        Graph staticDataGraph = RDFDataMgr.loadGraph(OUTPUT_NAME);
+        validateStaticData();
+        validateDynamicData();
+    }
+
+    private static void validateStaticData(){
+        System.out.println("Checking " + staticModel.size() + "  static model resources");
+        Graph staticDataGraph = staticModel.getGraph();
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
 
         Shapes shape = Shapes.parse(shapeGraph);
@@ -128,8 +152,22 @@ public class Main {
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
+    private static void validateDynamicData(){
+        System.out.println("Checking " + dynamicModel.size() + " dynamic model resources");
+        Graph dynamicDataGraph = dynamicModel.getGraph();
+        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+
+        Shapes shape = Shapes.parse(shapeGraph);
+        ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
+        System.out.println("---------------------------------------");
+        ShLib.printReport(report);
+        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+    }
 
     private static void writeRDF() {
+        Model model = ModelFactory.createDefaultModel();
+        model.add(staticModel);
+        model.add(dynamicModel);
         try {
             System.out.println("Printing " + model.size() + " resources");
             model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
@@ -141,15 +179,16 @@ public class Main {
         }
     }
 
+    @Deprecated
     private static void linkPositions() {
         System.out.println("Linking Positions");
-        ResIterator positionIterator = model.listSubjectsWithProperty(RDF.type, VOC.position); //todo: only iterate over positions in current dynamic data load cycle (timestamp), add function into loadDynamicData to get timestamp
+        ResIterator positionIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.position);
         int positionCounter = 0;
         int linkedCounter = 0;
         while (positionIterator.hasNext()) {
             Resource pos = positionIterator.nextResource();
 
-            ResIterator aircraftIterator = model.listSubjectsWithProperty(RDF.type, VOC.aircraft);
+            ResIterator aircraftIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.aircraft);
             while (aircraftIterator.hasNext()) {
                 Resource aircraft = aircraftIterator.nextResource();
                 //System.out.println("pos: "+ pos.getProperty(VOC.icao24).getObject().toString() + "  Aircraft: " + aircraft.getProperty(VOC.icao24).getObject().toString());
@@ -208,11 +247,11 @@ public class Main {
             String thisCategoryDescription = aircraft.get("categoryDescription").toString();
 
             //create aircraft resource
-            Resource aircraftToAdd = model.createResource(thisAircraftURI)
+            Resource aircraftToAdd = staticModel.createResource(thisAircraftURI)
                     .addLiteral(VOC.icao24, thisIcao24)
                     .addProperty(RDF.type, VOC.aircraft);
             if (!thisRegistration.isEmpty())
-                aircraftToAdd.addProperty(VOC.registration, thisRegistration); //TODO: Hier addProperty oder addLiteral?
+                aircraftToAdd.addProperty(VOC.registration, thisRegistration);
             if (!thisSerialNumber.isEmpty()) aircraftToAdd.addProperty(VOC.serialNumber, thisSerialNumber);
             if (!thisLineNumber.isEmpty()) aircraftToAdd.addProperty(VOC.lineNumber, thisLineNumber);
             if (!thisBuiltDate.isEmpty()) aircraftToAdd.addProperty(VOC.builtDate, thisBuiltDate);
@@ -222,14 +261,14 @@ public class Main {
             //create manufacturer resource
             Resource manufacturerToAdd;
             if (!thisManufacturer.isEmpty()) {
-                manufacturerToAdd = model.createResource(thisManufacturerURI)
+                manufacturerToAdd = staticModel.createResource(thisManufacturerURI)
                         .addProperty(VOC.manufacturerIcao, thisManufacturer)
                         .addProperty(RDF.type, VOC.manufacturer);
                 if (!thisManufacturerName.isEmpty())
                     manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
                 aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
             } else if (!thisManufacturerName.isEmpty()) {
-                manufacturerToAdd = model.createResource()
+                manufacturerToAdd = staticModel.createResource()
                         .addProperty(VOC.manufacturerName, thisManufacturerName)
                         .addProperty(RDF.type, VOC.manufacturer);
                 aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
@@ -239,7 +278,7 @@ public class Main {
             //create model resource
             Resource modelToAdd;
             if (!thisModel.isEmpty()) {
-                modelToAdd = model.createResource(thisModelURI)
+                modelToAdd = staticModel.createResource(thisModelURI)
                         .addProperty(VOC.modelName, thisModel)
                         .addProperty(RDF.type, VOC.model);
                 if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
@@ -248,7 +287,7 @@ public class Main {
 
                 aircraftToAdd.addProperty(VOC.hasModel, modelToAdd);
             } else if (!thisTypecode.isEmpty() || !thisEngines.isEmpty() || !thisIcaoAircraftType.isEmpty()) {
-                modelToAdd = model.createResource()
+                modelToAdd = staticModel.createResource()
                         .addProperty(RDF.type, VOC.model);
                 if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
                 if (!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines, thisEngines);
@@ -261,7 +300,7 @@ public class Main {
             //create operator resource
             Resource operatorToAdd;
             if (!thisOperatorIcao.isEmpty()) {
-                operatorToAdd = model.createResource(thisOperatorURI)
+                operatorToAdd = staticModel.createResource(thisOperatorURI)
                         .addProperty(VOC.operatorIcao, thisOperatorIcao)
                         .addProperty(RDF.type, VOC.operator);
                 if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
@@ -271,7 +310,7 @@ public class Main {
 
                 aircraftToAdd.addProperty(VOC.hasOperator, operatorToAdd);
             } else if (!thisOperator.isEmpty() || !thisOperatorCallsign.isEmpty() || !thisOperatorIata.isEmpty()) {
-                operatorToAdd = model.createResource()
+                operatorToAdd = staticModel.createResource()
                         .addProperty(RDF.type, VOC.operator);
                 if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
                 if (!thisOperatorCallsign.isEmpty())
@@ -285,7 +324,7 @@ public class Main {
             //create owner resource
             Resource ownerToAdd;
             if (!thisOwner.isEmpty()) {
-                ownerToAdd = model.createResource(thisOwnerURI)
+                ownerToAdd = staticModel.createResource(thisOwnerURI)
                         .addProperty(VOC.ownerName, thisOwner)
                         .addProperty(RDF.type, VOC.owner);
 
@@ -293,9 +332,9 @@ public class Main {
             }
             //link categories
             loadCategoryData();
-            Resource noCategory = model.getResource("http://example.org/category/0");
+            Resource noCategory = staticModel.getResource("http://example.org/category/0");
             if (!thisCategoryDescription.isEmpty()) {
-                ResIterator categoryIterator = model.listSubjectsWithProperty(RDF.type, VOC.category);
+                ResIterator categoryIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.category);
                 boolean loop = true;
                 while (categoryIterator.hasNext() && loop) {
                     Resource category = categoryIterator.nextResource();
@@ -317,107 +356,107 @@ public class Main {
         Resource categoryToAdd;
 
         String thisCategoryURI = categoryURI + "0";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "No information at all");
 
         thisCategoryURI = categoryURI + "1";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "No ADS-B Emitter Category Information");
 
         thisCategoryURI = categoryURI + "2";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Light (< 15500 lbs)");
 
         thisCategoryURI = categoryURI + "3";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Small (15500 to 75000 lbs)");
 
         thisCategoryURI = categoryURI + "4";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Large (75000 to 300000 lbs)");
 
         thisCategoryURI = categoryURI + "5";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "High Vortex Large (aircraft such as B-757)");
 
         thisCategoryURI = categoryURI + "6";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Heavy (> 300000 lbs)");
 
         thisCategoryURI = categoryURI + "7";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "High Performance (> 5g acceleration and 400 kts)");
 
         thisCategoryURI = categoryURI + "8";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Rotorcraft");
 
         thisCategoryURI = categoryURI + "9";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Glider / sailplane");
 
         thisCategoryURI = categoryURI + "10";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Lighter-than-air");
 
         thisCategoryURI = categoryURI + "11";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Parachutist / Skydiver");
 
         thisCategoryURI = categoryURI + "12";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Ultralight / hang-glider / paraglider");
 
         thisCategoryURI = categoryURI + "13";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Reserved");
 
         thisCategoryURI = categoryURI + "14";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Unmanned Aerial Vehicle");
 
         thisCategoryURI = categoryURI + "15";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Space / Trans-atmospheric vehicle");
 
         thisCategoryURI = categoryURI + "16";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Surface Vehicle – Emergency Vehicle");
 
         thisCategoryURI = categoryURI + "17";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Surface Vehicle – Service Vehicle");
 
         thisCategoryURI = categoryURI + "18";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Point Obstacle (includes tethered balloons)");
 
         thisCategoryURI = categoryURI + "19";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Cluster Obstacle");
 
         thisCategoryURI = categoryURI + "20";
-        model.createProperty(thisCategoryURI)
+        staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Line Obstacle");
 
@@ -425,15 +464,15 @@ public class Main {
 
     private static void loadDynamicData() {
         System.out.println("Loading Dynamic Data");
-        JSONObject dynamicData = initiator.getDynamicData();
+        JSONObject dynamicData = initiator.getDynamicData2();
         JSONArray states = (JSONArray) dynamicData.get("states");
-        String time = dynamicData.get("time").toString();
+        dynamicModelTime = dynamicData.get("time").toString();
 
         for (Object state : states) {
             JSONArray stateToAdd = (JSONArray) state;
             String icao24Pos = String.valueOf(stateToAdd.get(0));
             String callsign = String.valueOf(stateToAdd.get(1));
-            String originCountry = String.valueOf(stateToAdd.get(2)); //todo: implement in voc:aircraft? (UML)
+            String originCountry = String.valueOf(stateToAdd.get(2));
             String timePosition = String.valueOf(stateToAdd.get(3));
             String lastContact = String.valueOf(stateToAdd.get(4));
             String longitude = String.valueOf(stateToAdd.get(5));
@@ -443,35 +482,44 @@ public class Main {
             String velocity = String.valueOf(stateToAdd.get(9));
             String trueTrack = String.valueOf(stateToAdd.get(10));
             String verticalRate = String.valueOf(stateToAdd.get(11));
-            String sensors = String.valueOf(stateToAdd.get(12));
+            //String sensors = String.valueOf(stateToAdd.get(12));
             String geoAltitude = String.valueOf(stateToAdd.get(13));
             String squawk = String.valueOf(stateToAdd.get(14));
             String spi = String.valueOf(stateToAdd.get(15));
             String positionSource = String.valueOf(stateToAdd.get(16));
 
-            String thisPositionURI = positionURI + icao24Pos + "_" + time;
-            Resource positionToAdd = model.createResource(thisPositionURI)
+            String thisPositionURI = positionURI + icao24Pos + "_" + dynamicModelTime;
+            Resource positionToAdd = dynamicModel.createResource(thisPositionURI)
                     .addProperty(VOC.icao24, icao24Pos)
                     .addProperty(RDF.type, VOC.position)
-                    .addProperty(VOC.time, time);
+                    .addLiteral(VOC.time, Integer.valueOf(dynamicModelTime));
 
-            //todo check for "null"
-            if (!callsign.isEmpty()) positionToAdd.addProperty(VOC.callsign, callsign);
-            if (!originCountry.isEmpty()) positionToAdd.addProperty(VOC.originCountry, originCountry);
-            if (!timePosition.isEmpty()) positionToAdd.addProperty(VOC.timePosition, timePosition);
-            if (!lastContact.isEmpty()) positionToAdd.addProperty(VOC.lastContact, lastContact);
-            if (!longitude.isEmpty()) positionToAdd.addProperty(VOC.longitude, longitude);
-            if (!latitude.isEmpty()) positionToAdd.addProperty(VOC.latitude, latitude);
-            if (!baroAltitude.isEmpty()) positionToAdd.addProperty(VOC.baroAltitude, baroAltitude);
-            if (!onGround.isEmpty()) positionToAdd.addProperty(VOC.onGround, onGround);
-            if (!velocity.isEmpty()) positionToAdd.addProperty(VOC.velocity, velocity);
-            if (!trueTrack.isEmpty()) positionToAdd.addProperty(VOC.trueTrack, trueTrack);
-            if (!verticalRate.isEmpty()) positionToAdd.addProperty(VOC.verticalRate, verticalRate);
-            if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
-            if (!geoAltitude.isEmpty()) positionToAdd.addProperty(VOC.geoAltitude, geoAltitude);
-            if (!squawk.isEmpty()) positionToAdd.addProperty(VOC.squawk, squawk);
-            if (!spi.isEmpty()) positionToAdd.addProperty(VOC.spi, spi);
-            if (!positionSource.isEmpty()) positionToAdd.addProperty(VOC.positionSource, positionSource);
+            if (!timePosition.equals("null")) positionToAdd.addLiteral(VOC.timePosition, Integer.valueOf(timePosition));
+            if (!lastContact.equals("null")) positionToAdd.addLiteral(VOC.lastContact, Integer.valueOf(lastContact));
+            if (!longitude.equals("null")) positionToAdd.addLiteral(VOC.longitude, Float.valueOf(longitude));
+            if (!latitude.equals("null")) positionToAdd.addLiteral(VOC.latitude, Float.valueOf(latitude));
+            if (!baroAltitude.equals("null")) positionToAdd.addLiteral(VOC.baroAltitude, Float.valueOf(baroAltitude));
+            if (!onGround.equals("null")) positionToAdd.addLiteral(VOC.onGround, Boolean.valueOf(onGround));
+            if (!velocity.equals("null")) positionToAdd.addLiteral(VOC.velocity, Float.valueOf(velocity));
+            if (!trueTrack.equals("null")) positionToAdd.addLiteral(VOC.trueTrack, Float.valueOf(trueTrack));
+            if (!verticalRate.equals("null")) positionToAdd.addLiteral(VOC.verticalRate, Float.valueOf(verticalRate));
+           // if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
+            if (!geoAltitude.equals("null")) positionToAdd.addLiteral(VOC.geoAltitude, Float.valueOf(geoAltitude));
+            if (!squawk.equals("null")) positionToAdd.addLiteral(VOC.squawk, squawk);
+            if (!spi.equals("null")) positionToAdd.addLiteral(VOC.spi, Boolean.valueOf(spi));
+            if (!positionSource.equals("null")) positionToAdd.addLiteral(VOC.positionSource, Integer.valueOf(positionSource));
+
+
+            //Create dynamic aircraft Resource;
+            String thisAircraftURI = aircraftURI + icao24Pos;
+            Resource aircraftToAdd = dynamicModel.createResource(thisAircraftURI)
+                    .addProperty(VOC.icao24, icao24Pos)
+                    .addProperty(RDF.type, VOC.aircraft)
+                    .addProperty(VOC.hasPosition,positionToAdd);
+
+            if (callsign.equals("null")) aircraftToAdd.addProperty(VOC.callsign, callsign);
+            if (!originCountry.equals("null")) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
+
         }
         System.out.println("Dynamic Data Loaded");
     }

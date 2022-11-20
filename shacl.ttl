@@ -59,7 +59,7 @@ voc:aircraft_Shape
 
 voc:model_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:engines ] ;
     sh:property    [ sh:datatype xsd:string ;
@@ -67,15 +67,13 @@ voc:model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
-                     #sh:minCount 1 ;
                      sh:path     voc:model ] ;
     sh:targetClass voc:Model .
 
 voc:owner_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
+    sh:nodeKind    sh:BlankNodeOrIRI  ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:minCount 1 ;
                      sh:path     voc:owner ] ;
     sh:targetClass voc:Owner .
 
@@ -105,7 +103,6 @@ voc:positionsource_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:description ] ;
     sh:property    [ sh:datatype xsd:integer ;
-                     sh:minCount 1 ;
                      sh:path     voc:id ] ;
     sh:targetClass voc:Positionsource ;
     sh:deactivated true .
