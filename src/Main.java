@@ -45,7 +45,7 @@ public class Main {
 
     public static void main(String[] args) {
         //starting fuseki
-        runFuseki();
+        //runFuseki();
 
         //create vocabulary prefixes
         model.setNsPrefix("voc", VOC.getURI());
@@ -71,15 +71,15 @@ public class Main {
         //validateData();
 
         //upload Graph to Fuseki
-        uploadGraph();
+        //uploadGraph();
 
         //opening Dataset in Browser
-        openDatasetQuery();
+        //openDatasetQuery();
 
 
     }
 
-    private static void openDatasetQuery(){
+    private static void openDatasetQuery() {
 
         URI uri = null;
         try {
@@ -91,18 +91,17 @@ public class Main {
 
     }
 
-    private static void runFuseki(){
-        try{
+    private static void runFuseki() { //fuseki in src? why 2 cmd windows?
+        try {
             Runtime r = Runtime.getRuntime();
             r.getRuntime().exec("cmd /c start cmd.exe /K \"cd src\\fuseki && start fuseki-server.bat\" ");
             TimeUnit.SECONDS.sleep(3);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void uploadGraph() {
+    private static void uploadGraph() { //todo upload static graph to aircraft default, make new graph for dynamic data with uri of timestamp
         //upload to Fuseki
         System.out.println("---------------------------------------");
         String connectionURL = "http://localhost:3030/aircraft/";
@@ -111,8 +110,8 @@ public class Main {
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(model); // put -> set content, load -> add/append
-            conn.put("http://example.org/aircraft/testSet","testRDF.ttl");
-            conn.load("http://example.org/aircraft/testSett","testRDF.ttl");
+            conn.put("http://example.org/aircraft/testSet", "testRDF.ttl");
+            conn.load("http://example.org/aircraft/testSett", "testRDF.ttl");
         }
         System.out.println("Upload complete");
     }
@@ -206,7 +205,6 @@ public class Main {
             String thisOwner = aircraft.get("owner").toString();
 
             //CategoryDescription properties
-            String thisCategoryURI = categoryURI + aircraft.get("categoryDescription").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisCategoryDescription = aircraft.get("categoryDescription").toString();
 
             //create aircraft resource
@@ -223,66 +221,206 @@ public class Main {
 
             //create manufacturer resource
             Resource manufacturerToAdd;
-            if (!thisManufacturer.isEmpty()) manufacturerToAdd = model.createResource(thisManufacturerURI)
-                    .addProperty(VOC.manufacturerIcao, thisManufacturer);
-            else manufacturerToAdd = model.createResource();
+            if (!thisManufacturer.isEmpty()) {
+                manufacturerToAdd = model.createResource(thisManufacturerURI)
+                        .addProperty(VOC.manufacturerIcao, thisManufacturer)
+                        .addProperty(RDF.type, VOC.manufacturer);
+                if (!thisManufacturerName.isEmpty())
+                    manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
+                aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
+            } else if (!thisManufacturerName.isEmpty()) {
+                manufacturerToAdd = model.createResource()
+                        .addProperty(VOC.manufacturerName, thisManufacturerName)
+                        .addProperty(RDF.type, VOC.manufacturer);
+                aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
+            }
 
-            manufacturerToAdd.addProperty(RDF.type, VOC.manufacturer);
-            if (!thisManufacturerName.isEmpty())
-                manufacturerToAdd.addProperty(VOC.manufacturerName, thisManufacturerName);
-
-            aircraftToAdd.addProperty(VOC.hasManufacturer, manufacturerToAdd);
 
             //create model resource
             Resource modelToAdd;
-            if (!thisModel.isEmpty()) modelToAdd = model.createResource(thisModelURI)
-                    .addProperty(VOC.modelName, thisModel);
-            else modelToAdd = model.createResource();
+            if (!thisModel.isEmpty()) {
+                modelToAdd = model.createResource(thisModelURI)
+                        .addProperty(VOC.modelName, thisModel)
+                        .addProperty(RDF.type, VOC.model);
+                if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
+                if (!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines, thisEngines);
+                if (!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType, thisIcaoAircraftType);
 
-            modelToAdd.addProperty(RDF.type, VOC.model);
-            if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
-            if (!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines, thisEngines);
-            if (!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType, thisIcaoAircraftType);
+                aircraftToAdd.addProperty(VOC.hasModel, modelToAdd);
+            } else if (!thisTypecode.isEmpty() || !thisEngines.isEmpty() || !thisIcaoAircraftType.isEmpty()) {
+                modelToAdd = model.createResource()
+                        .addProperty(RDF.type, VOC.model);
+                if (!thisTypecode.isEmpty()) modelToAdd.addProperty(VOC.typecode, thisTypecode);
+                if (!thisEngines.isEmpty()) modelToAdd.addProperty(VOC.engines, thisEngines);
+                if (!thisIcaoAircraftType.isEmpty()) modelToAdd.addProperty(VOC.icaoAircraftType, thisIcaoAircraftType);
 
-            aircraftToAdd.addProperty(VOC.hasModel, modelToAdd);
+                aircraftToAdd.addProperty(VOC.hasModel, modelToAdd);
+            }
+
 
             //create operator resource
             Resource operatorToAdd;
-            if (!thisOperatorIcao.isEmpty()) operatorToAdd = model.createResource(thisOperatorURI)
-                    .addProperty(VOC.operatorIcao, thisOperatorIcao);
-            else operatorToAdd = model.createResource();
+            if (!thisOperatorIcao.isEmpty()) {
+                operatorToAdd = model.createResource(thisOperatorURI)
+                        .addProperty(VOC.operatorIcao, thisOperatorIcao)
+                        .addProperty(RDF.type, VOC.operator);
+                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
+                if (!thisOperatorCallsign.isEmpty())
+                    operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
+                if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
 
-            operatorToAdd.addProperty(RDF.type, VOC.operator);
-            if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
-            if (!thisOperatorCallsign.isEmpty())
-                operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
-            if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
+                aircraftToAdd.addProperty(VOC.hasOperator, operatorToAdd);
+            } else if (!thisOperator.isEmpty() || !thisOperatorCallsign.isEmpty() || !thisOperatorIata.isEmpty()) {
+                operatorToAdd = model.createResource()
+                        .addProperty(RDF.type, VOC.operator);
+                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
+                if (!thisOperatorCallsign.isEmpty())
+                    operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
+                if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
 
-            aircraftToAdd.addProperty(VOC.hasOperator, operatorToAdd);
+                aircraftToAdd.addProperty(VOC.hasOperator, operatorToAdd);
+            }
+
 
             //create owner resource
             Resource ownerToAdd;
-            if (!thisOwner.isEmpty()) ownerToAdd = model.createResource(thisOwnerURI)
-                    .addProperty(VOC.ownerName, thisOwner);
-            else ownerToAdd = model.createResource();
+            if (!thisOwner.isEmpty()) {
+                ownerToAdd = model.createResource(thisOwnerURI)
+                        .addProperty(VOC.ownerName, thisOwner)
+                        .addProperty(RDF.type, VOC.owner);
 
-            ownerToAdd.addProperty(RDF.type, VOC.owner);
-
-            aircraftToAdd.addProperty(VOC.hasOwner, ownerToAdd);
-
-            //create category resource
-            Resource categoryDescriptionToAdd; //todo: rebuild to category (with numbers from API)
-            if (!thisCategoryDescription.isEmpty()) categoryDescriptionToAdd = model.createResource(thisCategoryURI)
-                    .addProperty(VOC.categoryDescription, thisCategoryDescription);
-            else categoryDescriptionToAdd = model.createResource();
-
-            categoryDescriptionToAdd.addProperty(RDF.type, VOC.category);
-
-            aircraftToAdd.addProperty(VOC.hasCategory, categoryDescriptionToAdd);
+                aircraftToAdd.addProperty(VOC.hasOwner, ownerToAdd);
+            }
+            //link categories
+            loadCategoryData();
+            Resource noCategory = model.getResource("http://example.org/category/0");
+            if (!thisCategoryDescription.isEmpty()) {
+                ResIterator categoryIterator = model.listSubjectsWithProperty(RDF.type, VOC.category);
+                boolean loop = true;
+                while (categoryIterator.hasNext() && loop) {
+                    Resource category = categoryIterator.nextResource();
+                    if (thisCategoryDescription.equals(category.getProperty(VOC.categoryDescription).getObject().toString())) {
+                        aircraftToAdd.addProperty(VOC.hasCategory, category);
+                        loop = false;
+                    }
+                }
+            } else {
+                aircraftToAdd.addProperty(VOC.hasCategory, noCategory);
+            }
 
 
         }
         System.out.println("Static Data loaded");
+    }
+
+    private static void loadCategoryData() { //could not retrieve category info from API
+        Resource categoryToAdd;
+
+        String thisCategoryURI = categoryURI + "0";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "No information at all");
+
+        thisCategoryURI = categoryURI + "1";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "No ADS-B Emitter Category Information");
+
+        thisCategoryURI = categoryURI + "2";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Light (< 15500 lbs)");
+
+        thisCategoryURI = categoryURI + "3";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Small (15500 to 75000 lbs)");
+
+        thisCategoryURI = categoryURI + "4";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Large (75000 to 300000 lbs)");
+
+        thisCategoryURI = categoryURI + "5";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "High Vortex Large (aircraft such as B-757)");
+
+        thisCategoryURI = categoryURI + "6";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Heavy (> 300000 lbs)");
+
+        thisCategoryURI = categoryURI + "7";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "High Performance (> 5g acceleration and 400 kts)");
+
+        thisCategoryURI = categoryURI + "8";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Rotorcraft");
+
+        thisCategoryURI = categoryURI + "9";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Glider / sailplane");
+
+        thisCategoryURI = categoryURI + "10";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Lighter-than-air");
+
+        thisCategoryURI = categoryURI + "11";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Parachutist / Skydiver");
+
+        thisCategoryURI = categoryURI + "12";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Ultralight / hang-glider / paraglider");
+
+        thisCategoryURI = categoryURI + "13";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Reserved");
+
+        thisCategoryURI = categoryURI + "14";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Unmanned Aerial Vehicle");
+
+        thisCategoryURI = categoryURI + "15";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Space / Trans-atmospheric vehicle");
+
+        thisCategoryURI = categoryURI + "16";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Surface Vehicle – Emergency Vehicle");
+
+        thisCategoryURI = categoryURI + "17";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Surface Vehicle – Service Vehicle");
+
+        thisCategoryURI = categoryURI + "18";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Point Obstacle (includes tethered balloons)");
+
+        thisCategoryURI = categoryURI + "19";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Cluster Obstacle");
+
+        thisCategoryURI = categoryURI + "20";
+        model.createProperty(thisCategoryURI)
+                .addProperty(RDF.type, VOC.category)
+                .addProperty(VOC.categoryDescription, "Line Obstacle");
+
     }
 
     private static void loadDynamicData() {

@@ -9,14 +9,21 @@
 @prefix voc:          <http://example.org/vocabulary#> .
 @prefix sh:           <http://www.w3.org/ns/shacl#> .
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
 voc:aircraft_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:IRI ;
     sh:targetClass voc:Aircraft ;
-    sh:property    [ sh:node     voc:owner_Shape ;
-                     sh:maxCount 1 ;
-                     sh:path     voc:hasOwner ] ;
+    sh:xone        ( [ sh:property [ sh:node     voc:owner_Shape ;
+                                     sh:maxCount 1 ;
+                                     sh:path     voc:hasOwner ] ;
+                       ]
+                     [
+                       sh:property [ sh:nodeKind     sh:BlankNode ;
+                                     sh:maxCount 1 ;
+                                     sh:path     voc:hasOwner ] ;
+                     ] ) ;
     sh:property    [ sh:node     voc:category_Shape ;
                      sh:maxCount 1 ;
                      sh:path     voc:hasCategory ] ;
@@ -58,7 +65,7 @@ voc:aircraft_Shape
 
 voc:model_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:nodeKind    sh:IRI ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:engines ] ;
     sh:property    [ sh:datatype xsd:string ;
@@ -66,26 +73,29 @@ voc:model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
                      sh:path     voc:model ] ;
-    sh:targetClass voc:Model .
+    sh:targetClass voc:Model ;
+sh:deactivated true .
 
 voc:owner_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:nodeKind    sh:IRI ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
                      sh:path     voc:owner ] ;
     sh:targetClass voc:Owner .
 
 voc:category_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:category ] ;
     sh:targetClass voc:Category .
 
 voc:operator_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:BlankNodeOrIRI  ;
+    sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:operatoriata ] ;
     sh:property    [ sh:datatype xsd:string ;
@@ -98,7 +108,7 @@ voc:operator_Shape
 
 voc:positionsource_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind     sh:IRI;
+    sh:nodeKind    sh:IRI ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:description ] ;
     sh:property    [ sh:datatype xsd:integer ;
@@ -109,7 +119,7 @@ voc:positionsource_Shape
 
 voc:position_Shape
     rdf:type       sh:NodeShape ;
-    sh:nodeKind     sh:IRI;
+    sh:nodeKind    sh:IRI ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:callsign ] ;
     sh:property    [ sh:datatype xsd:string ;
