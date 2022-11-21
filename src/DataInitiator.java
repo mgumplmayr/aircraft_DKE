@@ -20,11 +20,13 @@ public class DataInitiator {
     public List<String[]> getStaticData() {
 
         try {
+            /*
             if(GUI.getChosenMode() == 0) {
                 CSVReader reader = new CSVReader(new FileReader("staticDataTest.csv"));
                 List<String[]> data = reader.readAll();
                 return data;
             }
+            */
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
 
             List<String[]> data = reader.readAll();

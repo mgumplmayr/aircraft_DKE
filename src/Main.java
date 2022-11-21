@@ -123,7 +123,7 @@ public class Main {
 
     }
 
-    private static void runFuseki() { //fuseki in src? why 2 cmd windows?
+    public static void runFuseki() { //fuseki in src? why 2 cmd windows?
         try {
             Runtime r = Runtime.getRuntime();
             r.getRuntime().exec("cmd /c start cmd.exe /K \"cd apache-jena-fuseki-4.6.1 && start fuseki-server.bat\" ");
