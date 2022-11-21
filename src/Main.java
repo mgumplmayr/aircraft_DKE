@@ -14,11 +14,19 @@ import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
+import org.apache.logging.log4j.core.util.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import javax.swing.*;
+import javax.swing.text.html.parser.Parser;
+import java.awt.*;
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 
@@ -45,6 +53,14 @@ public class Main {
     static String dynamicModelTime;
 
     public static void main(String[] args) {
+        //create GUI
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                GUI gui = new GUI();
+                gui.setVisible(true);
+            }
+        });
         //starting fuseki
         System.out.println("------------------Starting------------------");
         runFuseki();
@@ -88,14 +104,20 @@ public class Main {
         //upload both Graphs to Fuseki
         System.out.println("--------------------------------------------");
         uploadGraph();
+        */
 
         //opening Dataset in Browser
         System.out.println("--------------------------------------------");
         openDatasetQuery();
 
-
     }
-
+    public static void update(){
+        if(GUI.getFirst()) loadStaticData();
+        loadDynamicData();
+        validateData();
+        writeRDF();
+        uploadGraph();
+    }
     private static void openDatasetQuery() {
 
         URI uri = null;
@@ -120,7 +142,7 @@ public class Main {
         System.out.println("Fuseki Server started");
     }
 
-    private static void uploadGraph() {
+    public static void uploadGraph() {
         //upload to Fuseki
         uploadStaticGraph();
         uploadDynamicGraph();
@@ -469,7 +491,17 @@ public class Main {
 
     private static void loadDynamicData() {
         System.out.println("Loading Dynamic Data");
-        JSONObject dynamicData = initiator.getDynamicData2();
+        JSONObject dynamicData = null;
+        if(GUI.getChosenMode() == 0) {
+            try {
+                JSONParser parser = new JSONParser(); //String zu JSON parsen
+                dynamicData = (JSONObject) parser.parse(new FileReader("dynamicDataTest.json"));
+                System.out.println("hurray");
+            } catch (IOException | ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else dynamicData = initiator.getDynamicData2();
+
         JSONArray states = (JSONArray) dynamicData.get("states");
         dynamicModelTime = dynamicData.get("time").toString();
 
@@ -527,6 +559,7 @@ public class Main {
 
         }
         System.out.println("Dynamic Data Loaded");
+
     }
 
 }
