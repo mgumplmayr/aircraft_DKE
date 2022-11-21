@@ -7,10 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.net.URI;
 
 public class GUI extends JFrame {
     private static boolean first = true;
-    private static int chosenMode;
+    private static int chosenMode = -1;
     public GUI() {
 
         setTitle("Fusekimanager");
@@ -33,7 +34,7 @@ public class GUI extends JFrame {
         JLabel action = new JLabel("Aktionen:",SwingConstants.CENTER);
         action.setForeground(Color.BLUE);
         JButton updateButton = new JButton("Aktualisieren");
-        JButton exit = new JButton("Beenden");
+        JButton exit = new JButton("Fuseki öffnen");
 
         panel.add(mode);
         panel.add(test);
@@ -59,7 +60,8 @@ public class GUI extends JFrame {
                 if(first) {
                     productive.setSelected(false);
                     setChosenMode(0);
-                }
+                } else
+                    test.setSelected(false);
             }
         });
         productive.addActionListener(new ActionListener() {
@@ -68,14 +70,20 @@ public class GUI extends JFrame {
                 if(first) {
                     test.setSelected(false);
                     setChosenMode(1);
-                }
+                } else productive.setSelected(false);
             }
         });
 
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                try {
+                    Desktop desktop = java.awt.Desktop.getDesktop();
+                    URI oURL = new URI("http://localhost:3030/#/dataset/aircraft/query/");
+                    desktop.browse(oURL);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         //TODO SysTrayIcon für schnelles updaten
