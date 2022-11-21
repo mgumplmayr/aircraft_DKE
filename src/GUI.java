@@ -9,7 +9,7 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 
 public class GUI extends JFrame {
-
+    private static boolean first = true;
     private static int chosenMode;
     public GUI() {
 
@@ -47,21 +47,28 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(getChosenMode() != 0 && getChosenMode() != 1) return;
-                else Main.update();
+                else {
+                    first = false;
+                    Main.update();
+                }
             }
         });
         test.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                productive.setSelected(false);
-                setChosenMode(0);
+                if(first) {
+                    productive.setSelected(false);
+                    setChosenMode(0);
+                }
             }
         });
         productive.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                test.setSelected(false);
-                setChosenMode(1);
+                if(first) {
+                    test.setSelected(false);
+                    setChosenMode(1);
+                }
             }
         });
 
@@ -90,6 +97,10 @@ public class GUI extends JFrame {
 
     public void setChosenMode(int chosenMode) {
         this.chosenMode = chosenMode;
+    }
+
+    public static boolean getFirst(){
+        return first;
     }
 }
 

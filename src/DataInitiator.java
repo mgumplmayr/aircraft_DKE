@@ -94,9 +94,12 @@ public class DataInitiator {
             JSONObject dataObject = (JSONObject) parser.parse(response.body());
 
             //Patrick: für Testfile
+            /*
             FileWriter file = new FileWriter("C:/Github/test.json");
             file.write(dataObject.toJSONString());
             file.close();
+            */
+
 
             return dataObject;
         } catch (Exception e) {

@@ -105,7 +105,7 @@ public class Main {
 
     }
     public static void update(){
-        loadStaticData();
+        if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
         validateData();
         writeRDF();
