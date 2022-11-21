@@ -46,7 +46,8 @@ public class Main {
 
     public static void main(String[] args) {
         //starting fuseki
-        //runFuseki();
+        System.out.println("------------------Starting------------------");
+        runFuseki();
 
         //create vocabulary prefixes
         staticModel.setNsPrefix("voc", VOC.getURI());
@@ -70,20 +71,27 @@ public class Main {
         dynamicModel.setNsPrefix("aircraft", aircraftURI);
 
         //load data into models
+
+        System.out.println("--------------------------------------------");
         loadStaticData();
+        System.out.println("--------------------------------------------");
         loadDynamicData();
 
         //validate models
+        System.out.println("--------------------------------------------");
         validateData();
 
         //write RDF to file
+        System.out.println("--------------------------------------------");
         writeRDF();
 
         //upload both Graphs to Fuseki
+        System.out.println("--------------------------------------------");
         uploadGraph();
 
         //opening Dataset in Browser
-        //openDatasetQuery();
+        System.out.println("--------------------------------------------");
+        openDatasetQuery();
 
 
     }
@@ -100,14 +108,16 @@ public class Main {
 
     }
 
-    private static void runFuseki() { //fuseki in src? why 2 cmd windows?
+    private static void runFuseki() { //2 cmd windows?
+        System.out.println("Starting Fuseki Server");
         try {
             Runtime r = Runtime.getRuntime();
-            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd apache-jena-fuseki-4.6.1 && start fuseki-server.bat\" ");
+            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
             TimeUnit.SECONDS.sleep(3);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Fuseki Server started");
     }
 
     private static void uploadGraph() {
@@ -117,7 +127,6 @@ public class Main {
     }
 
     private static void uploadStaticGraph(){
-        System.out.println("---------------------------------------");
         System.out.println("Uploading static Graph data to endpoint " + connectionURL);
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
@@ -126,7 +135,6 @@ public class Main {
         System.out.println("Upload of static Graph data complete");
     }
     private static void uploadDynamicGraph(){
-        System.out.println("---------------------------------------");
         System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+dynamicModelTime);
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
@@ -148,7 +156,6 @@ public class Main {
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
-        System.out.println("---------------------------------------");
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
@@ -159,7 +166,6 @@ public class Main {
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
-        System.out.println("---------------------------------------");
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
@@ -172,7 +178,6 @@ public class Main {
             System.out.println("Printing " + model.size() + " resources");
             model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
             System.out.println("Printed to: " + OUTPUT_NAME);
-            System.out.println("---------------------------------------");
         } catch (
                 FileNotFoundException e) {
             e.printStackTrace();
