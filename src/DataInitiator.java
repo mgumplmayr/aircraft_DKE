@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -17,8 +18,15 @@ import java.util.Scanner;
 public class DataInitiator {
 
     public List<String[]> getStaticData() {
+
         try {
+            if(GUI.getChosenMode() == 0) {
+                CSVReader reader = new CSVReader(new FileReader("staticDataTest.csv"));
+                List<String[]> data = reader.readAll();
+                return data;
+            }
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
+
             List<String[]> data = reader.readAll();
             /*data.forEach(x -> {
                 for (String string : x) {
@@ -84,6 +92,11 @@ public class DataInitiator {
 
             JSONParser parser = new JSONParser(); //String zu JSON parsen
             JSONObject dataObject = (JSONObject) parser.parse(response.body());
+
+            //Patrick: für Testfile
+            FileWriter file = new FileWriter("C:/Github/test.json");
+            file.write(dataObject.toJSONString());
+            file.close();
 
             return dataObject;
         } catch (Exception e) {
