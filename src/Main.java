@@ -104,7 +104,7 @@ public class Main {
         //upload both Graphs to Fuseki
         System.out.println("--------------------------------------------");
         uploadGraph();
-        */
+
 
         //opening Dataset in Browser
         System.out.println("--------------------------------------------");
@@ -114,12 +114,12 @@ public class Main {
     public static void update(){
         if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
-        validateData();
-        writeRDF();
-        uploadGraph();
+        validateDynamicData();
+        writeRDF(); //RDF write necessary?
+        uploadDynamicGraph();
     }
-    private static void openDatasetQuery() {
 
+    private static void openDatasetQuery() {
         URI uri = null;
         try {
             uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
@@ -492,7 +492,7 @@ public class Main {
     private static void loadDynamicData() {
         System.out.println("Loading Dynamic Data");
         JSONObject dynamicData = null;
-        if(GUI.getChosenMode() == 0) {
+        if(GUI.getChosenMode() == GUI.Mode.TEST) {
             try {
                 JSONParser parser = new JSONParser(); //String zu JSON parsen
                 dynamicData = (JSONObject) parser.parse(new FileReader("dynamicDataTest.json"));

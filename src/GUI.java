@@ -11,7 +11,11 @@ import java.net.URI;
 
 public class GUI extends JFrame {
     private static boolean first = true;
-    private static int chosenMode = -1;
+    private static Mode chosenMode = Mode.NONE;
+
+    public enum Mode {
+        NONE, TEST, PRODUCTION
+    }
     public GUI() {
 
         setTitle("Fusekimanager");
@@ -34,7 +38,7 @@ public class GUI extends JFrame {
         JLabel action = new JLabel("Aktionen:",SwingConstants.CENTER);
         action.setForeground(Color.BLUE);
         JButton updateButton = new JButton("Aktualisieren");
-        JButton exit = new JButton("Fuseki öffnen");
+        JButton exit = new JButton("Fuseki-Query öffnen");
 
         panel.add(mode);
         panel.add(test);
@@ -47,7 +51,7 @@ public class GUI extends JFrame {
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(getChosenMode() != 0 && getChosenMode() != 1) return;
+                if(chosenMode == Mode.NONE) return;
                 else {
                     first = false;
                     Main.update();
@@ -59,7 +63,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(first) {
                     productive.setSelected(false);
-                    setChosenMode(0);
+                    setChosenMode(Mode.TEST);
                 } else
                     test.setSelected(false);
             }
@@ -69,7 +73,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(first) {
                     test.setSelected(false);
-                    setChosenMode(1);
+                    setChosenMode(Mode.PRODUCTION);
                 } else productive.setSelected(false);
             }
         });
@@ -99,11 +103,11 @@ public class GUI extends JFrame {
     }
 
 
-    public static int getChosenMode() {
+    public static Mode getChosenMode() {
         return chosenMode;
     }
 
-    public void setChosenMode(int chosenMode) {
+    public void setChosenMode(Mode chosenMode) {
         this.chosenMode = chosenMode;
     }
 

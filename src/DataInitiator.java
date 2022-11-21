@@ -20,7 +20,7 @@ public class DataInitiator {
     public List<String[]> getStaticData() {
 
         try {
-            if(GUI.getChosenMode() == 0) {
+            if(GUI.getChosenMode() == GUI.Mode.TEST) {
                 CSVReader reader = new CSVReader(new FileReader("staticDataTest.csv"));
                 List<String[]> data = reader.readAll();
                 return data;
