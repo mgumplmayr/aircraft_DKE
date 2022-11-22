@@ -4,8 +4,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.rdfconnection.RDFConnectionFuseki;
-import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
@@ -14,19 +12,14 @@ import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
-import org.apache.logging.log4j.core.util.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import javax.swing.*;
-import javax.swing.text.html.parser.Parser;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 
@@ -61,9 +54,7 @@ public class Main {
                 gui.setVisible(true);
             }
         });
-        //starting fuseki
-        System.out.println("------------------Starting------------------");
-        runFuseki();
+
 
         //create vocabulary prefixes
         staticModel.setNsPrefix("voc", VOC.getURI());
@@ -90,12 +81,10 @@ public class Main {
 
         System.out.println("--------------------------------------------");
         loadStaticData();
-        System.out.println("--------------------------------------------");
-        loadDynamicData();
 
         //validate models
         System.out.println("--------------------------------------------");
-        validateData();
+        validateStaticData();
 
         //write RDF to file
         System.out.println("--------------------------------------------");
@@ -103,14 +92,9 @@ public class Main {
 
         //upload both Graphs to Fuseki
         System.out.println("--------------------------------------------");
-        uploadGraph();
-
-
-        //opening Dataset in Browser
-        System.out.println("--------------------------------------------");
-        openDatasetQuery();
-
+        //uploadGraph();
     }
+
     public static void update(){
         if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
@@ -127,18 +111,18 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public static void runFuseki() { //fuseki in src? why 2 cmd windows?
+    public static void initiateFuseki() { //fuseki in src? why 2 cmd windows?
         try {
             Runtime r = Runtime.getRuntime();
             r.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(4);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("Fuseki Server started");
+        uploadStaticGraph();
     }
 
     public static void uploadGraph() {
