@@ -20,7 +20,7 @@ public class VOC {
     public static final Property hasOperator;
     public static final Property hasOwner;
     public static final Property hasCategory;
-    public static final Property hasPosition;
+
 
     public static final Property manufacturer;
     public static final Property manufacturerIcao;
@@ -61,7 +61,9 @@ public class VOC {
     public static final Property spi;
     public static final Property positionSource;
     public static final Property time;
+    public static final Property hasAircraft;
 
+    public static final Property focusNode;
 
     public VOC(){
 
@@ -73,10 +75,10 @@ public class VOC {
         //Aircraft vocabulary
         aircraft = m.createProperty(vocabularyURI+ "Aircraft");
         icao24 = m.createProperty(vocabularyURI + "icao24");
-        registration = m.createProperty(vocabularyURI + "hasRegistration");
+        registration = m.createProperty(vocabularyURI + "registration");
         serialNumber = m.createProperty(vocabularyURI + "serialNumber");
         lineNumber = m.createProperty(vocabularyURI + "lineNumber");
-        builtDate = m.createProperty(vocabularyURI + "buildDate");
+        builtDate = m.createProperty(vocabularyURI + "builtDate");
         registeredDate = m.createProperty(vocabularyURI + "registeredDate");
         firstFlightDate = m.createProperty(vocabularyURI + "firstFlightDate");
         hasManufacturer = m.createProperty(vocabularyURI + "hasManufacturer");
@@ -84,12 +86,12 @@ public class VOC {
         hasOperator = m.createProperty(vocabularyURI + "hasOperator");
         hasOwner = m.createProperty(vocabularyURI + "hasOwner");
         hasCategory = m.createProperty(vocabularyURI + "hasCategory");
-        hasPosition = m.createProperty(vocabularyURI+"hasPosition");
+
 
         //Manufacturer vocabulary
         manufacturer = m.createProperty(vocabularyURI+"Manufacturer");
-        manufacturerIcao = m.createProperty(vocabularyURI+"ManufacturerIcao");
-        manufacturerName = m.createProperty(vocabularyURI+"ManufacturerName");
+        manufacturerIcao = m.createProperty(vocabularyURI+"manufacturerIcao");
+        manufacturerName = m.createProperty(vocabularyURI+"manufacturerName");
 
         //Model vocabulary
         model = m.createProperty(vocabularyURI+"Model");
@@ -132,7 +134,9 @@ public class VOC {
         spi= m.createProperty(vocabularyURI+"spi");
         positionSource= m.createProperty(vocabularyURI+"positionSource");
         time = m.createProperty(vocabularyURI+"time");
+        hasAircraft = m.createProperty(vocabularyURI+"hasAircraft");
 
+        focusNode = m.createProperty("http://www.w3.org/ns/shacl#focusNode");
 
     }
 }

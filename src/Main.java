@@ -163,6 +163,7 @@ public class Main {
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
         ShLib.printReport(report);
+        //report.getModel() select query -> get focus nodes with error (SPARQL)
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
     private static void validateDynamicData(){
@@ -204,7 +205,7 @@ public class Main {
                 Resource aircraft = aircraftIterator.nextResource();
                 //System.out.println("pos: "+ pos.getProperty(VOC.icao24).getObject().toString() + "  Aircraft: " + aircraft.getProperty(VOC.icao24).getObject().toString());
                 if (pos.getProperty(VOC.icao24).getObject().equals(aircraft.getProperty(VOC.icao24).getObject())) {
-                    aircraft.addProperty(VOC.hasPosition, pos);
+                    aircraft.addProperty(VOC.hasAircraft, pos);
                     System.out.println("Aircraft: " + aircraft.getURI() + " linked");
                     linkedCounter++;
                 }
@@ -314,7 +315,7 @@ public class Main {
                 operatorToAdd = staticModel.createResource(thisOperatorURI)
                         .addProperty(VOC.operatorIcao, thisOperatorIcao)
                         .addProperty(RDF.type, VOC.operator);
-                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
+                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operatorName, thisOperator);
                 if (!thisOperatorCallsign.isEmpty())
                     operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
                 if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
@@ -323,7 +324,7 @@ public class Main {
             } else if (!thisOperator.isEmpty() || !thisOperatorCallsign.isEmpty() || !thisOperatorIata.isEmpty()) {
                 operatorToAdd = staticModel.createResource()
                         .addProperty(RDF.type, VOC.operator);
-                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operator, thisOperator);
+                if (!thisOperator.isEmpty()) operatorToAdd.addProperty(VOC.operatorName, thisOperator);
                 if (!thisOperatorCallsign.isEmpty())
                     operatorToAdd.addProperty(VOC.operatorCallsign, thisOperatorCallsign);
                 if (!thisOperatorIata.isEmpty()) operatorToAdd.addProperty(VOC.operatorIata, thisOperatorIata);
@@ -510,7 +511,6 @@ public class Main {
 
             String thisPositionURI = positionURI + icao24Pos + "_" + dynamicModelTime;
             Resource positionToAdd = dynamicModel.createResource(thisPositionURI)
-                    .addProperty(VOC.icao24, icao24Pos)
                     .addProperty(RDF.type, VOC.position)
                     .addLiteral(VOC.time, Integer.valueOf(dynamicModelTime));
 
@@ -534,12 +534,12 @@ public class Main {
             String thisAircraftURI = aircraftURI + icao24Pos;
             Resource aircraftToAdd = dynamicModel.createResource(thisAircraftURI)
                     .addProperty(VOC.icao24, icao24Pos)
-                    .addProperty(RDF.type, VOC.aircraft)
-                    .addProperty(VOC.hasPosition,positionToAdd);
+                    .addProperty(RDF.type, VOC.aircraft);
 
             if (!callsign.equals("null") && !callsign.isEmpty()) aircraftToAdd.addProperty(VOC.callsign, callsign);
             if (!originCountry.equals("null") && !originCountry.isEmpty()) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
 
+            positionToAdd.addProperty(VOC.hasAircraft,aircraftToAdd);
         }
         System.out.println("Dynamic Data Loaded");
 
