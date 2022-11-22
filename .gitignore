@@ -3,4 +3,4 @@ staticRDF.ttl
 /out/
 RDFData.ttl
 icon.jpg
-fuseki/run/system/tdb.lock
+/fuseki/run/system/tdb.lock
