@@ -1,7 +1,7 @@
-import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,18 +16,17 @@ public class GUI extends JFrame {
     }
     public GUI() {
         try {
-            UIManager.setLookAndFeel( new FlatLightLaf() );
+            UIManager.setLookAndFeel( new FlatDarculaLaf() );
             UIManager.put( "Button.arc", 10 );
             UIManager.put( "Component.arc", 5 );
             UIManager.put( "ProgressBar.arc", 5 );
             UIManager.put( "TextComponent.arc", 5 );
             UIManager.put( "Component.focusWidth", 1.5 );
-
         } catch( Exception ex ) {
             System.err.println( "Failed to initialize LaF" );
         }
 
-        setTitle("Fusekimanager");
+        setTitle("Aircraft Manager");
         setSize(500,150);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -37,12 +36,12 @@ public class GUI extends JFrame {
         Container secondPane = getContentPane();
         panel.setLayout(new GridLayout(1,3));
 
-        JButton test = new JButton("test");
-        JButton productive = new JButton("productive");
+        JButton test = new JButton("Test");
+        JButton productive = new JButton("Productive");
 
-        JButton startFuseki = new JButton("start Fuseki-Server");
-        JButton refresh = new JButton("refresh");
-        JButton openQuery = new JButton("open Query");
+        JButton startFuseki = new JButton("Start Fuseki-Server");
+        JButton refresh = new JButton("Refresh States");
+        JButton openQuery = new JButton("Open Query");
 
         panel.add(test);
         panel.add(productive);
