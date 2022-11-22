@@ -140,10 +140,11 @@ public class Main {
         System.out.println("Upload of static Graph data complete");
     }
     private static void uploadDynamicGraph(){
-        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+dynamicModelTime);
+
+        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"/states/"+dynamicModelTime);
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL+dynamicModelTime, dynamicModel);
+            conn.put(connectionURL+"/states/"+dynamicModelTime, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
         dynamicModel.removeAll();
@@ -477,13 +478,7 @@ public class Main {
         System.out.println("Loading Dynamic Data");
         JSONObject dynamicData = null;
         if(GUI.getChosenMode() == GUI.Mode.TEST) {
-            try {
-                JSONParser parser = new JSONParser(); //String zu JSON parsen
-                dynamicData = (JSONObject) parser.parse(new FileReader("dynamicDataTest.json"));
-                System.out.println("hurray");
-            } catch (IOException | ParseException e) {
-                throw new RuntimeException(e);
-            }
+            dynamicData = initiator.getDynamicTestData();
         } else dynamicData = initiator.getDynamicData2();
 
         JSONArray states = (JSONArray) dynamicData.get("states");

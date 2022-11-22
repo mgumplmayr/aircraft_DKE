@@ -26,5 +26,6 @@
     <orderEntry type="library" name="apache.poi" level="project" />
     <orderEntry type="library" name="opencsv" level="project" />
     <orderEntry type="library" name="apache.jena.shacl" level="project" />
+    <orderEntry type="library" name="formdev.flatlaf" level="project" />
   </component>
 </module>
