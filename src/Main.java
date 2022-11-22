@@ -477,13 +477,7 @@ public class Main {
         System.out.println("Loading Dynamic Data");
         JSONObject dynamicData = null;
         if(GUI.getChosenMode() == GUI.Mode.TEST) {
-            try {
-                JSONParser parser = new JSONParser(); //String zu JSON parsen
-                dynamicData = (JSONObject) parser.parse(new FileReader("dynamicDataTest.json"));
-                System.out.println("Dynamic Test Data loaded");
-            } catch (IOException | ParseException e) {
-                throw new RuntimeException(e);
-            }
+            dynamicData = initiator.getDynamicTestData();
         } else dynamicData = initiator.getDynamicData2();
 
         JSONArray states = (JSONArray) dynamicData.get("states");
