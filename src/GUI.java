@@ -1,3 +1,6 @@
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,6 +15,17 @@ public class GUI extends JFrame {
         NONE, TEST, PRODUCTION
     }
     public GUI() {
+        try {
+            UIManager.setLookAndFeel( new FlatLightLaf() );
+            UIManager.put( "Button.arc", 10 );
+            UIManager.put( "Component.arc", 5 );
+            UIManager.put( "ProgressBar.arc", 5 );
+            UIManager.put( "TextComponent.arc", 5 );
+            UIManager.put( "Component.focusWidth", 1.5 );
+
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
 
         setTitle("Fusekimanager");
         setSize(500,150);
