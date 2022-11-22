@@ -19,36 +19,26 @@ public class GUI extends JFrame {
     public GUI() {
 
         setTitle("Fusekimanager");
-        setSize(500,500);
+        setSize(500,150);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         Container panel = getContentPane();
-        panel.setLayout(new GridLayout(2,3));
+        panel.setLayout(new GridLayout(1,2));
+        Container secondPane = getContentPane();
+        panel.setLayout(new GridLayout(1,3));
 
-        JLabel mode= new JLabel("Modus:",SwingConstants.CENTER);
-        mode.setForeground(Color.BLUE);
-        JRadioButton test = new JRadioButton("Test",false);
-        test.setHorizontalTextPosition(SwingConstants.CENTER);
-        test.setVerticalTextPosition(JRadioButton.TOP);
-        JRadioButton productive = new JRadioButton("Produktion",false);
-        productive.setHorizontalTextPosition(SwingConstants.CENTER);
-        productive.setVerticalTextPosition(JRadioButton.TOP);
+        JButton test = new JButton("test");
+        JButton productive = new JButton("productive");
 
-        JLabel action = new JLabel("Aktionen:",SwingConstants.CENTER);
-        action.setForeground(Color.BLUE);
-        JButton updateButton = new JButton("Aktualisieren");
-        JButton exit = new JButton("Fuseki-Query öffnen");
+        JButton startFuseki = new JButton("start Fuseki-Server");
+        JButton refresh = new JButton("refresh");
+        JButton openQuery = new JButton("open Query");
 
-        panel.add(mode);
         panel.add(test);
         panel.add(productive);
-        panel.add(action);
-        panel.add(updateButton);
-        panel.add(exit);
 
-
-        updateButton.addActionListener(new ActionListener() {
+        refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(chosenMode == Mode.NONE) return;
@@ -63,7 +53,13 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(first) {
                     productive.setSelected(false);
-                    setChosenMode(Mode.TEST);
+                    setChosenMode(0);
+                    panel.removeAll();
+                    secondPane.add(startFuseki);
+                    secondPane.add(refresh);
+                    secondPane.add(openQuery);
+                    revalidate();
+                    repaint();
                 } else
                     test.setSelected(false);
             }
@@ -73,12 +69,24 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(first) {
                     test.setSelected(false);
-                    setChosenMode(Mode.PRODUCTION);
+                    setChosenMode(1);
+                    panel.removeAll();
+                    secondPane.add(startFuseki);
+                    secondPane.add(refresh);
+                    secondPane.add(openQuery);
+                    revalidate();
+                    repaint();
                 } else productive.setSelected(false);
             }
         });
+        startFuseki.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Main.runFuseki();
+            }
+        });
 
-        exit.addActionListener(new ActionListener() {
+        openQuery.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {

@@ -25,6 +25,7 @@ public class DataInitiator {
                 List<String[]> data = reader.readAll();
                 return data;
             }
+            */
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
 
             List<String[]> data = reader.readAll();

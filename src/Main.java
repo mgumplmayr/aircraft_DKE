@@ -130,8 +130,7 @@ public class Main {
 
     }
 
-    private static void runFuseki() { //2 cmd windows?
-        System.out.println("Starting Fuseki Server");
+    public static void runFuseki() { //fuseki in src? why 2 cmd windows?
         try {
             Runtime r = Runtime.getRuntime();
             r.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
