@@ -163,6 +163,7 @@ public class Main {
             conn.put(connectionURL+dynamicModelTime, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
+        dynamicModel.removeAll();
     }
 
     private static void validateData() {
@@ -359,7 +360,6 @@ public class Main {
             }
             //link categories
             loadCategoryData();
-            Resource noCategory = staticModel.getResource("http://example.org/category/0");
             if (!thisCategoryDescription.isEmpty()) {
                 ResIterator categoryIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.category);
                 boolean loop = true;
@@ -371,7 +371,7 @@ public class Main {
                     }
                 }
             } else {
-                aircraftToAdd.addProperty(VOC.hasCategory, noCategory);
+                aircraftToAdd.addProperty(VOC.hasCategory, staticModel.getResource("http://example.org/category/0"));
             }
 
         }
@@ -554,8 +554,8 @@ public class Main {
                     .addProperty(RDF.type, VOC.aircraft)
                     .addProperty(VOC.hasPosition,positionToAdd);
 
-            if (callsign.equals("null")) aircraftToAdd.addProperty(VOC.callsign, callsign);
-            if (!originCountry.equals("null")) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
+            if (!callsign.equals("null") && !callsign.isEmpty()) aircraftToAdd.addProperty(VOC.callsign, callsign);
+            if (!originCountry.equals("null") && !originCountry.isEmpty()) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
 
         }
         System.out.println("Dynamic Data Loaded");

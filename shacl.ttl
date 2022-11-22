@@ -55,7 +55,70 @@ voc:aircraft_Shape
                      sh:targetClass voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:firstflightdate ] ;
-.
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxLength 8 ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:callsign ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path voc:origincountry ] ;
+    sh:property    [ sh:path     voc:hasPosition ;
+                     sh:targetClass voc:Position ] .
+
+voc:position_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:IRI ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:minLength 6 ;
+                     sh:maxLength 6 ;
+                     sh:path     voc:icao24 ] ;
+    sh:property    [ sh:datatype xsd:int ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:timePosition ] ;
+    sh:property    [ sh:datatype xsd:int ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:time ] ;
+    sh:property    [ sh:datatype xsd:int ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:lastContact ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:longitude ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:latitude ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:baroAltitude ] ;
+    sh:property    [ sh:datatype xsd:boolean ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:onground ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:velocity ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:trueTrack ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:verticalRate ] ;
+    sh:property    [ sh:datatype xsd:float ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:geoAltitude ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:squawk ] ;
+    sh:property    [ sh:datatype xsd:boolean ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:spi ] ;
+    sh:property    [ sh:datatype xsd:int ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:positionSource ] ;
+    sh:targetClass voc:Position .
 
 voc:model_Shape
     rdf:type       sh:NodeShape ;
@@ -63,7 +126,7 @@ voc:model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:engines ] ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:icaoaircrafttype ] ;
+                     sh:path     voc:icaoAircraftType ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
@@ -88,76 +151,20 @@ voc:operator_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:operatoriata ] ;
+                     sh:path     voc:operatorIata ] ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:operatorcallsign ] ;
+                     sh:path     voc:operatorCallsign ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:operator ] ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:operatoricao ] ;
+                     sh:path     voc:operatorIcao ] ;
     sh:targetClass voc:Operator .
-
-voc:positionsource_Shape
-    rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
-    sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:description ] ;
-    sh:property    [ sh:datatype xsd:integer ;
-                     sh:path     voc:id ] ;
-    sh:targetClass voc:Positionsource ;
-    sh:deactivated true .
-
-voc:position_Shape
-    rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
-    sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:callsign ] ;
-    sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:squawk ] ;
-    sh:property    [ sh:node voc:origincountry_Shape ;
-                     sh:path voc:origincountry ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:truetrack ] ;
-    sh:property    [ sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:path     voc:icao24 ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:baroaltitude ] ;
-    sh:property    [ sh:datatype xsd:boolean ;
-                     sh:path     voc:onground ] ;
-    sh:property    [ sh:datatype xsd:integer ;
-                     sh:path     voc:lastcontact ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:longitude ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:verticalrate ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:latitude ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:geoaltitude ] ;
-    sh:property    [ sh:datatype xsd:integer ;
-                     sh:path     voc:timeposition ] ;
-    sh:property    [ sh:datatype xsd:boolean ;
-                     sh:path     voc:spi ] ;
-    sh:property    [ sh:datatype xsd:decimal ;
-                     sh:path     voc:velocity ] ;
-    sh:targetClass voc:Position ;
-    sh:deactivated true .
-
-voc:origincountry_Shape
-    rdf:type       sh:NodeShape ;
-    sh:property    [ sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:path     voc:name ] ;
-    sh:targetClass voc:origincountry ;
-    sh:deactivated true .
 
 voc:manufacturer_Shape
     rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:path     voc:manufacturername ] ;
+                     sh:path     voc:manufacturerName ] ;
     sh:property    [ sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:path     voc:manufacturericao ] ;
-    sh:targetClass voc:manufacturer ;
-    sh:deactivated true .
+                     sh:path     voc:manufacturerIcao ] ;
+    sh:targetClass voc:manufacturer .
