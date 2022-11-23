@@ -4,3 +4,5 @@ staticRDF.ttl
 RDFData.ttl
 icon.jpg
 /fuseki/run/system/tdb.lock
+.DS_Store
+.idea
