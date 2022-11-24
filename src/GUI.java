@@ -9,6 +9,7 @@ import java.net.URI;
 
 public class GUI extends JFrame {
     private static boolean first = true;
+    private static boolean createFile = false;
     private static Mode chosenMode = Mode.NONE;
 
     public enum Mode {
@@ -31,10 +32,12 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        Container panel = getContentPane();
+        Container central = getContentPane();
+        central.setLayout(new BorderLayout());
+        JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1,2));
-        Container secondPane = getContentPane();
-        panel.setLayout(new GridLayout(1,3));
+        JPanel secondPane = new JPanel();
+        panel.setLayout(new GridLayout(1,4));
 
         JButton test = new JButton("Test");
         JButton productive = new JButton("Productive");
@@ -42,18 +45,29 @@ public class GUI extends JFrame {
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton refresh = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
+        JButton log = new JButton("Log");
+
+        JCheckBox file = new JCheckBox("create RDF-File?", false);
 
         panel.add(test);
         panel.add(productive);
+        secondPane.add(startFuseki);
+        secondPane.add(refresh);
+        secondPane.add(openQuery);
+        secondPane.add(log);
+
+        central.add(panel,BorderLayout.CENTER);
+        central.add(file, BorderLayout.SOUTH);
 
         refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(chosenMode == Mode.NONE) return;
+                if(chosenMode == Mode.NONE);
                 else {
                     first = false;
                     Main.update();
                 }
+
             }
         });
         test.addActionListener(new ActionListener() {
@@ -62,10 +76,9 @@ public class GUI extends JFrame {
                 if(first) {
                     productive.setSelected(false);
                     setChosenMode(Mode.TEST);
-                    panel.removeAll();
-                    secondPane.add(startFuseki);
-                    secondPane.add(refresh);
-                    secondPane.add(openQuery);
+                    central.removeAll();
+                    central.add(secondPane, BorderLayout.CENTER);
+                    central.add(file, BorderLayout.SOUTH);
                     revalidate();
                     repaint();
                 } else
@@ -78,10 +91,9 @@ public class GUI extends JFrame {
                 if(first) {
                     test.setSelected(false);
                     setChosenMode(Mode.PRODUCTION);
-                    panel.removeAll();
-                    secondPane.add(startFuseki);
-                    secondPane.add(refresh);
-                    secondPane.add(openQuery);
+                    central.removeAll();
+                    central.add(secondPane, BorderLayout.CENTER);
+                    central.add(file, BorderLayout.SOUTH);
                     revalidate();
                     repaint();
                 } else productive.setSelected(false);
@@ -104,6 +116,20 @@ public class GUI extends JFrame {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+        });
+
+        file.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setCreateFile(!getCreateFile());
+            }
+        });
+
+        log.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new logscreen();
             }
         });
         //TODO SysTrayIcon für schnelles updaten
@@ -130,5 +156,38 @@ public class GUI extends JFrame {
     public static boolean getFirst(){
         return first;
     }
+
+    public static boolean getCreateFile() {
+        return createFile;
+    }
+
+    public static void setCreateFile(boolean createFile) {
+        GUI.createFile = createFile;
+    }
+
+    class logscreen extends JFrame {
+        public logscreen(){
+            setTitle("Log");
+            setSize(500,500);
+
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+
+            JTextArea text = new JTextArea();
+            String temp = String.valueOf(Main.log);
+            System.out.println(temp);
+            text.append(temp);
+
+            JScrollPane panel = new JScrollPane(text,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+            this.add(panel);
+
+
+            setVisible(true);
+        }
+
+    }
 }
+
 

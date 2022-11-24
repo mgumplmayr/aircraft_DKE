@@ -222,6 +222,7 @@ public class DataInitiator {
 
         } catch (Exception e) {
             System.out.println("Fehler beim laden der statischen Daten: ");
+            Main.log.append("Fehler beim laden der statischen Daten: ");
             e.printStackTrace();
             return null;
         }
@@ -249,11 +250,13 @@ public class DataInitiator {
             JSONParser parser = new JSONParser(); //String zu JSON parsen
             JSONObject dataObject = (JSONObject) parser.parse(data);
             System.out.println(dataObject);
+            Main.log.append(dataObject);
 
             //System.out.println(dataObject);
             return dataObject;
         } catch (Exception e) {
             System.out.println("Fehler beim laden der dynamischen Daten: ");
+            Main.log.append("Fehler beim laden der dynamischen Daten: ");
             e.printStackTrace();
             return null;
         }
@@ -279,6 +282,7 @@ public class DataInitiator {
             return dataObject;
         } catch (Exception e) {
             System.out.println("Fehler beim laden der dynamischen Daten: ");
+            Main.log.append("Fehler beim laden der dynamischen Daten: ");
             e.printStackTrace();
             return null;
         }

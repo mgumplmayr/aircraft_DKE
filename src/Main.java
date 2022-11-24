@@ -44,7 +44,7 @@ public class Main {
     static final String OUTPUT_NAME = "RDFData.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
     static String dynamicModelTime;
-
+    public static StringBuilder log = new StringBuilder();
     public static void main(String[] args) {
         //create GUI
         EventQueue.invokeLater(new Runnable() {
@@ -80,26 +80,32 @@ public class Main {
         //load data into models
 
         System.out.println("--------------------------------------------");
+        log.append("--------------------------------------------\n");
+        System.out.println(log);
         loadStaticData();
 
         //validate models
         System.out.println("--------------------------------------------");
+        log.append("--------------------------------------------\n");
         validateStaticData();
 
         //write RDF to file
         System.out.println("--------------------------------------------");
+        log.append("--------------------------------------------\n");
         writeRDF();
 
         //upload both Graphs to Fuseki
         System.out.println("--------------------------------------------");
+        log.append("--------------------------------------------\n");
         //uploadGraph();
+
     }
 
     public static void update(){
         if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
         validateDynamicData();
-        writeRDF(); //RDF write necessary?
+        if(GUI.getCreateFile()) writeRDF(); //RDF write necessary?
         uploadDynamicGraph();
     }
 
@@ -122,6 +128,7 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("Fuseki Server started");
+        log.append("Fuseki Server started\n");
         uploadStaticGraph();
     }
 
@@ -133,20 +140,24 @@ public class Main {
 
     private static void uploadStaticGraph(){
         System.out.println("Uploading static Graph data to endpoint " + connectionURL);
+        log.append("Uploading static Graph data to endpoint " + connectionURL +"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(staticModel); // put -> set content, load -> add/append
         }
         System.out.println("Upload of static Graph data complete");
+        log.append("Upload of static Graph data complete\n");
     }
     private static void uploadDynamicGraph(){
 
         System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"/states/"+dynamicModelTime);
+        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"/states/"+dynamicModelTime+"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(connectionURL+"/states/"+dynamicModelTime, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
+        log.append("Upload of dynamic Graph data complete\n");
         dynamicModel.removeAll();
     }
 
@@ -158,6 +169,7 @@ public class Main {
 
     private static void validateStaticData(){
         System.out.println("Checking " + staticModel.size() + "  static model resources");
+        log.append("Checking " + staticModel.size() + "  static model resources\n");
         Graph staticDataGraph = staticModel.getGraph();
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
 
@@ -169,6 +181,7 @@ public class Main {
     }
     private static void validateDynamicData(){
         System.out.println("Checking " + dynamicModel.size() + " dynamic model resources");
+        log.append("Checking " + dynamicModel.size() + " dynamic model resources\n");
         Graph dynamicDataGraph = dynamicModel.getGraph();
         Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
 
@@ -184,8 +197,10 @@ public class Main {
         model.add(dynamicModel);
         try {
             System.out.println("Printing " + model.size() + " resources");
+            log.append("Printing " + model.size() + " resources\n");
             model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
             System.out.println("Printed to: " + OUTPUT_NAME);
+            log.append("Printed to: " + OUTPUT_NAME +"\n");
         } catch (
                 FileNotFoundException e) {
             e.printStackTrace();
@@ -195,6 +210,7 @@ public class Main {
     @Deprecated
     private static void linkPositions() {
         System.out.println("Linking Positions");
+        log.append("Linking Positions\n");
         ResIterator positionIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.position);
         int positionCounter = 0;
         int linkedCounter = 0;
@@ -208,17 +224,21 @@ public class Main {
                 if (pos.getProperty(VOC.icao24).getObject().equals(aircraft.getProperty(VOC.icao24).getObject())) {
                     aircraft.addProperty(VOC.hasAircraft, pos);
                     System.out.println("Aircraft: " + aircraft.getURI() + " linked");
+                    log.append("Aircraft: " + aircraft.getURI() + " linked\n");
                     linkedCounter++;
                 }
             }
             positionCounter++;
         }
         System.out.println(positionCounter + " Positions available");
+        log.append(positionCounter + " Positions available\n");
         System.out.println(linkedCounter + " Positions linked");
+        log.append(linkedCounter + " Positions linked\n");
     }
 
     private static void loadStaticData() {
         System.out.println("Loading Static Data");
+        log.append("Loading Static Data\n");
         JSONArray staticData = initiator.getStaticDataJSON();
         for (Object o : staticData) {
             JSONObject aircraft = (JSONObject) o;
@@ -362,6 +382,7 @@ public class Main {
         }
 
         System.out.println("Static Data loaded");
+        log.append("Static Data loaded\n");
     }
 
     private static void loadCategoryData() { //could not retrieve category info from API
@@ -476,6 +497,7 @@ public class Main {
 
     private static void loadDynamicData() {
         System.out.println("Loading Dynamic Data");
+        log.append("Loading Dynamic Data\n");
         JSONObject dynamicData = null;
         if(GUI.getChosenMode() == GUI.Mode.TEST) {
             dynamicData = initiator.getDynamicTestData();
@@ -537,7 +559,7 @@ public class Main {
             positionToAdd.addProperty(VOC.hasAircraft,aircraftToAdd);
         }
         System.out.println("Dynamic Data Loaded");
+        log.append("Dynamic Data Loaded\n");
 
     }
-
 }
