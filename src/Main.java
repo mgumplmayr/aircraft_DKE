@@ -14,8 +14,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.*;
@@ -150,11 +148,11 @@ public class Main {
     }
     private static void uploadDynamicGraph(){
 
-        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"/states/"+dynamicModelTime);
-        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"/states/"+dynamicModelTime+"\n");
+        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+dynamicModelTime);
+        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+dynamicModelTime+"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL+"/states/"+dynamicModelTime, dynamicModel);
+            conn.put(connectionURL+"states/"+dynamicModelTime, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
@@ -501,7 +499,7 @@ public class Main {
         JSONObject dynamicData = null;
         if(GUI.getChosenMode() == GUI.Mode.TEST) {
             dynamicData = initiator.getDynamicTestData();
-        } else dynamicData = initiator.getDynamicData2();
+        } else dynamicData = initiator.getDynamicData();
 
         JSONArray states = (JSONArray) dynamicData.get("states");
         dynamicModelTime = dynamicData.get("time").toString();

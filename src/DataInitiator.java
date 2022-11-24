@@ -4,10 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -261,7 +258,7 @@ public class DataInitiator {
             return null;
         }
     }
-    public JSONObject getDynamicData2() {
+    public JSONObject getDynamicData() {
         try { //dynamische Daten
             HttpClient client = HttpClient.newHttpClient();
             String url= "https://opensky-network.org/api/states/all?lamin=46.3688&lomin=5.4897&lamax=50.0067&lomax=17.0987";
