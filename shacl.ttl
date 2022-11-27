@@ -39,10 +39,9 @@ voc:aircraft_Shape
                      sh:maxCount 1 ;
                      sh:path     voc:registration ] ;
     sh:property    [ sh:datatype  xsd:string ;
-                     sh:maxLength 6 ;
                      sh:minCount  1 ;
                      sh:maxCount  1 ;
-                     sh:minLength 6 ; #add regex
+                     sh:pattern "^[a-zA-Z0-9]{6}$";
                      sh:path      voc:icao24 ] ;
     sh:property    [ sh:path        voc:hasManufacturer ;
                      sh:maxCount    1 ;
