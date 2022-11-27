@@ -53,7 +53,7 @@ voc:aircraft_Shape
                      sh:path voc:hasPosition ] ;
     sh:property    [ sh:path        voc:hasModel ;
                      sh:maxCount    1 ;
-                     sh:targetClass voc:Manufacturer ] ;
+                     sh:targetClass voc:Model ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:firstFlightDate ] ;
     sh:property    [ sh:datatype xsd:string ;
