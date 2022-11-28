@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Main {
+
     static DataInitiator initiator = new DataInitiator();
     //create model
     static Model staticModel = ModelFactory.createDefaultModel();
@@ -42,7 +43,8 @@ public class Main {
     static final String OUTPUT_NAME = "RDFData.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
     static String dynamicModelTime;
-    public static StringBuilder log = new StringBuilder();
+    public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
+    public static final String DASHES = "--------------------------------------------";
     public static void main(String[] args) {
         //create GUI
         EventQueue.invokeLater(new Runnable() {
@@ -77,23 +79,23 @@ public class Main {
 
         //load data into models
 
-        System.out.println("--------------------------------------------");
+        System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         System.out.println(log);
         loadStaticData();
 
         //validate models
-        System.out.println("--------------------------------------------");
+        System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         validateStaticData();
 
         //write RDF to file
-        System.out.println("--------------------------------------------");
+        System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         writeRDF();
 
         //upload both Graphs to Fuseki
-        System.out.println("--------------------------------------------");
+        System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         //uploadGraph();
 
