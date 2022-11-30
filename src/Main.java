@@ -38,11 +38,12 @@ public class Main {
     static String operatorURI = startURI + "operator/";
     static String ownerURI = startURI + "owner/";
     static String categoryURI = startURI + "category/";
+    static String timeURI = startURI + "time/";
     static String positionURI = startURI + "position/";
 
     static final String OUTPUT_NAME = "RDFData.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
-    static String dynamicModelTime;
+    static String responseTime;
     public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
     public static final String DASHES = "--------------------------------------------";
     public static void main(String[] args) {
@@ -74,6 +75,7 @@ public class Main {
         staticModel.setNsPrefix("category", categoryURI);
 
         //create dynamic Aircraft Prefixes
+        dynamicModel.setNsPrefix("time", timeURI);
         dynamicModel.setNsPrefix("position", positionURI);
         dynamicModel.setNsPrefix("aircraft", aircraftURI);
 
@@ -150,11 +152,11 @@ public class Main {
     }
     private static void uploadDynamicGraph(){
 
-        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+dynamicModelTime);
-        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+dynamicModelTime+"\n");
+        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+ responseTime);
+        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+ responseTime +"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL+"states/"+dynamicModelTime, dynamicModel);
+            conn.put(connectionURL+"states/"+ responseTime, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
@@ -386,8 +388,6 @@ public class Main {
     }
 
     private static void loadCategoryData() { //could not retrieve category info from API
-        Resource categoryToAdd;
-
         String thisCategoryURI = categoryURI + "0";
         staticModel.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
@@ -504,7 +504,11 @@ public class Main {
         } else dynamicData = initiator.getDynamicData();
 
         JSONArray states = (JSONArray) dynamicData.get("states");
-        dynamicModelTime = dynamicData.get("time").toString();
+        responseTime = dynamicData.get("time").toString();
+
+        Resource timeToAdd = dynamicModel.createResource(timeURI+responseTime)
+                .addProperty(RDF.type,VOC.time)
+                .addLiteral(VOC.timestamp,Integer.valueOf(responseTime));
 
         for (Object state : states) {
             JSONArray stateToAdd = (JSONArray) state;
@@ -526,10 +530,10 @@ public class Main {
             String spi = String.valueOf(stateToAdd.get(15));
             String positionSource = String.valueOf(stateToAdd.get(16));
 
-            String thisPositionURI = positionURI + icao24Pos + "_" + dynamicModelTime;
+            String thisPositionURI = positionURI + icao24Pos + "_" + responseTime;
             Resource positionToAdd = dynamicModel.createResource(thisPositionURI)
                     .addProperty(RDF.type, VOC.position)
-                    .addLiteral(VOC.time, Integer.valueOf(dynamicModelTime));
+                    .addProperty(VOC.hasTime, timeToAdd);
 
             if (!timePosition.equals("null")) positionToAdd.addLiteral(VOC.timePosition, Integer.valueOf(timePosition));
             if (!lastContact.equals("null")) positionToAdd.addLiteral(VOC.lastContact, Integer.valueOf(lastContact));

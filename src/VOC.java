@@ -61,9 +61,11 @@ public class VOC {
     public static final Property spi;
     public static final Property positionSource;
     public static final Property time;
+    public static final Property hasTime;
+    public static final Property timestamp;
     public static final Property hasAircraft;
 
-    public static final Property focusNode;
+    //public static final Property focusNode;
 
     public VOC(){
 
@@ -115,6 +117,10 @@ public class VOC {
         category = m.createProperty(vocabularyURI+"Category");
         categoryDescription = m.createProperty(vocabularyURI+"category");
 
+        //Time Vocabulary
+        time = m.createProperty(vocabularyURI+"Time");
+        timestamp = m.createProperty(vocabularyURI+"time");
+
         //Position Vocabulary
         position = m.createProperty(vocabularyURI+"Position");
         callsign= m.createProperty(vocabularyURI+"callsign");
@@ -133,10 +139,9 @@ public class VOC {
         squawk= m.createProperty(vocabularyURI+"squawk");
         spi= m.createProperty(vocabularyURI+"spi");
         positionSource= m.createProperty(vocabularyURI+"positionSource");
-        time = m.createProperty(vocabularyURI+"time");
         hasAircraft = m.createProperty(vocabularyURI+"hasAircraft");
-
-        focusNode = m.createProperty("http://www.w3.org/ns/shacl#focusNode");
+        hasTime = m.createProperty(vocabularyURI+"hasTime");
+        //focusNode = m.createProperty("http://www.w3.org/ns/shacl#focusNode");
 
     }
 }

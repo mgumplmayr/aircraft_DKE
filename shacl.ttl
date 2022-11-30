@@ -4,6 +4,7 @@
 @prefix model:        <http://example.org/model/> .
 @prefix operator:     <http://example.org/operator/> .
 @prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
 @prefix position:     <http://example.org/position/> .
 @prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix voc:          <http://example.org/vocabulary#> .
@@ -17,43 +18,43 @@ voc:aircraft_Shape
     sh:targetClass voc:Aircraft ;
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Aircraft ] ;
-    sh:property    [ sh:path        voc:hasOwner ;
-                     sh:maxCount    1 ;
-                     sh:targetClass voc:Owner ] ;
-    sh:property    [ sh:path        voc:hasCategory ;
-                     sh:maxCount    1 ;
-                     sh:targetClass voc:Category ] ;
+    sh:property    [ sh:path     voc:hasOwner ;
+                     sh:maxCount 1 ;
+                     sh:class    voc:Owner ] ;
+    sh:property    [ sh:path     voc:hasCategory ;
+                     sh:maxCount 1 ;
+                     sh:class    voc:Category ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:serialNumber ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:registered ] ;
-    sh:property    [ sh:path        voc:hasOperator ;
-                     sh:maxCount    1 ;
-                     sh:targetClass voc:Operator ] ;
+    sh:property    [ sh:path     voc:hasOperator ;
+                     sh:maxCount 1 ;
+                     sh:class    voc:Operator ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:builtDate ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:registration ] ;
-    sh:property    [ sh:datatype  xsd:string ;
-                     sh:minCount  1 ;
-                     sh:maxCount  1 ;
-                     sh:pattern "^[a-fA-F0-9]{6}$";
-                     sh:path      voc:icao24 ] ;
-    sh:property    [ sh:path        voc:hasManufacturer ;
-                     sh:maxCount    1 ;
-                     sh:targetClass voc:Manufacturer ] ;
+    sh:property    [ sh:datatype xsd:string ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:pattern  "^[a-fA-F0-9]{6}$" ;
+                     sh:path     voc:icao24 ] ;
+    sh:property    [ sh:path     voc:hasManufacturer ;
+                     sh:maxCount 1 ;
+                     sh:class    voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:lineNumber ] ;
     sh:property    [ sh:node voc:position_Shape ;
                      sh:path voc:hasPosition ] ;
-    sh:property    [ sh:path        voc:hasModel ;
-                     sh:maxCount    1 ;
-                     sh:targetClass voc:Model ] ;
+    sh:property    [ sh:path     voc:hasModel ;
+                     sh:maxCount 1 ;
+                     sh:class    voc:Model ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:firstFlightDate ] ;
     sh:property    [ sh:datatype xsd:string ;
@@ -73,16 +74,17 @@ voc:position_Shape
     sh:nodeKind    sh:IRI ;
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Position ] ;
-    sh:property    [ sh:path        voc:hasAircraft ;
-                     sh:targetClass voc:Aircraft ] ;
+    sh:property    [ sh:path  voc:hasAircraft ;
+        # sh:minCount 1 not working, check for subject?
+                     sh:class voc:Aircraft ] ;
     sh:property    [ sh:datatype xsd:int ;
                      sh:minCount 1 ;
                      sh:maxCount 1 ;
                      sh:path     voc:timePosition ] ;
-    sh:property    [ sh:datatype xsd:int ;
+    sh:property    [ sh:path voc:hasTime ;
                      sh:minCount 1 ;
                      sh:maxCount 1 ;
-                     sh:path     voc:time ] ;
+                     sh:class     voc:Time ] ;
     sh:property    [ sh:datatype xsd:int ;
                      sh:maxCount 1 ;
                      sh:path     voc:lastContact ] ;
@@ -154,6 +156,7 @@ voc:category_Shape
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Category ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
                      sh:path     voc:category ] ;
     sh:targetClass voc:Category ;
     sh:closed      true .
@@ -170,6 +173,7 @@ voc:operator_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:operator ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
                      sh:path     voc:operatorIcao ] ;
     sh:targetClass voc:Operator ;
     sh:closed      true .
@@ -180,8 +184,23 @@ voc:manufacturer_Shape
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
+        # sh:maxCount 1 ; check semantics
                      sh:path     voc:manufacturerName ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
                      sh:path     voc:manufacturerIcao ] ;
     sh:targetClass voc:Manufacturer ;
     sh:closed      true .
+
+
+voc:time_Shape
+    rdf:type       sh:NodeShape ;
+    sh:nodeKind    sh:IRI ;
+    sh:property    [ sh:path     rdf:type ;
+                     sh:hasValue voc:Time ] ;
+    sh:property    [ sh:datatype xsd:int ;
+                     sh:minCount 1 ;
+                     sh:maxCount 1 ;
+                     sh:path     voc:time ] ;
+    sh:targetClass voc:Time ;
+    sh:closed      true.

@@ -9,7 +9,7 @@ import java.net.URI;
 
 public class GUI extends JFrame {
     private static boolean first = true;
-    private static boolean createFile = false;
+    private static boolean createFile = true;
     private static Mode chosenMode = Mode.NONE;
 
     public enum Mode {
@@ -47,7 +47,7 @@ public class GUI extends JFrame {
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
 
-        JCheckBox file = new JCheckBox("create RDF-File?", false);
+        JCheckBox file = new JCheckBox("create RDF-File?", true);
 
         panel.add(test);
         panel.add(productive);
