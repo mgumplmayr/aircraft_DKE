@@ -48,12 +48,9 @@ public class Main {
     public static final String DASHES = "--------------------------------------------";
     public static void main(String[] args) {
         //create GUI
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                GUI gui = new GUI();
-                gui.setVisible(true);
-            }
+        EventQueue.invokeLater(() -> {
+            GUI gui = new GUI();
+            gui.setVisible(true);
         });
 
 
@@ -79,7 +76,7 @@ public class Main {
         dynamicModel.setNsPrefix("position", positionURI);
         dynamicModel.setNsPrefix("aircraft", aircraftURI);
 
-        //load data into models
+        //load data into model
 
         System.out.println(DASHES);
         log.append("--------------------------------------------\n");
@@ -112,7 +109,7 @@ public class Main {
     }
 
     private static void openDatasetQuery() {
-        URI uri = null;
+        URI uri;
         try {
             uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
             java.awt.Desktop.getDesktop().browse(uri);
@@ -121,10 +118,10 @@ public class Main {
         }
     }
 
-    public static void initiateFuseki() { //fuseki in src? why 2 cmd windows?
+    public static void initiateFuseki() {
         try {
-            Runtime r = Runtime.getRuntime();
-            r.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
+            Runtime.getRuntime().exec(new String[]{"cmd.exe","/k","cd fuseki && start fuseki-server.bat"});
+            //Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
             TimeUnit.SECONDS.sleep(4);
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,22 +138,22 @@ public class Main {
     }
 
     private static void uploadStaticGraph(){
-        System.out.println("Uploading static Graph data to endpoint " + connectionURL);
-        log.append("Uploading static Graph data to endpoint " + connectionURL +"\n");
+        System.out.println("Uploading static Graph data to endpoint " + connectionURL+"static/");
+        log.append("Uploading static Graph data to endpoint " + connectionURL+"static/" +"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(staticModel); // put -> set content, load -> add/append
+            conn.put(connectionURL+"static/",staticModel); // put -> set content, load -> add/append
         }
         System.out.println("Upload of static Graph data complete");
         log.append("Upload of static Graph data complete\n");
     }
     private static void uploadDynamicGraph(){
-
-        System.out.println("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+ responseTime);
-        log.append("Uploading dynamic Graph data to endpoint " + connectionURL+"states/"+ responseTime +"\n");
+        String graphURL = connectionURL+"states/"+responseTime;
+        System.out.println("Uploading dynamic Graph data to endpoint " + graphURL);
+        log.append("Uploading dynamic Graph data to endpoint " + graphURL +"\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL+"states/"+ responseTime, dynamicModel);
+            conn.put(graphURL, dynamicModel);
         }
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
@@ -257,12 +254,12 @@ public class Main {
 
             //Manufacturer properties
             String thisManufacturerURI = manufacturerURI + aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]", "");
-            String thisManufacturer = aircraft.get("manufacturericao").toString(); //for aircraft
+            String thisManufacturer = aircraft.get("manufacturericao").toString();
             String thisManufacturerName = aircraft.get("manufacturername").toString();
 
             //Model properties
             String thisModelURI = modelURI + aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]", "");
-            String thisModel = aircraft.get("model").toString();
+            String thisModel = aircraft.get("model").toString().trim();
             String thisTypecode = aircraft.get("typecode").toString();
             String thisEngines = aircraft.get("engines").toString();
             String thisIcaoAircraftType = aircraft.get("icaoaircrafttype").toString();
@@ -270,16 +267,16 @@ public class Main {
             //Operator properties
             String thisOperatorURI = operatorURI + aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisOperatorIcao = aircraft.get("operatoricao").toString();
-            String thisOperator = aircraft.get("operator").toString();
+            String thisOperator = aircraft.get("operator").toString().trim();
             String thisOperatorCallsign = aircraft.get("operatorcallsign").toString();
             String thisOperatorIata = aircraft.get("operatoriata").toString();
 
             //Owner properies
             String thisOwnerURI = ownerURI + aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]", "");
-            String thisOwner = aircraft.get("owner").toString();
+            String thisOwner = aircraft.get("owner").toString().trim();
 
             //CategoryDescription properties
-            String thisCategoryDescription = aircraft.get("categoryDescription").toString();
+            String thisCategoryDescription = aircraft.get("categoryDescription").toString().trim();
 
             //create aircraft resource
             Resource aircraftToAdd = staticModel.createResource(thisAircraftURI)
@@ -498,7 +495,7 @@ public class Main {
     private static void loadDynamicData() {
         System.out.println("Loading Dynamic Data");
         log.append("Loading Dynamic Data\n");
-        JSONObject dynamicData = null;
+        JSONObject dynamicData;
         if(GUI.getChosenMode() == GUI.Mode.TEST) {
             dynamicData = initiator.getDynamicTestData();
         } else dynamicData = initiator.getDynamicData();

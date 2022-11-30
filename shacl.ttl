@@ -12,7 +12,7 @@
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
-voc:aircraft_Shape
+voc:Aircraft_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:IRI ;
     sh:targetClass voc:Aircraft ;
@@ -69,22 +69,22 @@ voc:aircraft_Shape
     sh:closed      true .
 
 
-voc:position_Shape
+voc:Position_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:IRI ;
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Position ] ;
-    sh:property    [ sh:path  voc:hasAircraft ;
-        # sh:minCount 1 not working, check for subject?
-                     sh:class voc:Aircraft ] ;
+    sh:property    [ sh:path     voc:hasAircraft ;
+                     sh:minCount 1 ;
+                     sh:class    voc:Aircraft ] ;
     sh:property    [ sh:datatype xsd:int ;
                      sh:minCount 1 ;
                      sh:maxCount 1 ;
                      sh:path     voc:timePosition ] ;
-    sh:property    [ sh:path voc:hasTime ;
+    sh:property    [ sh:path     voc:hasTime ;
                      sh:minCount 1 ;
                      sh:maxCount 1 ;
-                     sh:class     voc:Time ] ;
+                     sh:class    voc:Time ] ;
     sh:property    [ sh:datatype xsd:int ;
                      sh:maxCount 1 ;
                      sh:path     voc:lastContact ] ;
@@ -124,7 +124,7 @@ voc:position_Shape
     sh:targetClass voc:Position ;
     sh:closed      true .
 
-voc:model_Shape
+voc:Model_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:path     rdf:type ;
@@ -136,21 +136,23 @@ voc:model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     # sh:maxCount 1 ; to many typos in csv
                      sh:path     voc:model ] ;
     sh:targetClass voc:Model ;
     sh:closed      true .
 
-voc:owner_Shape
+voc:Owner_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Owner ] ;
     sh:property    [ sh:datatype xsd:string ;
+                     sh:maxCount 1 ;
                      sh:path     voc:owner ] ;
     sh:targetClass voc:Owner ;
     sh:closed      true .
 
-voc:category_Shape
+voc:Category_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:path     rdf:type ;
@@ -161,7 +163,7 @@ voc:category_Shape
     sh:targetClass voc:Category ;
     sh:closed      true .
 
-voc:operator_Shape
+voc:Operator_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:path     rdf:type ;
@@ -178,7 +180,7 @@ voc:operator_Shape
     sh:targetClass voc:Operator ;
     sh:closed      true .
 
-voc:manufacturer_Shape
+voc:Manufacturer_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:BlankNodeOrIRI ;
     sh:property    [ sh:path     rdf:type ;
@@ -193,7 +195,7 @@ voc:manufacturer_Shape
     sh:closed      true .
 
 
-voc:time_Shape
+voc:Time_Shape
     rdf:type       sh:NodeShape ;
     sh:nodeKind    sh:IRI ;
     sh:property    [ sh:path     rdf:type ;
@@ -203,4 +205,4 @@ voc:time_Shape
                      sh:maxCount 1 ;
                      sh:path     voc:time ] ;
     sh:targetClass voc:Time ;
-    sh:closed      true.
+    sh:closed      true .
