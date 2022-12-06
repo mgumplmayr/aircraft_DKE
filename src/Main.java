@@ -77,7 +77,7 @@ public class Main {
         dynamicModel.setNsPrefix("aircraft", aircraftURI);
 
         //load data into model
-
+        /*
         System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         System.out.println(log);
@@ -92,16 +92,15 @@ public class Main {
         System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         writeRDF();
-
+        */
         //upload both Graphs to Fuseki
         System.out.println(DASHES);
         log.append("--------------------------------------------\n");
         //uploadGraph();
 
     }
-
     public static void update(){
-        if(GUI.getFirst()) loadStaticData();
+        //if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
         validateDynamicData();
         if(GUI.getCreateFile()) writeRDF(); //RDF write necessary?
@@ -128,7 +127,7 @@ public class Main {
         }
         System.out.println("Fuseki Server started");
         log.append("Fuseki Server started\n");
-        uploadStaticGraph();
+        //uploadStaticGraph();
     }
 
     public static void uploadGraph() {
@@ -137,7 +136,7 @@ public class Main {
         uploadDynamicGraph();
     }
 
-    private static void uploadStaticGraph(){
+    public static void uploadStaticGraph(){
         System.out.println("Uploading static Graph data to endpoint " + connectionURL+"static/");
         log.append("Uploading static Graph data to endpoint " + connectionURL+"static/" +"\n");
 
@@ -166,7 +165,7 @@ public class Main {
         validateDynamicData();
     }
 
-    private static void validateStaticData(){
+    public static void validateStaticData(){
         System.out.println("Checking " + staticModel.size() + "  static model resources");
         log.append("Checking " + staticModel.size() + "  static model resources\n");
         Graph staticDataGraph = staticModel.getGraph();
@@ -235,7 +234,7 @@ public class Main {
         log.append(linkedCounter + " Positions linked\n");
     }
 
-    private static void loadStaticData() {
+    public static void loadStaticData() {
         System.out.println("Loading Static Data");
         log.append("Loading Static Data\n");
         JSONArray staticData = initiator.getStaticDataJSON();

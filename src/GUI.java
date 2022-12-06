@@ -37,12 +37,13 @@ public class GUI extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1,2));
         JPanel secondPane = new JPanel();
-        panel.setLayout(new GridLayout(1,4));
+        panel.setLayout(new GridLayout(1,5));
 
         JButton test = new JButton("Test");
         JButton productive = new JButton("Productive");
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
+        JButton importStaticData = new JButton("Import Static Data");
         JButton refresh = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
@@ -51,6 +52,7 @@ public class GUI extends JFrame {
 
         panel.add(test);
         panel.add(productive);
+        secondPane.add(importStaticData);
         secondPane.add(startFuseki);
         secondPane.add(refresh);
         secondPane.add(openQuery);
@@ -59,6 +61,14 @@ public class GUI extends JFrame {
         central.add(panel,BorderLayout.CENTER);
         central.add(file, BorderLayout.SOUTH);
 
+        importStaticData.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(getFirst()) Main.loadStaticData();
+                Main.validateStaticData();
+                Main.uploadStaticGraph();
+            }
+        });
         refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
