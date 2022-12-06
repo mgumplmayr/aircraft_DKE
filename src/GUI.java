@@ -64,9 +64,12 @@ public class GUI extends JFrame {
         importStaticData.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(getFirst()) Main.loadStaticData();
-                Main.validateStaticData();
-                Main.uploadStaticGraph();
+                if(getFirst()){
+                    first = false;
+                    Main.loadStaticData();
+                    Main.validateStaticData();
+                    Main.uploadStaticGraph();
+                }
             }
         });
         refresh.addActionListener(new ActionListener() {
@@ -74,7 +77,6 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(chosenMode == Mode.NONE);
                 else {
-                    first = false;
                     Main.update();
                 }
 
