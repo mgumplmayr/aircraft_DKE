@@ -44,6 +44,7 @@ public class GUI extends JFrame {
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
+        JButton predictPosition = new JButton("Predict Position");
         JButton refresh = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
@@ -53,6 +54,7 @@ public class GUI extends JFrame {
         panel.add(test);
         panel.add(productive);
         secondPane.add(importStaticData);
+        secondPane.add(predictPosition);
         secondPane.add(startFuseki);
         secondPane.add(refresh);
         secondPane.add(openQuery);
@@ -72,6 +74,13 @@ public class GUI extends JFrame {
                 }
             }
         });
+        predictPosition.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Main.predictPosition();
+            }
+        });
+
         refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

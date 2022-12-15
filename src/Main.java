@@ -160,6 +160,10 @@ public class Main {
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
         dynamicModel.removeAll();
+
+    }
+
+    public static void predictPosition(){
         try{
             String query = "SELECT ?x ?y ?z WHERE {\n" + "  GRAPH ?graph{\n" +
                     "    ?x ?y ?z\n" +
@@ -192,8 +196,8 @@ public class Main {
             System.out.println(qexec.execSelect().next());
             ResultSet results = qexec.execSelect();
             ResultSetFormatter.out(System.out, results);
+            log.append(results);
             qexec.close();
-
 
         } catch (Exception e) {
             e.printStackTrace();
