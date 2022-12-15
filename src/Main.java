@@ -1,4 +1,5 @@
 import org.apache.jena.graph.Graph;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -98,6 +99,8 @@ public class Main {
         log.append("--------------------------------------------\n");
         //uploadGraph();
 
+
+
     }
     public static void update(){
         //if(GUI.getFirst()) loadStaticData();
@@ -157,6 +160,44 @@ public class Main {
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
         dynamicModel.removeAll();
+        try{
+            String query = "SELECT ?x ?y ?z WHERE {\n" + "  GRAPH ?graph{\n" +
+                    "    ?x ?y ?z\n" +
+                    "  }\n" +
+                    "}";
+            String query1 = "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                    "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                    "prefix aircraft: <http://example.org/aircraft/> \n" +
+                    "prefix position: <http://example.org/position/> \n" +
+                    "prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
+                    "prefix time:     <http://example.org/time/> \n" +
+                    "prefix voc:      <http://example.org/vocabulary#> \n" +
+                    "prefix xsd:      <http://www.w3.org/2001/XMLSchema#> \n" +
+                    "\n" +
+                    "SELECT ?aircraft ?time ?onGround ?time_position ?velocity ?true_track ?latitude ?longitude WHERE {\n" +
+                    "  GRAPH ?graph{\n" +
+                    "    ?thisPosition voc:hasTime ?time_object.\n" +
+                    "    ?thisPosition voc:latitude ?latitude.\n" +
+                    "    ?thisPosition voc:longitude ?longitude.\n" +
+                    "    ?thisPosition voc:velocity ?velocity.\n" +
+                    "    ?thisPosition voc:hasAircraft ?aircraft.\n" +
+                    "    ?thisPosition voc:onGround ?onGround.\n" +
+                    "    ?thisPosition voc:trueTrack ?true_track.\n" +
+                    "    ?time_object voc:time ?time.\n" +
+                    "    ?thisPosition voc:lastContact ?time_position\n" +
+                    "    FILTER(?time_position<?time &&?onGround = false)\n" +
+                    "  }\n" +
+                    "}";
+            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://localhost:3030/aircraft/sparql", query1);
+            System.out.println(qexec.execSelect().next());
+            ResultSet results = qexec.execSelect();
+            ResultSetFormatter.out(System.out, results);
+            qexec.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void validateData() {
@@ -540,7 +581,7 @@ public class Main {
             if (!velocity.equals("null")) positionToAdd.addLiteral(VOC.velocity, Float.valueOf(velocity));
             if (!trueTrack.equals("null")) positionToAdd.addLiteral(VOC.trueTrack, Float.valueOf(trueTrack));
             if (!verticalRate.equals("null")) positionToAdd.addLiteral(VOC.verticalRate, Float.valueOf(verticalRate));
-           // if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
+            // if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
             if (!geoAltitude.equals("null")) positionToAdd.addLiteral(VOC.geoAltitude, Float.valueOf(geoAltitude));
             if (!squawk.equals("null")) positionToAdd.addLiteral(VOC.squawk, squawk);
             if (!spi.equals("null")) positionToAdd.addLiteral(VOC.spi, Boolean.valueOf(spi));
