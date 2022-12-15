@@ -44,9 +44,9 @@ public class GUI extends JFrame {
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
-        JButton predictPosition = new JButton("Predict Position");
         JButton refresh = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
+        JButton predictPosition = new JButton("Predict Position");
         JButton log = new JButton("Log");
 
         JCheckBox file = new JCheckBox("create RDF-File?", true);
@@ -54,10 +54,10 @@ public class GUI extends JFrame {
         panel.add(test);
         panel.add(productive);
         secondPane.add(importStaticData);
-        secondPane.add(predictPosition);
         secondPane.add(startFuseki);
         secondPane.add(refresh);
         secondPane.add(openQuery);
+        secondPane.add(predictPosition);
         secondPane.add(log);
 
         central.add(panel,BorderLayout.CENTER);
