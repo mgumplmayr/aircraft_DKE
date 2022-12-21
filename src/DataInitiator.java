@@ -39,7 +39,7 @@ public class DataInitiator {
 
     public DataInitiator(){
         String testData1 = "{\n" +
-                "  \"time\": 1669043816,\n" +
+                "  \"time\": 1669943816,\n" +
                 "  \"states\": [\n" +
                 "    [\n" +
                 "      \"4b1815\",\n" +
@@ -69,7 +69,7 @@ public class DataInitiator {
                 "      8.5599,\n" +
                 "      47.4515,\n" +
                 "      null,\n" +
-                "      true,\n" +
+                "      false,\n" +
                 "      0,\n" +
                 "      185.62,\n" +
                 "      null,\n" +
@@ -129,7 +129,7 @@ public class DataInitiator {
                 "      8.5599,\n" +
                 "      47.4515,\n" +
                 "      null,\n" +
-                "      true,\n" +
+                "      false,\n" +
                 "      0,\n" +
                 "      185.62,\n" +
                 "      null,\n" +
@@ -186,7 +186,7 @@ public class DataInitiator {
                 "      8.5576,\n" +
                 "      47.4535,\n" +
                 "      533.4,\n" +
-                "      true,\n" +
+                "      false,\n" +
                 "      0,\n" +
                 "      5.62,\n" +
                 "      null,\n" +

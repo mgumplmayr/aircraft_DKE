@@ -11,10 +11,14 @@ import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
 import org.apache.jena.shacl.lib.ShLib;
+import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.apache.jena.sparql.util.*;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.util.ModelPrinter;
 
 import java.awt.*;
 import java.io.*;
@@ -192,14 +196,22 @@ public class Main {
                     "    FILTER(?time_position<?time &&?onGround = false)\n" +
                     "  }\n" +
                     "}";
-            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://localhost:3030/aircraft/sparql", query1);
+            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://localhost:3030/aircraft/sparql", query);
             System.out.println(qexec.execSelect().next());
             ResultSet results = qexec.execSelect();
             OutputStream outPrediction = new FileOutputStream("prediction.xml");
             ResultSetFormatter.outputAsXML(outPrediction, results);
-            ResultSetFormatter.out(System.out, results);
-            log.append(results);
             qexec.close();
+
+            File initialFile = new File("prediction.xml");
+            InputStream targetStream = new FileInputStream(initialFile);
+
+            Model dataModel = JenaUtil.createMemoryModel();
+            dataModel.read(targetStream, FileUtils.langXML);
+            System.out.println(ModelPrinter.get().print(dataModel));
+
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
