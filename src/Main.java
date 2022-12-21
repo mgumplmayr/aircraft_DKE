@@ -195,6 +195,8 @@ public class Main {
             QueryExecution qexec = QueryExecutionFactory.sparqlService("http://localhost:3030/aircraft/sparql", query1);
             System.out.println(qexec.execSelect().next());
             ResultSet results = qexec.execSelect();
+            OutputStream outPrediction = new FileOutputStream("prediction.xml");
+            ResultSetFormatter.outputAsXML(outPrediction, results);
             ResultSetFormatter.out(System.out, results);
             log.append(results);
             qexec.close();
