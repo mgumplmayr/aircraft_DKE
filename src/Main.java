@@ -5,6 +5,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
@@ -168,54 +170,8 @@ public class Main {
     }
 
     public static void predictPosition(){
-        try{
-            String query = "SELECT ?x ?y ?z WHERE {\n" + "  GRAPH ?graph{\n" +
-                    "    ?x ?y ?z\n" +
-                    "  }\n" +
-                    "}";
-            String query1 = "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                    "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                    "prefix aircraft: <http://example.org/aircraft/> \n" +
-                    "prefix position: <http://example.org/position/> \n" +
-                    "prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
-                    "prefix time:     <http://example.org/time/> \n" +
-                    "prefix voc:      <http://example.org/vocabulary#> \n" +
-                    "prefix xsd:      <http://www.w3.org/2001/XMLSchema#> \n" +
-                    "\n" +
-                    "SELECT ?aircraft ?time ?onGround ?time_position ?velocity ?true_track ?latitude ?longitude WHERE {\n" +
-                    "  GRAPH ?graph{\n" +
-                    "    ?thisPosition voc:hasTime ?time_object.\n" +
-                    "    ?thisPosition voc:latitude ?latitude.\n" +
-                    "    ?thisPosition voc:longitude ?longitude.\n" +
-                    "    ?thisPosition voc:velocity ?velocity.\n" +
-                    "    ?thisPosition voc:hasAircraft ?aircraft.\n" +
-                    "    ?thisPosition voc:onGround ?onGround.\n" +
-                    "    ?thisPosition voc:trueTrack ?true_track.\n" +
-                    "    ?time_object voc:time ?time.\n" +
-                    "    ?thisPosition voc:lastContact ?time_position\n" +
-                    "    FILTER(?time_position<?time &&?onGround = false)\n" +
-                    "  }\n" +
-                    "}";
-            QueryExecution qexec = QueryExecutionFactory.sparqlService("http://localhost:3030/aircraft/sparql", query);
-            System.out.println(qexec.execSelect().next());
-            ResultSet results = qexec.execSelect();
-            OutputStream outPrediction = new FileOutputStream("prediction.xml");
-            ResultSetFormatter.outputAsXML(outPrediction, results);
-            qexec.close();
-
-            File initialFile = new File("prediction.xml");
-            InputStream targetStream = new FileInputStream(initialFile);
-
-            Model dataModel = JenaUtil.createMemoryModel();
-            dataModel.read(targetStream, FileUtils.langXML);
-            System.out.println(ModelPrinter.get().print(dataModel));
-
-
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        PositionPredictor predictor = new PositionPredictor();
+        predictor.predictPosition();
     }
 
     private static void validateData() {
