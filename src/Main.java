@@ -165,7 +165,7 @@ public class Main {
         validateDynamicData();
     }
 
-    public static void validateStaticData(){
+    public static void validateStaticData() {
         System.out.println("Checking " + staticModel.size() + "  static model resources");
         log.append("Checking " + staticModel.size() + "  static model resources\n");
         Graph staticDataGraph = staticModel.getGraph();
@@ -173,9 +173,17 @@ public class Main {
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
-        ShLib.printReport(report);
-        //report.getModel() select query -> get focus nodes with error (SPARQL)
-        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+        //ShLib.printReport(report);
+
+        if (report.conforms()) { //todo this is not sparql, still ok?
+            System.out.println("Static Data Conforms");
+        } else {
+            report.getEntries().forEach((e) -> {
+                System.out.println("Removing: " + e.focusNode());
+                staticModel.removeAll(staticModel.getResource(e.focusNode().toString()),null,null);
+            });
+        }
+        //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
     private static void validateDynamicData(){
         System.out.println("Checking " + dynamicModel.size() + " dynamic model resources");
@@ -185,8 +193,17 @@ public class Main {
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
-        ShLib.printReport(report);
-        RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+        //ShLib.printReport(report);
+
+        if (report.conforms()) { //todo this is not sparql, still ok?
+            System.out.println("Dynamic Data Conforms");
+        } else {
+            report.getEntries().forEach((e) -> {
+                System.out.println("Removing: " + e.focusNode());
+                dynamicModel.removeAll(dynamicModel.getResource(e.focusNode().toString()),null,null);
+            });
+        }
+        //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
 
     private static void writeRDF() {
