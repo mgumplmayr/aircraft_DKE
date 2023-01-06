@@ -1,0 +1,122 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rs:  <http://www.w3.org/2001/sw/DataAccess/tests/result-set#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[ rdf:type           rs:ResultSet ;
+  rs:resultVariable  "time" , "longitude" , "velocity" , "true_track" , "aircraft" , "latitude" ;
+  rs:size            "6"^^xsd:int ;
+  rs:solution        [ rs:binding  [ rs:value     "7.8876"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "47.2855"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "25.62"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "195.12"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669943816"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1815> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ] ;
+  rs:solution        [ rs:binding  [ rs:value     "8.5599"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "47.4515"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "185.62"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "0.0"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669043826"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1816> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ] ;
+  rs:solution        [ rs:binding  [ rs:value     "8.5599"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "47.4515"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "185.62"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "0.0"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669943816"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1816> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ] ;
+  rs:solution        [ rs:binding  [ rs:value     "7.8876"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "47.2855"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "25.62"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "195.12"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669043836"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1815> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ] ;
+  rs:solution        [ rs:binding  [ rs:value     "8.5576"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "47.4535"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "5.62"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "0.0"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669043826"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1805> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ] ;
+  rs:solution        [ rs:binding  [ rs:value     "6.5257"^^xsd:float ;
+                                     rs:variable  "longitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "49.2063"^^xsd:float ;
+                                     rs:variable  "latitude"
+                                   ] ;
+                       rs:binding  [ rs:value     "150.32"^^xsd:float ;
+                                     rs:variable  "true_track"
+                                   ] ;
+                       rs:binding  [ rs:value     "236.86"^^xsd:float ;
+                                     rs:variable  "velocity"
+                                   ] ;
+                       rs:binding  [ rs:value     "1669943816"^^xsd:int ;
+                                     rs:variable  "time"
+                                   ] ;
+                       rs:binding  [ rs:value     <http://example.org/aircraft/4b1817> ;
+                                     rs:variable  "aircraft"
+                                   ]
+                     ]
+] .

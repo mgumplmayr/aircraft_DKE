@@ -20,6 +20,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.apache.jena.sparql.util.*;
 import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.rules.RuleUtil;
 import org.topbraid.shacl.util.ModelPrinter;
 
 import java.awt.*;
@@ -202,7 +203,14 @@ public class Main {
         ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
         ShLib.printReport(report);
         RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+
+        Model predictionShapeModel = ModelFactory.createDefaultModel();
+        predictionShapeModel.read("predictionSHACL.ttl");
+        predictionShapeModel = RuleUtil.executeRules(dynamicModel, predictionShapeModel, dynamicModel, null);
+        RDFDataMgr.write(System.out, predictionShapeModel, Lang.TTL);
     }
+
+
 
     private static void writeRDF() {
         Model model = ModelFactory.createDefaultModel();
