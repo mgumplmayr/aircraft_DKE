@@ -206,6 +206,8 @@ public class Main {
 
         Model predictionShapeModel = ModelFactory.createDefaultModel();
         predictionShapeModel.read("predictionSHACL.ttl");
+        RDFDataMgr.write(System.out, predictionShapeModel, Lang.TTL);
+        System.out.println("---------------------");
         predictionShapeModel = RuleUtil.executeRules(dynamicModel, predictionShapeModel, dynamicModel, null);
         RDFDataMgr.write(System.out, predictionShapeModel, Lang.TTL);
     }
