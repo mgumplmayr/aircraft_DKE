@@ -1,0 +1,59 @@
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
+
+voc:testShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Aircraft ;
+    sh:rule [
+          a sh:TripleRule ;
+          sh:prefixes voc: ;
+          sh:subject sh:this ;
+          sh:predicate rdf:type ;
+          sh:object voc:Test ;
+          sh:condition voc:Aircraft ;
+      ] .
+
+voc:ChangeRuleShape
+    a sh:NodeShape ;
+    sh:deactivated true;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:prefixes voc: ;
+
+          sh:construct """
+                prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+            CONSTRUCT {
+                $this voc:old ?x .
+            }
+            WHERE {
+            GRAPH ?graph{
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                ?time_object voc:time ?time.
+                $this voc:lastContact ?time_position.
+                FILTER(?time_position<?time &&?onGround = false).
+                BIND (?onGround AS ?x).
+                }
+            }
+            """ ;
+          sh:condition voc:Position ;
+      ] ;
+.

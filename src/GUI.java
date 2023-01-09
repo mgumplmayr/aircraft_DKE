@@ -47,6 +47,7 @@ public class GUI extends JFrame {
         JButton refresh = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
+        JButton changeIdentifier = new JButton("ChangeIdentifier");
 
         JCheckBox file = new JCheckBox("create RDF-File?", true);
 
@@ -58,9 +59,12 @@ public class GUI extends JFrame {
         secondPane.add(refresh);
         secondPane.add(openQuery);
         secondPane.add(log);
+        secondPane.add(changeIdentifier);
 
         central.add(panel,BorderLayout.CENTER);
         central.add(file, BorderLayout.SOUTH);
+
+        changeIdentifier.addActionListener(e -> ChangeIdentifier.IdentifyChanges());
 
         importStaticData.addActionListener(new ActionListener() {
             @Override
