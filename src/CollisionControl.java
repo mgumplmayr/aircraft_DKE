@@ -43,5 +43,51 @@ public class CollisionControl {
             "    FILTER(?distance < 200)\n" +
             "  }\n" +
             "}";
+
+
+    /* Query for use in Fuseki Server
+
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX aircraft: <http://example.org/aircraft/>
+    PREFIX position: <http://example.org/position/>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX time: <http://example.org/time/>
+    PREFIX voc: <http://example.org/vocabulary#>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    PREFIX math: <http://www.w3.org/2005/xpath-functions/math#>
+
+
+    SELECT ?aircraft1 ?aircraft2 ?distance ?time WHERE {
+      GRAPH ?graph {
+        ?position1 voc:hasTime ?time1.
+        ?position1 voc:latitude ?latitude1.
+        ?position1 voc:longitude ?longitude1.
+        ?position1 voc:velocity ?velocity1.
+        ?position1 voc:hasAircraft ?aircraft1.
+        ?position1 voc:onGround ?onGround1.
+        ?position1 voc:trueTrack ?true_track1.
+        ?time1 voc:time ?time.
+        ?position1 voc:lastContact ?time_position1
+        FILTER(?time_position1<?time &&?onGround1 = false)
+        ?position2 voc:hasTime ?time2.
+        ?position2 voc:latitude ?latitude2.
+        ?position2 voc:longitude ?longitude2.
+        ?position2 voc:velocity ?velocity2.
+        ?position2 voc:hasAircraft ?aircraft2.
+        ?position2 voc:onGround ?onGround2.
+        ?position2 voc:trueTrack ?true_track2.
+        ?time2 voc:time ?time.
+        ?position2 voc:lastContact ?time_position2
+        FILTER(?time_position2<?time &&?onGround2 = false)
+        FILTER(?aircraft1 != ?aircraft2)
+        BIND ((?latitude2 - ?latitude1) as ?dLat)
+        BIND ((?longitude2 - ?longitude1) as ?dLon)
+        BIND (math:pow(math:sin(?dLat/2), 2) + math:pow(math:sin(?dLon/2), 2) * math:cos(?latitude1) * math:cos(?latitude2) as ?a)
+        BIND (6378.388 * 2 * math:atan2(math:sqrt(?a), math:sqrt(1.0-?a)) as ?distance)
+        FILTER(?distance < 200)
+      }
+    }
+    */
 }
 
