@@ -27,6 +27,7 @@ public class Main {
     //create model
     static Model staticModel = ModelFactory.createDefaultModel();
     static Model dynamicModel = ModelFactory.createDefaultModel();
+    static Model testModel = ModelFactory.createDefaultModel();
 
     //define general URIS
     static final String startURI = "http://example.org/";
@@ -41,7 +42,8 @@ public class Main {
     static String timeURI = startURI + "time/";
     static String positionURI = startURI + "position/";
 
-    static final String OUTPUT_NAME = "RDFData.ttl";
+    static final String OUTPUT_NAME = "out/RDFData.ttl";
+    static final String SHAPES_NAME = "shacl/shapes.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
     static String responseTime;
     public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
@@ -156,6 +158,7 @@ public class Main {
         }
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
+
         dynamicModel.removeAll();
     }
 
@@ -169,7 +172,7 @@ public class Main {
         System.out.println("Checking " + staticModel.size() + "  static model resources");
         log.append("Checking " + staticModel.size() + "  static model resources\n");
         Graph staticDataGraph = staticModel.getGraph();
-        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+        Graph shapeGraph = RDFDataMgr.loadGraph(SHAPES_NAME);
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
@@ -189,7 +192,7 @@ public class Main {
         System.out.println("Checking " + dynamicModel.size() + " dynamic model resources");
         log.append("Checking " + dynamicModel.size() + " dynamic model resources\n");
         Graph dynamicDataGraph = dynamicModel.getGraph();
-        Graph shapeGraph = RDFDataMgr.loadGraph("shacl.ttl");
+        Graph shapeGraph = RDFDataMgr.loadGraph(SHAPES_NAME);
 
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
@@ -203,13 +206,14 @@ public class Main {
                 dynamicModel.removeAll(dynamicModel.getResource(e.focusNode().toString()),null,null);
             });
         }
+        testModel.add(dynamicModel);
         //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
 
-    private static void writeRDF() {
+    public static void writeRDF() {
         Model model = ModelFactory.createDefaultModel();
         model.add(staticModel);
-        model.add(dynamicModel);
+        model.add(testModel);
         try {
             System.out.println("Printing " + model.size() + " resources");
             log.append("Printing " + model.size() + " resources\n");
