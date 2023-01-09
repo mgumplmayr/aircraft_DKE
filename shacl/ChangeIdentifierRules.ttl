@@ -15,6 +15,7 @@
 voc:testShape
     a sh:NodeShape ;
     sh:targetClass voc:Aircraft ;
+    sh:deactivated true;
     sh:rule [
           a sh:TripleRule ;
           sh:prefixes voc: ;
