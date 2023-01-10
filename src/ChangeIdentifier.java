@@ -18,57 +18,37 @@ import java.io.InputStream;
 
 public class ChangeIdentifier {
 
+    static Model responseModel = ModelFactory.createDefaultModel();
+
     public static void IdentifyChanges() {
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
         Query query = QueryFactory.create("SELECT * { BIND('Hello'as ?text) }");
-        Query query1 = QueryFactory.create("PREFIX voc: <http://example.org/vocabulary#>\n" +
-                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                "CONSTRUCT{\n" +
-                "  ?s ?p ?o}\n" +
-                "    WHERE {\n" +
-                "  Graph ?g{\n" +
-                "  ?s ?p ?o.\n" +
-                "    ?s rdf:type voc:Position.\n" +
-                "  }\n" +
-                "}");
+        Query constructQuery = QueryFactory.create("""
+                PREFIX voc: <http://example.org/vocabulary#>
+                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                CONSTRUCT{
+                  ?s ?p ?o}
+                    WHERE {
+                  Graph ?g{
+                  ?s ?p ?o.
+                    ?s rdf:type voc:Position.
+                  }
+                }""");
 
-        // In this variation, a connection is built each time.
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
-            /** Funktioniert
+            /* Funktioniert
              Model fetch = conn.fetch("http://localhost:3030/aircraft/static/");
              System.out.println(fetch);*/
 
-            /** Funktioniert nicht!
-             Dataset ds2 = conn.fetchDataset();
-             Model test = ModelFactory.createDefaultModel();
-             test.add(ds2.getDefaultModel());
+            responseModel = conn.query(constructQuery).execConstruct();
 
-             System.out.println(test);
-             */
-
-            Model test = ModelFactory.createDefaultModel();
-            //ResultSet rs = conn.query(query1).execSelect();
-            test = conn.query(query1).execConstruct();
-
-            /*while (rs.hasNext()){
-                QuerySolution qs = rs.next();
-
-                Resource subject = qs.getResource("s");
-                Property predicate = test.createProperty(qs.get("p").toString());
-                RDFNode object = qs.get("o");
-
-                test.add(subject,predicate,object);
-            }*/
-
-            //test.add(RDFOutput.encodeAsModel(rs));
             try {
-                test.write(new FileOutputStream("out/test.ttl"),"TTL");
+                responseModel.write(new FileOutputStream("out/response.ttl"),"TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            //System.out.println(test);
 
             Model fetchModel = conn.fetch("http://localhost:3030/aircraft/static/");
             //Graph ruleGraph = RDFDataMgr.loadGraph("shacl/ChangeIdentifierRules.ttl");
@@ -83,7 +63,7 @@ public class ChangeIdentifier {
 
             //infer Triples from rules
             Model result = RuleUtil.executeRules(fetchModel,shapesModel,null,null);
-            result.add(test);
+            result.add(responseModel);
             try { //write infered triples to file
                 result.write(new FileOutputStream("out/inference.ttl"),"TTL");
             } catch (FileNotFoundException e) {
