@@ -45,6 +45,7 @@ public class Main {
     static final String OUTPUT_NAME = "out/RDFData.ttl";
     static final String SHAPES_NAME = "shacl/shapes.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
+
     static String responseTime;
     public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
     public static final String DASHES = "--------------------------------------------";
@@ -182,7 +183,7 @@ public class Main {
             System.out.println("Static Data Conforms");
         } else {
             report.getEntries().forEach((e) -> {
-                System.out.println("Removing: " + e.focusNode());
+                System.out.println("Removing: " + e.focusNode() + " Reason: " + e.message());
                 staticModel.removeAll(staticModel.getResource(e.focusNode().toString()),null,null);
             });
         }
@@ -197,12 +198,11 @@ public class Main {
         Shapes shape = Shapes.parse(shapeGraph);
         ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
         //ShLib.printReport(report);
-
         if (report.conforms()) { //todo this is not sparql, still ok?
             System.out.println("Dynamic Data Conforms");
         } else {
             report.getEntries().forEach((e) -> {
-                System.out.println("Removing: " + e.focusNode());
+                System.out.println("Removing: " + e.focusNode() + " Reason: " + e.message());
                 dynamicModel.removeAll(dynamicModel.getResource(e.focusNode().toString()),null,null);
             });
         }
@@ -383,7 +383,7 @@ public class Main {
                 aircraftToAdd.addProperty(VOC.hasOwner, ownerToAdd);
             }
             //link categories
-            loadCategoryData();
+            loadCategoryData(staticModel);
             if (!thisCategoryDescription.isEmpty()) {
                 ResIterator categoryIterator = staticModel.listSubjectsWithProperty(RDF.type, VOC.category);
                 boolean loop = true;
@@ -404,109 +404,110 @@ public class Main {
         log.append("Static Data loaded\n");
     }
 
-    private static void loadCategoryData() { //could not retrieve category info from API
+    private static void loadCategoryData(Model model) { //could not retrieve category info from API
+
         String thisCategoryURI = categoryURI + "0";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "No information at all");
 
         thisCategoryURI = categoryURI + "1";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "No ADS-B Emitter Category Information");
 
         thisCategoryURI = categoryURI + "2";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Light (< 15500 lbs)");
 
         thisCategoryURI = categoryURI + "3";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Small (15500 to 75000 lbs)");
 
         thisCategoryURI = categoryURI + "4";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Large (75000 to 300000 lbs)");
 
         thisCategoryURI = categoryURI + "5";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "High Vortex Large (aircraft such as B-757)");
 
         thisCategoryURI = categoryURI + "6";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Heavy (> 300000 lbs)");
 
         thisCategoryURI = categoryURI + "7";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "High Performance (> 5g acceleration and 400 kts)");
 
         thisCategoryURI = categoryURI + "8";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Rotorcraft");
 
         thisCategoryURI = categoryURI + "9";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Glider / sailplane");
 
         thisCategoryURI = categoryURI + "10";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Lighter-than-air");
 
         thisCategoryURI = categoryURI + "11";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Parachutist / Skydiver");
 
         thisCategoryURI = categoryURI + "12";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Ultralight / hang-glider / paraglider");
 
         thisCategoryURI = categoryURI + "13";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Reserved");
 
         thisCategoryURI = categoryURI + "14";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Unmanned Aerial Vehicle");
 
         thisCategoryURI = categoryURI + "15";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Space / Trans-atmospheric vehicle");
 
         thisCategoryURI = categoryURI + "16";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Surface Vehicle – Emergency Vehicle");
 
         thisCategoryURI = categoryURI + "17";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Surface Vehicle – Service Vehicle");
 
         thisCategoryURI = categoryURI + "18";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Point Obstacle (includes tethered balloons)");
 
         thisCategoryURI = categoryURI + "19";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Cluster Obstacle");
 
         thisCategoryURI = categoryURI + "20";
-        staticModel.createProperty(thisCategoryURI)
+        model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Line Obstacle");
 
@@ -546,6 +547,7 @@ public class Main {
             String squawk = String.valueOf(stateToAdd.get(14));
             String spi = String.valueOf(stateToAdd.get(15));
             String positionSource = String.valueOf(stateToAdd.get(16));
+            String category = String.valueOf(stateToAdd.get(17));
 
             String thisPositionURI = positionURI + icao24Pos + "_" + responseTime;
             Resource positionToAdd = dynamicModel.createResource(thisPositionURI)
@@ -576,6 +578,8 @@ public class Main {
 
             if (!callsign.equals("null") && !callsign.isEmpty()) aircraftToAdd.addProperty(VOC.callsign, callsign);
             if (!originCountry.equals("null") && !originCountry.isEmpty()) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
+            loadCategoryData(dynamicModel);
+            if(!category.equals("null")) aircraftToAdd.addProperty(VOC.hasCategory,staticModel.getResource(categoryURI+category));
 
             positionToAdd.addProperty(VOC.hasAircraft,aircraftToAdd);
         }
