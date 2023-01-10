@@ -25,8 +25,8 @@ public class ChangeIdentifier {
         Query query = QueryFactory.create("SELECT * { BIND('Hello'as ?text) }");
         Query query1 = QueryFactory.create("PREFIX voc: <http://example.org/vocabulary#>\n" +
                 "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-                "select\n" +
-                "  ?s ?p ?o\n" +
+                "CONSTRUCT{\n" +
+                "  ?s ?p ?o}\n" +
                 "    WHERE {\n" +
                 "  Graph ?g{\n" +
                 "  ?s ?p ?o.\n" +
@@ -49,9 +49,10 @@ public class ChangeIdentifier {
              */
 
             Model test = ModelFactory.createDefaultModel();
-            ResultSet rs = conn.query(query1).execSelect();
+            //ResultSet rs = conn.query(query1).execSelect();
+            test = conn.query(query1).execConstruct();
 
-            while (rs.hasNext()){
+            /*while (rs.hasNext()){
                 QuerySolution qs = rs.next();
 
                 Resource subject = qs.getResource("s");
@@ -59,7 +60,7 @@ public class ChangeIdentifier {
                 RDFNode object = qs.get("o");
 
                 test.add(subject,predicate,object);
-            }
+            }*/
 
             //test.add(RDFOutput.encodeAsModel(rs));
             try {
@@ -88,7 +89,7 @@ public class ChangeIdentifier {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-
+            System.out.println("end");
         }
     }
 }

@@ -27,12 +27,9 @@ voc:testShape
 
 voc:ChangeRuleShape
     a sh:NodeShape ;
-    sh:deactivated true;
-    sh:targetClass voc:Position ;
+    sh:targetClass voc:Aircraft ;
     sh:rule [
           a sh:SPARQLRule ;
-          sh:prefixes voc: ;
-
           sh:construct """
                 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                 prefix aircraft: <http://example.org/aircraft/>
@@ -42,19 +39,12 @@ voc:ChangeRuleShape
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
             CONSTRUCT {
-                $this voc:old ?x .
+                $this voc:old "test" .
             }
             WHERE {
-            GRAPH ?graph{
-                $this voc:hasTime ?time_object.
-                $this voc:onGround ?onGround.
-                ?time_object voc:time ?time.
-                $this voc:lastContact ?time_position.
-                FILTER(?time_position<?time &&?onGround = false).
-                BIND (?onGround AS ?x).
-                }
+                $this rdf:type voc:Aircraft
+
             }
             """ ;
-          sh:condition voc:Position ;
       ] ;
 .

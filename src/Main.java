@@ -202,7 +202,7 @@ public class Main {
             System.out.println("Dynamic Data Conforms");
         } else {
             report.getEntries().forEach((e) -> {
-                System.out.println("Removing: " + e.focusNode());
+                System.out.println("Removing: " + e.focusNode()); //remove object
                 dynamicModel.removeAll(dynamicModel.getResource(e.focusNode().toString()),null,null);
             });
         }
