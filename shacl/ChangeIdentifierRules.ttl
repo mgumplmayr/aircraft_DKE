@@ -27,23 +27,28 @@ voc:testShape
 
 voc:ChangeRuleShape
     a sh:NodeShape ;
-    sh:targetClass voc:Aircraft ;
+    sh:targetClass voc:Position ;
     sh:rule [
           a sh:SPARQLRule ;
           sh:construct """
-                prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
                 prefix aircraft: <http://example.org/aircraft/>
                 prefix position: <http://example.org/position/>
                 prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 prefix time:     <http://example.org/time/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+
             CONSTRUCT {
-                $this voc:old "test" .
+                $this voc:old ?x .
             }
             WHERE {
-                $this rdf:type voc:Aircraft
-
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                ?time_object voc:time ?time.
+                $this voc:lastContact ?time_position.
+                FILTER(?time_position<?time &&?onGround = false).
+                BIND (?onGround AS ?x).
             }
             """ ;
       ] ;

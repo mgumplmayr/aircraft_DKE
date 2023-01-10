@@ -26,16 +26,35 @@ public class ChangeIdentifier {
 
         Query query = QueryFactory.create("SELECT * { BIND('Hello'as ?text) }");
         Query constructQuery = QueryFactory.create("""
-                PREFIX voc: <http://example.org/vocabulary#>
-                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX aircraft: <http://example.org/aircraft/>
+                    PREFIX position: <http://example.org/position/>
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX time: <http://example.org/time/>
+                    PREFIX voc: <http://example.org/vocabulary#>
+                    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                    
                 CONSTRUCT{
-                  ?s ?p ?o}
-                    WHERE {
-                  Graph ?g{
-                  ?s ?p ?o.
-                    ?s rdf:type voc:Position.
-                  }
-                }""");
+                     	?s ?p ?o}
+                         WHERE {
+                             Graph ?graph{
+                             ?s ?p ?o.
+                     		{?s a voc:Position} UNION {?s a voc:Time}
+                             }
+                             {
+                                 SELECT ?graph ?time ?timestamp WHERE {
+                                 GRAPH ?graph {
+                                       ?time rdf:type voc:Time.
+                                       ?time voc:time ?timestamp.
+                                 }
+                               }
+                 
+                           order by desc(?timestamp)
+                           limit 1
+                             }
+                     }
+                     """);
 
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             /* Funktioniert
@@ -45,27 +64,25 @@ public class ChangeIdentifier {
             responseModel = conn.query(constructQuery).execConstruct();
 
             try {
-                responseModel.write(new FileOutputStream("out/response.ttl"),"TTL");
+                responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
-            Model fetchModel = conn.fetch("http://localhost:3030/aircraft/static/");
-            //Graph ruleGraph = RDFDataMgr.loadGraph("shacl/ChangeIdentifierRules.ttl");
-            Model shapesModel= JenaUtil.createMemoryModel();
+            Model shapesModel = JenaUtil.createMemoryModel();
 
             try { //add rules to model
                 shapesModel.read("shacl/ChangeIdentifierRules.ttl");
-                shapesModel.write(new FileOutputStream("out/testRules.ttl"),"TTL");
+                shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
             //infer Triples from rules
-            Model result = RuleUtil.executeRules(fetchModel,shapesModel,null,null);
-            result.add(responseModel);
+            Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
+            //result.add(responseModel);
             try { //write infered triples to file
-                result.write(new FileOutputStream("out/inference.ttl"),"TTL");
+                result.write(new FileOutputStream("out/inference.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
