@@ -261,7 +261,7 @@ public class DataInitiator {
     public JSONObject getDynamicData() {
         try { //dynamische Daten
             HttpClient client = HttpClient.newHttpClient();
-            String url= "https://opensky-network.org/api/states/all?lamin=46.3688&lomin=5.4897&lamax=50.0067&lomax=17.0987";
+            String url= "https://opensky-network.org/api/states/all?&extended=1&lamin=45.5&lomin=5.5&lamax=50.07&lomax=17.0";
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 

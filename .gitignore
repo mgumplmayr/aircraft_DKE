@@ -1,7 +1,6 @@
 /apache-jena-fuseki-4.6.1/
 staticRDF.ttl
 /out/
-RDFData.ttl
 icon.jpg
 /fuseki/run/system/tdb.lock
 .DS_Store

@@ -51,10 +51,11 @@ public class GUI extends JFrame {
 
         JCheckBox file = new JCheckBox("create RDF-File?", true);
 
-        panel.add(test);
         panel.add(productive);
-        secondPane.add(importStaticData);
+        panel.add(test);
+
         secondPane.add(startFuseki);
+        secondPane.add(importStaticData);
         secondPane.add(refresh);
         secondPane.add(openQuery);
         secondPane.add(predictPosition);
@@ -70,6 +71,7 @@ public class GUI extends JFrame {
                     first = false;
                     Main.loadStaticData();
                     Main.validateStaticData();
+                    if(createFile) Main.writeRDF();
                     Main.uploadStaticGraph();
                 }
             }
