@@ -4,12 +4,10 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
-import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
@@ -27,7 +25,10 @@ public class Main {
     //create model
     static Model staticModel = ModelFactory.createDefaultModel();
     static Model dynamicModel = ModelFactory.createDefaultModel();
-    static Model testModel = ModelFactory.createDefaultModel();
+    //used for saving of all graphs in RDF File
+    static Model RDFFileModel = ModelFactory.createDefaultModel();
+    //used to store Category Data
+    static Model categoryModel = ModelFactory.createDefaultModel();
 
     //define general URIS
     static final String startURI = "http://example.org/";
@@ -49,6 +50,7 @@ public class Main {
     static String responseTime;
     public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
     public static final String DASHES = "--------------------------------------------";
+
     public static void main(String[] args) {
         //create GUI
         EventQueue.invokeLater(() -> {
@@ -65,6 +67,8 @@ public class Main {
         dynamicModel.setNsPrefix("voc", VOC.getURI());
         dynamicModel.setNsPrefix("rdf", RDF.getURI());
         dynamicModel.setNsPrefix("xsd", XSD.getURI());
+
+        loadCategoryData(categoryModel);
 
         //create static Aircraft Prefixes
         staticModel.setNsPrefix("aircraft", aircraftURI);
@@ -102,11 +106,12 @@ public class Main {
         //uploadGraph();
 
     }
-    public static void update(){
+
+    public static void update() {
         //if(GUI.getFirst()) loadStaticData();
         loadDynamicData();
         validateDynamicData();
-        if(GUI.getCreateFile()) writeRDF(); //RDF write necessary?
+        if (GUI.getCreateFile()) writeRDF(); //RDF write necessary?
         uploadDynamicGraph();
     }
 
@@ -122,15 +127,13 @@ public class Main {
 
     public static void initiateFuseki() {
         try {
-            Runtime.getRuntime().exec(new String[]{"cmd.exe","/k","cd fuseki && start fuseki-server.bat"});
-            //Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd fuseki && start fuseki-server.bat\" ");
+            Runtime.getRuntime().exec(new String[]{"cmd.exe", "/k", "cd fuseki && start fuseki-server.bat"});
             TimeUnit.SECONDS.sleep(4);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("Fuseki Server started");
         log.append("Fuseki Server started\n");
-        //uploadStaticGraph();
     }
 
     public static void uploadGraph() {
@@ -139,20 +142,21 @@ public class Main {
         uploadDynamicGraph();
     }
 
-    public static void uploadStaticGraph(){
-        System.out.println("Uploading static Graph data to endpoint " + connectionURL+"static/");
-        log.append("Uploading static Graph data to endpoint " + connectionURL+"static/" +"\n");
+    public static void uploadStaticGraph() {
+        System.out.println("Uploading static Graph data to endpoint " + connectionURL + "static/");
+        log.append("Uploading static Graph data to endpoint " + connectionURL + "static/" + "\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL+"static/",staticModel); // put -> set content, load -> add/append
+            conn.put(connectionURL + "static/", staticModel); // put -> set content, load -> add/append
         }
         System.out.println("Upload of static Graph data complete");
         log.append("Upload of static Graph data complete\n");
     }
-    private static void uploadDynamicGraph(){
-        String graphURL = connectionURL+"states/"+responseTime;
+
+    private static void uploadDynamicGraph() {
+        String graphURL = connectionURL + "states/" + responseTime;
         System.out.println("Uploading dynamic Graph data to endpoint " + graphURL);
-        log.append("Uploading dynamic Graph data to endpoint " + graphURL +"\n");
+        log.append("Uploading dynamic Graph data to endpoint " + graphURL + "\n");
 
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(graphURL, dynamicModel);
@@ -170,56 +174,43 @@ public class Main {
     }
 
     public static void validateStaticData() {
-        System.out.println("Checking " + staticModel.size() + "  static model resources");
-        log.append("Checking " + staticModel.size() + "  static model resources\n");
-        Graph staticDataGraph = staticModel.getGraph();
-        Graph shapeGraph = RDFDataMgr.loadGraph(SHAPES_NAME);
-
-        Shapes shape = Shapes.parse(shapeGraph);
-        ValidationReport report = ShaclValidator.get().validate(shape, staticDataGraph);
-        //ShLib.printReport(report);
-
-        if (report.conforms()) { //todo this is not sparql, still ok?
-            System.out.println("Static Data Conforms");
-        } else {
-            report.getEntries().forEach((e) -> {
-                System.out.println("Removing: " + e.focusNode() + " Reason: " + e.message());
-                staticModel.removeAll(staticModel.getResource(e.focusNode().toString()),null,null);
-            });
-        }
-        //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+        validateModel(staticModel, "Static Model");
     }
-    private static void validateDynamicData(){
-        System.out.println("Checking " + dynamicModel.size() + " dynamic model resources");
-        log.append("Checking " + dynamicModel.size() + " dynamic model resources\n");
-        Graph dynamicDataGraph = dynamicModel.getGraph();
+
+    private static void validateDynamicData() {
+        validateModel(dynamicModel, "Dynamic Model");
+        RDFFileModel.add(dynamicModel);
+    }
+
+    private static void validateModel(Model model, String modelName) {
+        System.out.println("Checking " + model.size() + " " + modelName + " resources");
+        Graph modelGraph = model.getGraph();
         Graph shapeGraph = RDFDataMgr.loadGraph(SHAPES_NAME);
 
         Shapes shape = Shapes.parse(shapeGraph);
-        ValidationReport report = ShaclValidator.get().validate(shape, dynamicDataGraph);
-        //ShLib.printReport(report);
-        if (report.conforms()) { //todo this is not sparql, still ok?
-            System.out.println("Dynamic Data Conforms");
+        ValidationReport report = ShaclValidator.get().validate(shape, modelGraph);
+        //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
+        if (report.conforms()) {
+            System.out.println(modelName + " Data Conforms");
         } else {
             report.getEntries().forEach((e) -> {
                 System.out.println("Removing: " + e.focusNode() + " Reason: " + e.message());
-                dynamicModel.removeAll(dynamicModel.getResource(e.focusNode().toString()),null,null);
+                model.removeAll(model.getResource(e.focusNode().toString()), null, null);
+                model.removeAll(null, null, model.getResource(e.focusNode().toString()));
             });
         }
-        testModel.add(dynamicModel);
-        //RDFDataMgr.write(System.out, report.getModel(), Lang.TTL);
     }
 
     public static void writeRDF() {
         Model model = ModelFactory.createDefaultModel();
         model.add(staticModel);
-        model.add(testModel);
+        model.add(RDFFileModel);
         try {
             System.out.println("Printing " + model.size() + " resources");
             log.append("Printing " + model.size() + " resources\n");
             model.write(new FileOutputStream(OUTPUT_NAME), "TTL");
             System.out.println("Printed to: " + OUTPUT_NAME);
-            log.append("Printed to: " + OUTPUT_NAME +"\n");
+            log.append("Printed to: " + OUTPUT_NAME + "\n");
         } catch (
                 FileNotFoundException e) {
             e.printStackTrace();
@@ -517,16 +508,16 @@ public class Main {
         System.out.println("Loading Dynamic Data");
         log.append("Loading Dynamic Data\n");
         JSONObject dynamicData;
-        if(GUI.getChosenMode() == GUI.Mode.TEST) {
+        if (GUI.getChosenMode() == GUI.Mode.TEST) {
             dynamicData = initiator.getDynamicTestData();
         } else dynamicData = initiator.getDynamicData();
 
         JSONArray states = (JSONArray) dynamicData.get("states");
         responseTime = dynamicData.get("time").toString();
 
-        Resource timeToAdd = dynamicModel.createResource(timeURI+responseTime)
-                .addProperty(RDF.type,VOC.time)
-                .addLiteral(VOC.timestamp,Integer.valueOf(responseTime));
+        Resource timeToAdd = dynamicModel.createResource(timeURI + responseTime)
+                .addProperty(RDF.type, VOC.time)
+                .addLiteral(VOC.timestamp, Integer.valueOf(responseTime));
 
         for (Object state : states) {
             JSONArray stateToAdd = (JSONArray) state;
@@ -563,11 +554,12 @@ public class Main {
             if (!velocity.equals("null")) positionToAdd.addLiteral(VOC.velocity, Float.valueOf(velocity));
             if (!trueTrack.equals("null")) positionToAdd.addLiteral(VOC.trueTrack, Float.valueOf(trueTrack));
             if (!verticalRate.equals("null")) positionToAdd.addLiteral(VOC.verticalRate, Float.valueOf(verticalRate));
-           // if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
+            // if (!sensors.isEmpty()) positionToAdd.addProperty(VOC.sensors, sensors);
             if (!geoAltitude.equals("null")) positionToAdd.addLiteral(VOC.geoAltitude, Float.valueOf(geoAltitude));
             if (!squawk.equals("null")) positionToAdd.addLiteral(VOC.squawk, squawk);
             if (!spi.equals("null")) positionToAdd.addLiteral(VOC.spi, Boolean.valueOf(spi));
-            if (!positionSource.equals("null")) positionToAdd.addLiteral(VOC.positionSource, Integer.valueOf(positionSource));
+            if (!positionSource.equals("null"))
+                positionToAdd.addLiteral(VOC.positionSource, Integer.valueOf(positionSource));
 
 
             //Create dynamic aircraft Resource;
@@ -577,11 +569,12 @@ public class Main {
                     .addProperty(RDF.type, VOC.aircraft);
 
             if (!callsign.equals("null") && !callsign.isEmpty()) aircraftToAdd.addProperty(VOC.callsign, callsign);
-            if (!originCountry.equals("null") && !originCountry.isEmpty()) aircraftToAdd.addProperty(VOC.originCountry, originCountry);
-            loadCategoryData(dynamicModel);
-            if(!category.equals("null")) aircraftToAdd.addProperty(VOC.hasCategory,staticModel.getResource(categoryURI+category));
+            if (!originCountry.equals("null") && !originCountry.isEmpty())
+                aircraftToAdd.addProperty(VOC.originCountry, originCountry);
+            if (!category.equals("null"))
+                aircraftToAdd.addProperty(VOC.hasCategory, categoryModel.getResource(categoryURI + category));
 
-            positionToAdd.addProperty(VOC.hasAircraft,aircraftToAdd);
+            positionToAdd.addProperty(VOC.hasAircraft, aircraftToAdd);
         }
         System.out.println("Dynamic Data Loaded");
         log.append("Dynamic Data Loaded\n");
