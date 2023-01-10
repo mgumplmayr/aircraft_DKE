@@ -51,6 +51,16 @@ public class ChangeIdentifier {
             Model test = ModelFactory.createDefaultModel();
             ResultSet rs = conn.query(query1).execSelect();
 
+            while (rs.hasNext()){
+                QuerySolution qs = rs.next();
+
+                Resource subject = qs.getResource("s");
+                Property predicate = test.createProperty(qs.get("p").toString());
+                RDFNode object = qs.get("o");
+
+                test.add(subject,predicate,object);
+            }
+
             //test.add(RDFOutput.encodeAsModel(rs));
             try {
                 test.write(new FileOutputStream("out/test.ttl"),"TTL");
