@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="apache.jena.base" type="repository">
+    <properties maven-id="org.apache.jena:jena-base:4.6.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jena-base-4.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.36.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jena-shaded-guava-4.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-csv-1.9.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-io-2.11.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.12.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-compress-1.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/collection-0.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
