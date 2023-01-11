@@ -35,8 +35,8 @@ voc:PredictPositionShape
                 #$this voc:timeDiff ?timeDifference.
                 #$this voc:distance ?distance.
                 #$this voc:deltaLong ?deltaLong.
-                $this voc:predictedLongitude ?predictedLong.
-                $this voc:predictedLatitude ?predictedLat.
+                $this voc:predictedLongitude ?predictedLongitude.
+                $this voc:predictedLatitude ?predictedLatitude.
 
             }
             WHERE {
@@ -88,6 +88,8 @@ voc:PredictPositionShape
                 BIND((?dy/110540) AS ?deltaLat).
                 BIND((?oldLatitude + ?deltaLat) AS ?predictedLat).
                 BIND((?oldLongitude + ?deltaLong) AS ?predictedLong).
+                BIND(STRDT(STRBEFORE(STR(?predictedLat),"e0"), xsd:float) AS ?predictedLatitude).
+                BIND(STRDT(STRBEFORE(STR(?predictedLong), "e0"), xsd:float) AS ?predictedLongitude).
             }
             """ ;
       ] ;

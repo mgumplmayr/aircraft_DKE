@@ -16,6 +16,7 @@ public class PositionPredictor {
     static Model responseModel = ModelFactory.createDefaultModel();
 
     public static void predictPosition() {
+        System.out.println("Predicting position");
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
@@ -93,7 +94,7 @@ public class PositionPredictor {
             System.out.println("SHACL-Rule for Position Prediction executed");
 
             System.out.println("Uploading generated Position Prediction data to endpoint " + graphURL);
-            conn.put(graphURL, result);
+            conn.load(graphURL, result);
             System.out.println("Upload of Position Prediction data complete");
 
         }
