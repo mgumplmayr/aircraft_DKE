@@ -1,70 +1,84 @@
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
-import org.apache.jena.sparql.resultset.RDFOutput;
-import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.util.ModelPrinter;
+import org.topbraid.shacl.rules.*;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 public class PositionPredictor {
-    private static final String OUTPUT_NAME = "outputPred.ttl";
-    private static String query = "SELECT ?x ?y ?z WHERE {\n" + "  GRAPH ?graph{\n" +
-            "    ?x ?y ?z\n" +
-            "  }\n" +
-            "}\n"+
-            "LIMIT 25";
-    private static String query1 = "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-            "prefix aircraft: <http://example.org/aircraft/> \n" +
-            "prefix position: <http://example.org/position/> \n" +
-            "prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
-            "prefix time:     <http://example.org/time/> \n" +
-            "prefix voc:      <http://example.org/vocabulary#> \n" +
-            "prefix xsd:      <http://www.w3.org/2001/XMLSchema#> \n" +
-            "\n" +
-            "SELECT ?aircraft ?time ?velocity ?true_track ?latitude ?longitude WHERE {\n" +
-            "  GRAPH ?graph{\n" +
-            "    ?thisPosition voc:hasTime ?time_object.\n" +
-            "    ?thisPosition voc:latitude ?latitude.\n" +
-            "    ?thisPosition voc:longitude ?longitude.\n" +
-            "    ?thisPosition voc:velocity ?velocity.\n" +
-            "    ?thisPosition voc:hasAircraft ?aircraft.\n" +
-            "    ?thisPosition voc:onGround ?onGround.\n" +
-            "    ?thisPosition voc:trueTrack ?true_track.\n" +
-            "    ?time_object voc:time ?time.\n" +
-            "    ?thisPosition voc:lastContact ?time_position\n" +
-            "    FILTER(?time_position<?time &&?onGround = false)\n" +
-            "  }\n" +
-            "}";
 
+    static Model responseModel = ModelFactory.createDefaultModel();
 
-    public static void predictPosition(){
-        try{
-            RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create().destination("http://localhost:3030/aircraft/");
-            RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build();
-            final Model[] m = new Model[1];
+    public static void predictPosition() {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
+                .destination("http://localhost:3030/aircraft/");
 
-            conn.queryResultSet(query1, (rs) -> {
-                try {
-                    m[0] = RDFOutput.encodeAsModel(rs);
-                    m[0].write(new FileOutputStream(OUTPUT_NAME), "TTL");;
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+        Query graphsQuery = QueryFactory.create("""
+                	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX aircraft: <http://example.org/aircraft/>
+                    PREFIX position: <http://example.org/position/>
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX time: <http://example.org/time/>
+                    PREFIX voc: <http://example.org/vocabulary#>
+                    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                    
+                CONSTRUCT{
+                     	?s ?p ?o}
+                         WHERE {
+                             Graph ?graph{
+                             ?s ?p ?o.
+                     		{?s a voc:Position} UNION {?s a voc:Time}
+                             }
+                             {
+                                 SELECT ?graph ?time ?timestamp WHERE {
+                                 GRAPH ?graph {
+                                       ?time rdf:type voc:Time.
+                                       ?time voc:time ?timestamp.
+                                 }
+                               }
+                 
+                           order by desc(?timestamp)
+                           limit 3
+                             }
+                     }
+                     """);
 
-            Model mod = m[0];
-            mod.write(System.out, "TTL");
+        try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
+            /* Funktioniert
+             Model fetch = conn.fetch("http://localhost:3030/aircraft/static/");
+             System.out.println(fetch);*/
 
+            responseModel = conn.query(graphsQuery).execConstruct();
 
+            try {
+                responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
 
+            Model shapesModel = JenaUtil.createMemoryModel();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            try { //add rules to model
+                shapesModel.read("shacl/PositionPredictorRules.ttl");
+                shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            //infer Triples from rules
+            Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
+            //result.add(responseModel);
+            try { //write infered triples to file
+                result.write(new FileOutputStream("out/inference.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("end");
+
         }
     }
 }

@@ -1,5 +1,4 @@
 import org.apache.jena.graph.Graph;
-import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -13,10 +12,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.apache.jena.sparql.util.*;
-import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.rules.RuleUtil;
-import org.topbraid.shacl.util.ModelPrinter;
 
 import java.awt.*;
 import java.io.*;
@@ -178,7 +173,7 @@ public class Main {
     public static void predictPosition(){
         /*PositionPredictor predictor = new PositionPredictor();
         predictor.predictPosition();*/
-        ChangeIdentifier.IdentifyChanges();
+        PositionPredictor.predictPosition();
     }
 
     private static void validateData() {

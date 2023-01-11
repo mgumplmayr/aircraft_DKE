@@ -37,7 +37,9 @@ voc:PredictPositionShape
                 $this voc:onGround ?onGround.
                 $this voc:hasAircraft ?aircraft.
                 ?time_object voc:time ?time.
+
             {
+            #Query for the Position before the current Position saved on Variable ?oldPos
                 SELECT ?oldPos ?oldTime ?oldAircraft
                     WHERE{
                     ?oldPos a voc:Position.
@@ -46,7 +48,9 @@ voc:PredictPositionShape
                     ?oldPos voc:hasAircraft ?oldAircraft.
                     }
             }
+
             {
+            #Query for the Position before the Position before the current Position saved on Variable ?beforeOldPos
                 SELECT ?beforeOldPos ?beforeOldTime ?beforeOldAircraft
                     WHERE{
                     ?beforeOldPos a voc:Position.
@@ -55,11 +59,13 @@ voc:PredictPositionShape
                     ?beforeOldPos voc:hasAircraft ?beforeOldAircraft.
                     }
             }
-
                 $this voc:lastContact ?time_position.
                 FILTER(?time_position<?time &&?onGround = false &&
                 ?oldAircraft = ?aircraft && ?beforeOldAircraft = ?aircraft &&
                 ?oldTime < ?time && ?beforeOldTime < ?oldTime).
+
+
+            #TODO: Calculations with the Positions to get expected Position
 
             }
             """ ;
