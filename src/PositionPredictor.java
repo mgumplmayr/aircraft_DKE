@@ -1,5 +1,6 @@
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
 import org.topbraid.jenax.util.JenaUtil;
@@ -16,7 +17,7 @@ public class PositionPredictor {
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
-        Query graphsQuery = QueryFactory.create("""
+        Query resultQuery = QueryFactory.create("""
                 	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                     PREFIX aircraft: <http://example.org/aircraft/>
@@ -47,12 +48,35 @@ public class PositionPredictor {
                      }
                      """);
 
+        Query latestGraphQuery = QueryFactory.create(
+                """
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX aircraft: <http://example.org/aircraft/>
+                        PREFIX position: <http://example.org/position/>
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX time: <http://example.org/time/>
+                        PREFIX voc: <http://example.org/vocabulary#>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                                           
+                        SELECT DISTINCT ?g ?time
+                            WHERE {
+                                GRAPH ?g {\s
+                        	        ?s voc:time ?time.
+                        	    }
+                            } ORDER BY DESC(?time)
+                            LIMIT 1"""
+        );
+
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             /* Funktioniert
              Model fetch = conn.fetch("http://localhost:3030/aircraft/static/");
              System.out.println(fetch);*/
 
-            responseModel = conn.query(graphsQuery).execConstruct();
+            responseModel = conn.query(resultQuery).execConstruct();
+            QuerySolution q =conn.query(latestGraphQuery).execSelect().nextSolution();
+            String graph = q.get("g").toString();
+            System.out.println(graph);
 
             try {
                 responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
@@ -77,7 +101,19 @@ public class PositionPredictor {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("end");
+            System.out.println("SHACL-Rule for Position Prediction executed");
+
+            /*String graphURL = connectionURL + "states/" + responseTime;
+            System.out.println("Uploading dynamic Graph data to endpoint " + graphURL);
+            log.append("Uploading dynamic Graph data to endpoint " + graphURL + "\n");
+
+            try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
+                conn.put(graphURL, dynamicModel);
+            }
+            System.out.println("Upload of dynamic Graph data complete");
+            log.append("Upload of dynamic Graph data complete\n");*/
+
+
 
         }
     }

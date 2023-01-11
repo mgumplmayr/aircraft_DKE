@@ -25,38 +25,51 @@ voc:PredictPositionShape
                 prefix time:     <http://example.org/time/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
                 $this voc:old true .
-                $this voc:oldPosition ?oldPos.
-                $this voc:beforeOldPosition ?beforeOldPos.
+                #$this voc:oldPosition ?oldPos.
+                #$this voc:beforeOldPosition ?beforeOldPos.
+                #$this voc:avgVelo ?avgVelocity.
+                #$this voc:timeDiff ?timeDifference.
+                #$this voc:distance ?distance.
+                #$this voc:deltaLong ?deltaLong.
+                $this voc:predictedLongitude ?predictedLong.
+                $this voc:predictedLatitude ?predictedLat.
 
             }
             WHERE {
                 $this voc:hasTime ?time_object.
                 $this voc:onGround ?onGround.
                 $this voc:hasAircraft ?aircraft.
+                $this voc:velocity ?velocity.
                 ?time_object voc:time ?time.
 
             {
             #Query for the Position before the current Position saved on Variable ?oldPos
-                SELECT ?oldPos ?oldTime ?oldAircraft
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVelocity ?oldTrueTrack ?oldLatitude ?oldLongitude
                     WHERE{
                     ?oldPos a voc:Position.
                     ?oldPos voc:hasTime ?oldTime_object.
                     ?oldTime_object voc:time ?oldTime.
                     ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:velocity ?oldVelocity.
+                    ?oldPos voc:trueTrack ?oldTrueTrack.
+                    ?oldPos voc:latitude ?oldLatitude.
+                    ?oldPos voc:longitude ?oldLongitude.
                     }
             }
 
             {
             #Query for the Position before the Position before the current Position saved on Variable ?beforeOldPos
-                SELECT ?beforeOldPos ?beforeOldTime ?beforeOldAircraft
+                SELECT ?beforeOldPos ?beforeOldTime ?beforeOldAircraft ?beforeOldVelocity
                     WHERE{
                     ?beforeOldPos a voc:Position.
                     ?beforeOldPos voc:hasTime ?beforeOldTime_object.
                     ?beforeOldTime_object voc:time ?beforeOldTime.
                     ?beforeOldPos voc:hasAircraft ?beforeOldAircraft.
+                    ?beforeOldPos voc:velocity ?beforeOldVelocity
                     }
             }
                 $this voc:lastContact ?time_position.
@@ -65,8 +78,16 @@ voc:PredictPositionShape
                 ?oldTime < ?time && ?beforeOldTime < ?oldTime).
 
 
-            #TODO: Calculations with the Positions to get expected Position
-
+                #TODO: Calculations with the Positions to get expected Position
+                BIND((?time_position - ?oldTime) AS ?timeDifference). #Difference between time_position of current and the time before
+                BIND(((?velocity+?oldVelocity+?beforeOldVelocity)/3) AS ?avgVelocity). #average velocity of current state, old state and the state before (linar regression?)
+                BIND((?avgVelocity * ?timeDifference) AS ?distance). #distance to be travelled in the timeDifference
+                BIND((?distance * math:sin(?oldTrueTrack)) AS ?dx).
+                BIND((?distance * math:cos(?oldTrueTrack)) AS ?dy).
+                BIND((?dx/(111320 * math:cos(?oldLatitude))) AS ?deltaLong).
+                BIND((?dy/110540) AS ?deltaLat).
+                BIND((?oldLatitude + ?deltaLat) AS ?predictedLat).
+                BIND((?oldLongitude + ?deltaLong) AS ?predictedLong).
             }
             """ ;
       ] ;
