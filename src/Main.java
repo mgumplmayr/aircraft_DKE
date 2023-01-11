@@ -176,8 +176,9 @@ public class Main {
     }
 
     public static void predictPosition(){
-        PositionPredictor predictor = new PositionPredictor();
-        predictor.predictPosition();
+        /*PositionPredictor predictor = new PositionPredictor();
+        predictor.predictPosition();*/
+        ChangeIdentifier.IdentifyChanges();
     }
 
     private static void validateData() {
@@ -401,7 +402,6 @@ public class Main {
             } else {
                 aircraftToAdd.addProperty(VOC.hasCategory, staticModel.getResource("http://example.org/category/0"));
             }
-
         }
 
         System.out.println("Static Data loaded");
@@ -573,7 +573,6 @@ public class Main {
             if (!spi.equals("null")) positionToAdd.addLiteral(VOC.spi, Boolean.valueOf(spi));
             if (!positionSource.equals("null"))
                 positionToAdd.addLiteral(VOC.positionSource, Integer.valueOf(positionSource));
-
 
             //Create dynamic aircraft Resource;
             String thisAircraftURI = aircraftURI + icao24Pos;
