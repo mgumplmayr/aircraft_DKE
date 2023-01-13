@@ -9,6 +9,12 @@ import org.apache.jena.shacl.Shapes;
 import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.util.JenaUtil;
+import org.apache.jena.shacl.Shapes;
+import org.topbraid.shacl.engine.Shape;
+import org.topbraid.shacl.engine.ShapesGraphFactory;
+import org.topbraid.shacl.model.SHParameter;
+import org.topbraid.shacl.model.impl.SHParameterImpl;
+import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
 import org.topbraid.shacl.rules.*;
 
 import java.io.FileInputStream;
@@ -51,18 +57,41 @@ public class ChangeIdentifier {
                                }
                  
                            order by desc(?timestamp)
-                           limit 1
+                           limit 2
                              }
                      }
                      """);
 
-        try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
-            /* Funktioniert
-             Model fetch = conn.fetch("http://localhost:3030/aircraft/static/");
-             System.out.println(fetch);*/
+        Query latestGraphQuery = QueryFactory.create("""
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX aircraft: <http://example.org/aircraft/>
+                        PREFIX position: <http://example.org/position/>
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX time: <http://example.org/time/>
+                        PREFIX voc: <http://example.org/vocabulary#>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                                           
+                        SELECT DISTINCT ?g ?time
+                            WHERE {
+                                GRAPH ?g {
+                        	        ?s voc:time ?time.
+                        	    }
+                            } ORDER BY DESC(?time)
+                            LIMIT 1
+                """);
 
+        try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
+            //getting Response from last 3 Graphs
             responseModel = conn.query(constructQuery).execConstruct();
 
+            //getting the latest Graph for Upload
+            QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
+            String graphURL = q.get("g").toString(); //todo add /3
+
+
+
+            //print response to file
             try {
                 responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
             } catch (FileNotFoundException e) {
@@ -70,23 +99,26 @@ public class ChangeIdentifier {
             }
 
             Model shapesModel = JenaUtil.createMemoryModel();
+            shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
-            try { //add rules to model
-                shapesModel.read("shacl/ChangeIdentifierRules.ttl");
+            //todo: add parameter to shacl shape / sparql query?
+
+            /* add rules to model
+            try {
                 shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
-            }
+            }*/
 
             //infer Triples from rules
             Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
             //result.add(responseModel);
             try { //write infered triples to file
-                result.write(new FileOutputStream("out/inference.ttl"), "TTL");
+                result.write(new FileOutputStream("out/changeIdentifier.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("end");
+            System.out.println("SHACL-Rule for Change Identification executed");
         }
     }
 }

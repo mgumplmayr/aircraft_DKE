@@ -12,20 +12,7 @@
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
-voc:testShape
-    a sh:NodeShape ;
-    sh:targetClass voc:Aircraft ;
-    sh:deactivated true;
-    sh:rule [
-          a sh:TripleRule ;
-          sh:prefixes voc: ;
-          sh:subject sh:this ;
-          sh:predicate rdf:type ;
-          sh:object voc:Test ;
-          sh:condition voc:Aircraft ;
-      ] .
-
-voc:ChangeRuleShape
+voc:ChangeIdentifierShape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -38,17 +25,38 @@ voc:ChangeRuleShape
                 prefix time:     <http://example.org/time/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                $this voc:old ?x .
+                $this voc:changed true.
+                #$this voc:oldPosition ?oldPos.
+                $this voc:deltaVelocity ?deltaVelocity
             }
             WHERE {
                 $this voc:hasTime ?time_object.
                 $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:velocity ?velocity.
                 ?time_object voc:time ?time.
-                $this voc:lastContact ?time_position.
-                FILTER(?time_position<?time &&?onGround = false).
-                BIND (?onGround AS ?x).
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVelocity
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:velocity ?oldVelocity.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ?deltaVelocity < ?threshold).
+
+
+            BIND(abs((?velocity-?oldVelocity)) AS ?deltaVelocity). #Delta of velocities
             }
             """ ;
       ] ;
