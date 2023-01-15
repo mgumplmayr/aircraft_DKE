@@ -44,10 +44,9 @@ public class GUI extends JFrame {
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
-        JButton refresh = new JButton("Refresh States");
+        JButton update = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
-        JButton changeIdentifier = new JButton("ChangeIdentifier");
 
         JCheckBox file = new JCheckBox("create RDF-File?", true);
 
@@ -56,100 +55,64 @@ public class GUI extends JFrame {
 
         secondPane.add(startFuseki);
         secondPane.add(importStaticData);
-        secondPane.add(refresh);
+        secondPane.add(update);
         secondPane.add(openQuery);
         secondPane.add(log);
-        secondPane.add(changeIdentifier);
 
         central.add(panel,BorderLayout.CENTER);
         central.add(file, BorderLayout.SOUTH);
 
-        changeIdentifier.addActionListener(e -> ChangeIdentifier.IdentifyChanges());
+        importStaticData.addActionListener(e -> {
+            if(getFirst()){
+                first = false;
+                Main.loadStaticData();
+                Main.validateStaticData();
+                if(createFile) Main.writeRDF();
+                Main.uploadStaticGraph();
+            }
+        });
+        update.addActionListener(e -> {
+            if(chosenMode == Mode.NONE);
+            else {
+                Main.update();
+                if (getCreateFile()) Main.writeRDF();
+            }
 
-        importStaticData.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getFirst()){
-                    first = false;
-                    Main.loadStaticData();
-                    Main.validateStaticData();
-                    if(createFile) Main.writeRDF();
-                    Main.uploadStaticGraph();
-                }
-            }
         });
-        refresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(chosenMode == Mode.NONE);
-                else {
-                    Main.update();
-                }
-
-            }
-        });
-        test.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(first) {
-                    productive.setSelected(false);
-                    setChosenMode(Mode.TEST);
-                    central.removeAll();
-                    central.add(secondPane, BorderLayout.CENTER);
-                    central.add(file, BorderLayout.SOUTH);
-                    revalidate();
-                    repaint();
-                } else
-                    test.setSelected(false);
-            }
-        });
-        productive.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(first) {
-                    test.setSelected(false);
-                    setChosenMode(Mode.PRODUCTION);
-                    central.removeAll();
-                    central.add(secondPane, BorderLayout.CENTER);
-                    central.add(file, BorderLayout.SOUTH);
-                    revalidate();
-                    repaint();
-                } else productive.setSelected(false);
-            }
-        });
-        startFuseki.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Main.initiateFuseki();
-            }
+        test.addActionListener(e -> {
+            if(first) {
+                productive.setSelected(false);
+                setChosenMode(Mode.TEST);
+                central.removeAll();
+                central.add(secondPane, BorderLayout.CENTER);
+                central.add(file, BorderLayout.SOUTH);
+                revalidate();
+                repaint();
+            } else
+                test.setSelected(false);
         });
 
-        openQuery.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Desktop desktop = java.awt.Desktop.getDesktop();
-                    URI oURL = new URI("http://localhost:3030/#/dataset/aircraft/query/");
-                    desktop.browse(oURL);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+        productive.addActionListener(e -> {
+            if(first) {
+                test.setSelected(false);
+                setChosenMode(Mode.PRODUCTION);
+                central.removeAll();
+                central.add(secondPane, BorderLayout.CENTER);
+                central.add(file, BorderLayout.SOUTH);
+                revalidate();
+                repaint();
+            } else productive.setSelected(false);
         });
 
-        file.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setCreateFile(!getCreateFile());
-            }
+        startFuseki.addActionListener(e -> Main.initiateFuseki());
+
+        openQuery.addActionListener(e -> {
+            Main.openDatasetQuery();
         });
 
-        log.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new logscreen();
-            }
-        });
+        file.addActionListener(e -> setCreateFile(!getCreateFile()));
+
+        log.addActionListener(e -> new logscreen());
         //TODO SysTrayIcon für schnelles updaten
         /*if(java.awt.SystemTray.isSupported()){
             SystemTray tray = SystemTray.getSystemTray();

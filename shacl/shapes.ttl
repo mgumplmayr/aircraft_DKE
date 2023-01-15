@@ -23,7 +23,8 @@ voc:Aircraft_Shape
                      sh:class    voc:Owner ] ;
     sh:property    [ sh:path     voc:hasCategory ;
                      sh:maxCount 1 ;
-                     sh:class    voc:Category ] ;
+                     #sh:class    voc:Category  used only if all category data is loaded in current graph
+                   ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:serialNumber ] ;
