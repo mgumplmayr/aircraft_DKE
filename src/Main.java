@@ -13,6 +13,7 @@ import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javax.swing.text.Position;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
@@ -171,9 +172,8 @@ public class Main {
     }
 
     public static void predictPosition(){
-        /*PositionPredictor predictor = new PositionPredictor();
-        predictor.predictPosition();*/
-        PositionPredictor.predictPosition();
+        PositionPredictor.executeRule();
+        PositionPredictor.writeRDF();
     }
 
     private static void validateData() {
@@ -509,7 +509,6 @@ public class Main {
         model.createProperty(thisCategoryURI)
                 .addProperty(RDF.type, VOC.category)
                 .addProperty(VOC.categoryDescription, "Line Obstacle");
-
     }
 
     private static void loadDynamicData() {

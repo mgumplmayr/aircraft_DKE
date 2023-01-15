@@ -78,7 +78,7 @@ voc:PredictPositionShape
                 ?oldTime < ?time && ?beforeOldTime < ?oldTime).
 
 
-                #TODO: Calculations with the Positions to get expected Position
+                #Calculations with the Positions to get expected Position
                 BIND((?time_position - ?oldTime) AS ?timeDifference). #Difference between time_position of current and the time before
                 BIND(((?velocity+?oldVelocity+?beforeOldVelocity)/3) AS ?avgVelocity). #average velocity of current state, old state and the state before (linar regression?)
                 BIND((?avgVelocity * ?timeDifference) AS ?distance). #distance to be travelled in the timeDifference

@@ -5,6 +5,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
+import org.topbraid.jenax.progress.SimpleProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.rules.RuleUtil;
 
@@ -14,8 +15,11 @@ import java.io.FileOutputStream;
 public class PositionPredictor {
 
     static Model responseModel = ModelFactory.createDefaultModel();
+    static Model result = ModelFactory.createDefaultModel();
 
-    public static void predictPosition() {
+    static String OUTPUT_NAME = "out/result.ttl";
+
+    public static void executeRule() {
         System.out.println("Predicting position");
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
@@ -83,20 +87,28 @@ public class PositionPredictor {
             Model shapesModel = JenaUtil.createMemoryModel();
             shapesModel.read("shacl/PositionPredictorRules.ttl");
 
+            SimpleProgressMonitor monitor = new SimpleProgressMonitor("Position Predictor");
+
             //infer Triples from rules
-            Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
-            try {
-                //write infered triples to file
-                result.write(new FileOutputStream("out/result.ttl"), "TTL");
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            result = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
+
+
             System.out.println("SHACL-Rule for Position Prediction executed");
 
-            System.out.println("Uploading generated Position Prediction data to endpoint " + graphURL);
-            conn.load(graphURL, result);
+            System.out.println("Uploading generated Position Prediction data to endpoint " + graphURL+"/1");
+            conn.load(graphURL+"/1", result); //Main.uploadModel(result, graphURL+"/1");
             System.out.println("Upload of Position Prediction data complete");
 
+        }
+
+
+    }
+    public static void writeRDF(){
+        try {
+            //write infered triples to file
+            result.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
         }
     }
 
