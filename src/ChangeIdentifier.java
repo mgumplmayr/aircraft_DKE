@@ -17,8 +17,7 @@ public class ChangeIdentifier implements RuleExecutor{
     static final String EVENT_URI = START_URI + "event/";
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model resultModel = ModelFactory.createDefaultModel();
-
-
+    static SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
 
     public static void executeRule() {
         resultModel.setNsPrefix("event", EVENT_URI); //todo add subclasses of event?
@@ -104,7 +103,6 @@ public class ChangeIdentifier implements RuleExecutor{
                 throw new RuntimeException(e);
             }*/
 
-            SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
             //infer Triples from rules
             resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
 
