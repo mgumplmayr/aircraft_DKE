@@ -46,7 +46,7 @@ public class ChangeIdentifier {
                          WHERE {
                              Graph ?graph{
                              ?s ?p ?o.
-                     		{?s a voc:Position} UNION {?s a voc:Time}
+                     		{?s a voc:Position} UNION {?s a voc:Time} UNION {?s a voc:Aircraft}
                              }
                              {
                                  SELECT ?graph ?time ?timestamp WHERE {

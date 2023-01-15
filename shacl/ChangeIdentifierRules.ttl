@@ -28,9 +28,14 @@ voc:ChangeIdentifierShape
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                $this voc:changed true.
+                ?event rdf:type voc:Event.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaVelocity ?deltaVelocity.
+                ?event voc:interpretation ?interpretation.
+                #$this voc:changed true.
                 #$this voc:oldPosition ?oldPos.
-                $this voc:deltaVelocity ?deltaVelocity
+                #$this voc:deltaVelocity ?deltaVelocity
             }
             WHERE {
                 $this voc:hasTime ?time_object.
@@ -38,6 +43,7 @@ voc:ChangeIdentifierShape
                 $this voc:hasAircraft ?aircraft.
                 $this voc:velocity ?velocity.
                 ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
 
             {
             #Query for the Position before the current Position saved on Variable ?oldPos
@@ -53,10 +59,12 @@ voc:ChangeIdentifierShape
                 FILTER(?onGround = false &&
                 ?oldAircraft = ?aircraft &&
                 ?oldTime < ?time &&
-                ?deltaVelocity < ?threshold).
+                ABS(?deltaVelocity) > 5).
 
 
-            BIND(abs((?velocity-?oldVelocity)) AS ?deltaVelocity). #Delta of velocities
+            BIND((?velocity-?oldVelocity) AS ?deltaVelocity). #Delta of velocities
+            BIND( IRI(CONCAT("http://example.org/event/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?deltaVelocity>0,"Acceleration","Slowdown") as ?interpretation).
             }
             """ ;
       ] ;
