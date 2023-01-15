@@ -44,6 +44,7 @@ public class GUI extends JFrame {
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
+        JButton changeIdentifier = new JButton("ChangeIdentifier");
         JButton update = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
@@ -58,6 +59,7 @@ public class GUI extends JFrame {
         secondPane.add(update);
         secondPane.add(openQuery);
         secondPane.add(log);
+        secondPane.add(changeIdentifier);
 
         central.add(panel,BorderLayout.CENTER);
         central.add(file, BorderLayout.SOUTH);
@@ -105,6 +107,10 @@ public class GUI extends JFrame {
         });
 
         startFuseki.addActionListener(e -> Main.initiateFuseki());
+
+        changeIdentifier.addActionListener(e ->
+            ChangeIdentifier.IdentifyChanges()
+        );
 
         openQuery.addActionListener(e -> {
             Main.openDatasetQuery();

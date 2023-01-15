@@ -124,6 +124,8 @@ public class ChangeIdentifier {
                 throw new RuntimeException(e);
             }
             System.out.println("SHACL-Rule for Change Identification executed");
+
+            Main.uploadModel(result,graphURL+"/3");
         }
     }
 }
