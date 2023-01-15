@@ -55,6 +55,8 @@ public class Main {
         loadDynamicData();
         validateDynamicData();
         uploadDynamicGraph();
+
+        ChangeIdentifier.executeRule();
     }
 
     public static void openDatasetQuery() {

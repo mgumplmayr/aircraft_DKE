@@ -8,6 +8,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.sparql.resultset.RDFOutput;
 import org.apache.jena.util.FileUtils;
+import org.topbraid.jenax.progress.SimpleProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
 import org.apache.jena.shacl.Shapes;
 import org.topbraid.shacl.engine.Shape;
@@ -25,15 +26,20 @@ import java.io.InputStream;
 public class ChangeIdentifier {
 
     static final String startURI = "http://example.org/";
+    static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
 
     static String eventURI = startURI + "event/";
     static Model responseModel = ModelFactory.createDefaultModel();
+    static Model resultModel = ModelFactory.createDefaultModel();
 
-    public static void IdentifyChanges() {
+
+
+    public static void executeRule() {
+        resultModel.setNsPrefix("event",eventURI); //todo add subclasses of event?
+
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
-        Query query = QueryFactory.create("SELECT * { BIND('Hello'as ?text) }");
         Query constructQuery = QueryFactory.create("""
                 	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -85,14 +91,12 @@ public class ChangeIdentifier {
                 """);
 
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
-            //getting Response from last 3 Graphs
+            //getting Response from last 2 Graphs
             responseModel = conn.query(constructQuery).execConstruct();
 
             //getting the latest Graph for Upload
             QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
             String graphURL = q.get("g").toString(); //todo add /3
-
-
 
             //print response to file
             try {
@@ -114,18 +118,25 @@ public class ChangeIdentifier {
                 throw new RuntimeException(e);
             }*/
 
+            SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
             //infer Triples from rules
-            Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
-            result.setNsPrefix("event",eventURI); //todo add subclasses of event?
-            //result.add(responseModel);
-            try { //write infered triples to file
-                result.write(new FileOutputStream("out/changeIdentifier.ttl"), "TTL");
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println("SHACL-Rule for Change Identification executed");
+            resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
 
-            Main.uploadModel(result,graphURL+"/3");
+
+            System.out.println("SHACL-Rule for Change Identification executed");
+            Main.uploadModel(resultModel,graphURL+"/3");
+            System.out.println("Upload of Change Identification data complete");
+        }
+    }
+
+    public static void writeRDF() {
+        try {
+            System.out.println("Printing " + resultModel.size() + " resources");
+            resultModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

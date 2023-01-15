@@ -108,9 +108,10 @@ public class GUI extends JFrame {
 
         startFuseki.addActionListener(e -> Main.initiateFuseki());
 
-        changeIdentifier.addActionListener(e ->
-            ChangeIdentifier.IdentifyChanges()
-        );
+        changeIdentifier.addActionListener(e -> {
+            ChangeIdentifier.executeRule();
+            if (getCreateFile()) ChangeIdentifier.writeRDF();
+        });
 
         openQuery.addActionListener(e -> {
             Main.openDatasetQuery();
