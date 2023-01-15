@@ -9,12 +9,12 @@ import org.json.simple.JSONObject;
 public class DynamicDataModel {
     static DataInitiator initiator = new DataInitiator();
     static Model dynamicModel;
-    static final String startURI = "http://example.org/";
-    static String categoryURI = startURI + "category/";
+    static final String START_URI = "http://example.org/";
+    static final String CATEGORY_URI = START_URI + "category/";
 
-    static String aircraftURI = startURI + "aircraft/";
-    static String timeURI = startURI + "time/";
-    static String positionURI = startURI + "position/";
+    static final String AIRCRAFT_URI = START_URI + "aircraft/";
+    static final String TIME_URI = START_URI + "time/";
+    static final String POSITION_URI = START_URI + "position/";
     static String responseTime;
     public static Model loadDynamicData() {
         dynamicModel = ModelFactory.createDefaultModel();
@@ -25,9 +25,9 @@ public class DynamicDataModel {
         dynamicModel.setNsPrefix("xsd", XSD.getURI());
 
         //create dynamic Aircraft Prefixes
-        dynamicModel.setNsPrefix("time", timeURI);
-        dynamicModel.setNsPrefix("position", positionURI);
-        dynamicModel.setNsPrefix("aircraft", aircraftURI);
+        dynamicModel.setNsPrefix("time", TIME_URI);
+        dynamicModel.setNsPrefix("position", POSITION_URI);
+        dynamicModel.setNsPrefix("aircraft", AIRCRAFT_URI);
 
         System.out.println("Loading Dynamic Data");
         JSONObject dynamicData;
@@ -38,7 +38,7 @@ public class DynamicDataModel {
         JSONArray states = (JSONArray) dynamicData.get("states");
         responseTime = dynamicData.get("time").toString();
 
-        Resource timeToAdd = dynamicModel.createResource(timeURI + responseTime)
+        Resource timeToAdd = dynamicModel.createResource(TIME_URI + responseTime)
                 .addProperty(RDF.type, VOC.time)
                 .addLiteral(VOC.timestamp, Integer.valueOf(responseTime));
 
@@ -63,7 +63,7 @@ public class DynamicDataModel {
             String positionSource = String.valueOf(stateToAdd.get(16));
             String category = String.valueOf(stateToAdd.get(17));
 
-            String thisPositionURI = positionURI + icao24Pos + "_" + responseTime;
+            String thisPositionURI = POSITION_URI + icao24Pos + "_" + responseTime;
             Resource positionToAdd = dynamicModel.createResource(thisPositionURI)
                     .addProperty(RDF.type, VOC.position)
                     .addProperty(VOC.hasTime, timeToAdd);
@@ -86,7 +86,7 @@ public class DynamicDataModel {
 
 
             //Create dynamic aircraft Resource;
-            String thisAircraftURI = aircraftURI + icao24Pos;
+            String thisAircraftURI = AIRCRAFT_URI + icao24Pos;
             Resource aircraftToAdd = dynamicModel.createResource(thisAircraftURI)
                     .addProperty(VOC.icao24, icao24Pos)
                     .addProperty(RDF.type, VOC.aircraft);
@@ -95,7 +95,7 @@ public class DynamicDataModel {
             if (!originCountry.equals("null") && !originCountry.isEmpty())
                 aircraftToAdd.addProperty(VOC.originCountry, originCountry);
             if (!category.equals("null"))
-                aircraftToAdd.addProperty(VOC.hasCategory, CategoryDataModel.model.getResource(categoryURI + category));
+                aircraftToAdd.addProperty(VOC.hasCategory, CategoryDataModel.model.getResource(CATEGORY_URI + category));
 
             positionToAdd.addProperty(VOC.hasAircraft, aircraftToAdd);
         }

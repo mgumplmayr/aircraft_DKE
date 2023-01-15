@@ -56,13 +56,17 @@ public class Main {
         validateDynamicData();
         uploadDynamicGraph();
 
+        executeRules();
+    }
+
+    private static void executeRules() {
+        System.out.println("Executing SHACL-Rules for current Graph");
         ChangeIdentifier.executeRule();
     }
 
     public static void openDatasetQuery() {
-        URI uri;
         try {
-            uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
+            URI uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
             java.awt.Desktop.getDesktop().browse(uri);
         } catch (Exception e) {
             e.printStackTrace();

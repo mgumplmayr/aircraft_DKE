@@ -10,14 +10,14 @@ import org.json.simple.JSONObject;
 public class StaticDataModel {
     static DataInitiator initiator = new DataInitiator();
     static Model staticModel = ModelFactory.createDefaultModel();
-    static final String startURI = "http://example.org/";
-    static String aircraftURI = startURI + "aircraft/";
+    static final String START_URI = "http://example.org/";
+    static final String AIRCRAFT_URI = START_URI + "aircraft/";
 
-    static String manufacturerURI = startURI + "manufacturer/";
-    static String modelURI = startURI + "model/";
-    static String operatorURI = startURI + "operator/";
-    static String ownerURI = startURI + "owner/";
-    static String categoryURI = startURI + "category/";
+    static final String MANUFACTURER_URI = START_URI + "manufacturer/";
+    static final String MODEL_URI = START_URI + "model/";
+    static final String OPERATOR_URI = START_URI + "operator/";
+    static final String OWNER_URI = START_URI + "owner/";
+    static final String CATEGORY_URI = START_URI + "category/";
 
     public static Model loadModel() {
         //create vocabulary prefixes
@@ -26,12 +26,12 @@ public class StaticDataModel {
         staticModel.setNsPrefix("xsd", XSD.getURI());
 
         //create static Aircraft Prefixes
-        staticModel.setNsPrefix("aircraft", aircraftURI);
-        staticModel.setNsPrefix("manufacturer", manufacturerURI);
-        staticModel.setNsPrefix("model", modelURI);
-        staticModel.setNsPrefix("operator", operatorURI);
-        staticModel.setNsPrefix("owner", ownerURI);
-        staticModel.setNsPrefix("category", categoryURI);
+        staticModel.setNsPrefix("aircraft", AIRCRAFT_URI);
+        staticModel.setNsPrefix("manufacturer", MANUFACTURER_URI);
+        staticModel.setNsPrefix("model", MODEL_URI);
+        staticModel.setNsPrefix("operator", OPERATOR_URI);
+        staticModel.setNsPrefix("owner", OWNER_URI);
+        staticModel.setNsPrefix("category", CATEGORY_URI);
 
 
         System.out.println("Loading Static Data");
@@ -40,7 +40,7 @@ public class StaticDataModel {
             JSONObject aircraft = (JSONObject) o;
 
             //Static Aircraft properties
-            String thisAircraftURI = aircraftURI + aircraft.get("icao24");
+            String thisAircraftURI = AIRCRAFT_URI + aircraft.get("icao24");
             String thisIcao24 = aircraft.get("icao24").toString();
             String thisRegistration = aircraft.get("registration").toString();
             String thisSerialNumber = aircraft.get("serialnumber").toString();
@@ -50,26 +50,26 @@ public class StaticDataModel {
             String thisFirstFlightDate = aircraft.get("firstflightdate").toString();
 
             //Manufacturer properties
-            String thisManufacturerURI = manufacturerURI + aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]", "");
+            String thisManufacturerURI = MANUFACTURER_URI + aircraft.get("manufacturericao").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisManufacturer = aircraft.get("manufacturericao").toString();
             String thisManufacturerName = aircraft.get("manufacturername").toString();
 
             //Model properties
-            String thisModelURI = modelURI + aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]", "");
+            String thisModelURI = MODEL_URI + aircraft.get("model").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisModel = aircraft.get("model").toString().trim();
             String thisTypecode = aircraft.get("typecode").toString();
             String thisEngines = aircraft.get("engines").toString();
             String thisIcaoAircraftType = aircraft.get("icaoaircrafttype").toString();
 
             //Operator properties
-            String thisOperatorURI = operatorURI + aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]", "");
+            String thisOperatorURI = OPERATOR_URI + aircraft.get("operatoricao").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisOperatorIcao = aircraft.get("operatoricao").toString();
             String thisOperator = aircraft.get("operator").toString().trim();
             String thisOperatorCallsign = aircraft.get("operatorcallsign").toString();
             String thisOperatorIata = aircraft.get("operatoriata").toString();
 
             //Owner properies
-            String thisOwnerURI = ownerURI + aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]", "");
+            String thisOwnerURI = OWNER_URI + aircraft.get("owner").toString().replaceAll("[^A-Za-z0-9]", "");
             String thisOwner = aircraft.get("owner").toString().trim();
 
             //CategoryDescription properties

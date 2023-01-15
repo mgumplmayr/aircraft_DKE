@@ -1,41 +1,27 @@
-import org.apache.jena.graph.Graph;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.shacl.Shapes;
-import org.apache.jena.sparql.resultset.RDFOutput;
-import org.apache.jena.util.FileUtils;
 import org.topbraid.jenax.progress.SimpleProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
-import org.apache.jena.shacl.Shapes;
-import org.topbraid.shacl.engine.Shape;
-import org.topbraid.shacl.engine.ShapesGraphFactory;
-import org.topbraid.shacl.model.SHParameter;
-import org.topbraid.shacl.model.impl.SHParameterImpl;
-import org.topbraid.shacl.model.impl.SHParameterizableInstanceImpl;
 import org.topbraid.shacl.rules.*;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 
-public class ChangeIdentifier {
+public class ChangeIdentifier implements RuleExecutor{
 
-    static final String startURI = "http://example.org/";
+    static final String START_URI = "http://example.org/";
     static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
 
-    static String eventURI = startURI + "event/";
+    static final String EVENT_URI = START_URI + "event/";
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model resultModel = ModelFactory.createDefaultModel();
 
 
 
     public static void executeRule() {
-        resultModel.setNsPrefix("event",eventURI); //todo add subclasses of event?
+        resultModel.setNsPrefix("event", EVENT_URI); //todo add subclasses of event?
 
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
