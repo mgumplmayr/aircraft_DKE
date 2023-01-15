@@ -5,6 +5,7 @@
 @prefix operator:     <http://example.org/operator/> .
 @prefix owner:        <http://example.org/owner/> .
 @prefix time:         <http://example.org/time/> .
+@prefix event:         <http://example.org/event/> .
 @prefix position:     <http://example.org/position/> .
 @prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix voc:          <http://example.org/vocabulary#> .
@@ -12,7 +13,7 @@
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
-voc:ChangeIdentifierShape
+voc:SpeedChangeIdentifierShape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -23,19 +24,18 @@ voc:ChangeIdentifierShape
                 prefix position: <http://example.org/position/>
                 prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 prefix time:     <http://example.org/time/>
+                prefix event:     <http://example.org/event/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
                 ?event rdf:type voc:Event.
+                ?event voc:hasTime ?time_object.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
                 ?event voc:deltaVelocity ?deltaVelocity.
                 ?event voc:interpretation ?interpretation.
-                #$this voc:changed true.
-                #$this voc:oldPosition ?oldPos.
-                #$this voc:deltaVelocity ?deltaVelocity
             }
             WHERE {
                 $this voc:hasTime ?time_object.
@@ -63,8 +63,124 @@ voc:ChangeIdentifierShape
 
 
             BIND((?velocity-?oldVelocity) AS ?deltaVelocity). #Delta of velocities
-            BIND( IRI(CONCAT("http://example.org/event/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IRI(CONCAT("http://example.org/event/speed/",STR(?icao24),"_",STR(?time))) as ?event).
             BIND( IF(?deltaVelocity>0,"Acceleration","Slowdown") as ?interpretation).
+            }
+            """ ;
+      ] ;
+.
+voc:DirectionChangeIdentifierShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix event:     <http://example.org/event/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                ?event rdf:type voc:Event.
+                ?event voc:hasTime ?time_object.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaTrueTrack ?deltaTrueTrack.
+                ?event voc:interpretation ?interpretation.
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:trueTrack ?trueTrack.
+                ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldTrueTrack
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:trueTrack ?oldTrueTrack.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ABS(?deltaTrueTrack) > 5).
+
+
+            BIND((?trueTrack-?oldTrueTrack) AS ?deltaTrueTrack). #Delta of true Track
+            BIND( IRI(CONCAT("http://example.org/event/direction/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?trueTrack<45,"North",
+                    IF(?trueTrack<135,"East",
+                    IF(?trueTrack<225,"South",
+                    IF(?trueTrack<315,"West","North"))))
+                  as ?interpretation).
+            }
+            """ ;
+      ] ;
+.
+voc:HeightChangeIdentifierShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix event:     <http://example.org/event/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                ?event rdf:type voc:Event.
+                ?event voc:hasTime ?time_object.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaVerticalRate ?deltaVerticalRate.
+                ?event voc:interpretation ?interpretation.
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:verticalRate ?verticalRate.
+                ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVerticalRate
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:verticalRate ?oldVerticalRate.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ABS(?deltaVerticalRate) > 0).
+
+
+            BIND((?verticalRate-?oldVerticalRate) AS ?deltaVerticalRate). #Delta of vertical Rate
+            BIND( IRI(CONCAT("http://example.org/event/height/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?deltaVerticalRate>0,"Climbing","Descending") as ?interpretation).
             }
             """ ;
       ] ;

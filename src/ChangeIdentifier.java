@@ -24,6 +24,9 @@ import java.io.InputStream;
 
 public class ChangeIdentifier {
 
+    static final String startURI = "http://example.org/";
+
+    static String eventURI = startURI + "event/";
     static Model responseModel = ModelFactory.createDefaultModel();
 
     public static void IdentifyChanges() {
@@ -102,6 +105,7 @@ public class ChangeIdentifier {
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
             //todo: add parameter to shacl shape / sparql query?
+            //todo "timestamp" --> Respone stime or timePosition?
 
             /* add rules to model
             try {
@@ -112,6 +116,7 @@ public class ChangeIdentifier {
 
             //infer Triples from rules
             Model result = RuleUtil.executeRules(responseModel, shapesModel, null, null);
+            result.setNsPrefix("event",eventURI); //todo add subclasses of event?
             //result.add(responseModel);
             try { //write infered triples to file
                 result.write(new FileOutputStream("out/changeIdentifier.ttl"), "TTL");
