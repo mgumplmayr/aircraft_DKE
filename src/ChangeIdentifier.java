@@ -105,7 +105,7 @@ public class ChangeIdentifier {
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
             //todo: add parameter to shacl shape / sparql query?
-            //todo "timestamp" --> Respone stime or timePosition?
+            //todo "timestamp" --> Response time or timePosition?
 
             /* add rules to model
             try {
