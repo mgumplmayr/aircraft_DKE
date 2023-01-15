@@ -142,13 +142,18 @@ public class Main {
         uploadDynamicGraph();
     }
 
+    public static void uploadModel(Model model, String endpoint){
+        try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
+            conn.put(endpoint, model); // put -> set content, load -> add/append
+        }
+    }
+
     public static void uploadStaticGraph() {
         System.out.println("Uploading static Graph data to endpoint " + connectionURL + "static/");
         log.append("Uploading static Graph data to endpoint " + connectionURL + "static/" + "\n");
 
-        try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(connectionURL + "static/", staticModel); // put -> set content, load -> add/append
-        }
+        uploadModel(staticModel,connectionURL+"static/");
+
         System.out.println("Upload of static Graph data complete");
         log.append("Upload of static Graph data complete\n");
     }
@@ -158,9 +163,8 @@ public class Main {
         System.out.println("Uploading dynamic Graph data to endpoint " + graphURL);
         log.append("Uploading dynamic Graph data to endpoint " + graphURL + "\n");
 
-        try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
-            conn.put(graphURL, dynamicModel);
-        }
+        uploadModel(dynamicModel,graphURL);
+
         System.out.println("Upload of dynamic Graph data complete");
         log.append("Upload of dynamic Graph data complete\n");
 
