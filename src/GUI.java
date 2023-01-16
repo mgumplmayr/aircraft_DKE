@@ -109,7 +109,7 @@ public class GUI extends JFrame {
         startFuseki.addActionListener(e -> Main.initiateFuseki());
 
         changeIdentifier.addActionListener(e -> {
-            ChangeIdentifier.executeRule();
+            ChangeIdentifier.executeRule(5,3,1);
             if (getCreateFile()) ChangeIdentifier.writeRDF();
         });
 

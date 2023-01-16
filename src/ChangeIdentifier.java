@@ -2,9 +2,10 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.progress.SimpleProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
-import org.topbraid.shacl.rules.*;
+import org.topbraid.shacl.rules.RuleUtil;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,12 +15,14 @@ public class ChangeIdentifier implements RuleExecutor{
     static final String START_URI = "http://example.org/";
     static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
 
+    static final String VOCABULARY_URI = "http://example.org/vocabulary#";
+
     static final String EVENT_URI = START_URI + "event/";
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model resultModel = ModelFactory.createDefaultModel();
     static SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
 
-    public static void executeRule() {
+    public static void executeRule(float velocityThreshold, float directionThreshold, float heightThreshold ) {
         resultModel.setNsPrefix("event", EVENT_URI); //todo add subclasses of event?
 
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
@@ -78,37 +81,42 @@ public class ChangeIdentifier implements RuleExecutor{
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             //getting Response from last 2 Graphs
             responseModel = conn.query(constructQuery).execConstruct();
+            responseModel.createResource(START_URI + "velocityThreshold").addLiteral(RDF.value, velocityThreshold);
+            responseModel.createResource(START_URI + "directionThreshold").addLiteral(RDF.value, directionThreshold);
+            responseModel.createResource(START_URI + "heightThreshold").addLiteral(RDF.value, heightThreshold);
 
             //getting the latest Graph for Upload
             QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
-            String graphURL = q.get("g").toString(); //todo add /3
+            String Endpoint = q.get("g").toString()+"/3";
 
+
+            /*
             //print response to file
             try {
                 responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
+            */
 
             Model shapesModel = JenaUtil.createMemoryModel();
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
-            //todo: add parameter to shacl shape / sparql query?
             //todo "timestamp" --> Response time or timePosition?
 
-            /* add rules to model
+            // add rules to model
             try {
                 shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
-            }*/
+            }
 
             //infer Triples from rules
             resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
 
 
             System.out.println("SHACL-Rule for Change Identification executed");
-            Main.uploadModel(resultModel,graphURL+"/3");
+            Main.uploadModel(resultModel,Endpoint);
             System.out.println("Upload of Change Identification data complete");
         }
     }

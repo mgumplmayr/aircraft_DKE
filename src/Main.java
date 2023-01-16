@@ -61,7 +61,7 @@ public class Main {
 
     private static void executeRules() {
         System.out.println("Executing SHACL-Rules for current Graph");
-        ChangeIdentifier.executeRule();
+        ChangeIdentifier.executeRule(5,2,1);
     }
 
     public static void openDatasetQuery() {

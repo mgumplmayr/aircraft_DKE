@@ -31,6 +31,7 @@ voc:SpeedChangeIdentifierShape
 
             CONSTRUCT {
                 ?event rdf:type voc:Event.
+                ?event rdf:value ?threshold.
                 ?event voc:hasTime ?time_object.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
@@ -44,7 +45,7 @@ voc:SpeedChangeIdentifierShape
                 $this voc:velocity ?velocity.
                 ?time_object voc:time ?time.
                 ?aircraft voc:icao24 ?icao24.
-
+                ?velocityThreshold rdf:value ?threshold.
             {
             #Query for the Position before the current Position saved on Variable ?oldPos
                 SELECT ?oldPos ?oldTime ?oldAircraft ?oldVelocity
@@ -59,7 +60,8 @@ voc:SpeedChangeIdentifierShape
                 FILTER(?onGround = false &&
                 ?oldAircraft = ?aircraft &&
                 ?oldTime < ?time &&
-                ABS(?deltaVelocity) > 5).
+                ABS(?deltaVelocity) > ?threshold).
+                FILTER(?velocityThreshold = <http://example.org/velocityThreshold>).
 
 
             BIND((?velocity-?oldVelocity) AS ?deltaVelocity). #Delta of velocities
@@ -87,6 +89,7 @@ voc:DirectionChangeIdentifierShape
 
             CONSTRUCT {
                 ?event rdf:type voc:Event.
+                ?event rdf:value ?threshold.
                 ?event voc:hasTime ?time_object.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
@@ -100,6 +103,7 @@ voc:DirectionChangeIdentifierShape
                 $this voc:trueTrack ?trueTrack.
                 ?time_object voc:time ?time.
                 ?aircraft voc:icao24 ?icao24.
+                ?directionThreshold rdf:value ?threshold.
 
             {
             #Query for the Position before the current Position saved on Variable ?oldPos
@@ -115,7 +119,8 @@ voc:DirectionChangeIdentifierShape
                 FILTER(?onGround = false &&
                 ?oldAircraft = ?aircraft &&
                 ?oldTime < ?time &&
-                ABS(?deltaTrueTrack) > 5).
+                ABS(?deltaTrueTrack) > ?threshold).
+                FILTER(?directionThreshold = <http://example.org/directionThreshold>).
 
 
             BIND((?trueTrack-?oldTrueTrack) AS ?deltaTrueTrack). #Delta of true Track
@@ -147,6 +152,7 @@ voc:HeightChangeIdentifierShape
 
             CONSTRUCT {
                 ?event rdf:type voc:Event.
+                ?event rdf:value ?threshold.
                 ?event voc:hasTime ?time_object.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
@@ -160,6 +166,7 @@ voc:HeightChangeIdentifierShape
                 $this voc:verticalRate ?verticalRate.
                 ?time_object voc:time ?time.
                 ?aircraft voc:icao24 ?icao24.
+                ?heightThreshold rdf:value ?threshold.
 
             {
             #Query for the Position before the current Position saved on Variable ?oldPos
@@ -175,7 +182,8 @@ voc:HeightChangeIdentifierShape
                 FILTER(?onGround = false &&
                 ?oldAircraft = ?aircraft &&
                 ?oldTime < ?time &&
-                ABS(?deltaVerticalRate) > 0).
+                ABS(?deltaVerticalRate) > ?threshold).
+                FILTER(?heightThreshold = <http://example.org/heightThreshold>).
 
 
             BIND((?verticalRate-?oldVerticalRate) AS ?deltaVerticalRate). #Delta of vertical Rate
