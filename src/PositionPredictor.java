@@ -17,7 +17,7 @@ public class PositionPredictor {
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model result = ModelFactory.createDefaultModel();
 
-    static String OUTPUT_NAME = "out/result.ttl";
+    static String OUTPUT_NAME = "out/prediction_result.ttl";
 
     public static void executeRule() {
         System.out.println("Predicting position");
