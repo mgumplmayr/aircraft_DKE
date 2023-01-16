@@ -15,16 +15,14 @@ public class ChangeIdentifier implements RuleExecutor{
     static final String START_URI = "http://example.org/";
     static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
 
-    static final String VOCABULARY_URI = "http://example.org/vocabulary#";
-
-    static final String EVENT_URI = START_URI + "event/";
+    static final String VELOCITY_EVENT_URI = START_URI + "velocityEvent/";
+    static final String DIRECTION_EVENT_URI = START_URI + "directionEvent/";
+    static final String HEIGHT_EVENT_URI = START_URI + "heightEvent/";
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model resultModel = ModelFactory.createDefaultModel();
     static SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
 
     public static void executeRule(float velocityThreshold, float directionThreshold, float heightThreshold ) {
-        resultModel.setNsPrefix("event", EVENT_URI); //todo add subclasses of event?
-
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
@@ -90,8 +88,7 @@ public class ChangeIdentifier implements RuleExecutor{
             String Endpoint = q.get("g").toString()+"/3";
 
 
-            /*
-            //print response to file
+            /* print response to file
             try {
                 responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
             } catch (FileNotFoundException e) {
@@ -102,7 +99,6 @@ public class ChangeIdentifier implements RuleExecutor{
             Model shapesModel = JenaUtil.createMemoryModel();
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
-            //todo "timestamp" --> Response time or timePosition?
 
             // add rules to model
             try {
@@ -113,6 +109,9 @@ public class ChangeIdentifier implements RuleExecutor{
 
             //infer Triples from rules
             resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
+            resultModel.setNsPrefix("velocityEvent", VELOCITY_EVENT_URI);
+            resultModel.setNsPrefix("directionEvent", DIRECTION_EVENT_URI);
+            resultModel.setNsPrefix("heightEvent", HEIGHT_EVENT_URI);
 
 
             System.out.println("SHACL-Rule for Change Identification executed");

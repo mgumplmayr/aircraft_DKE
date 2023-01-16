@@ -5,7 +5,6 @@
 @prefix operator:     <http://example.org/operator/> .
 @prefix owner:        <http://example.org/owner/> .
 @prefix time:         <http://example.org/time/> .
-@prefix event:         <http://example.org/event/> .
 @prefix position:     <http://example.org/position/> .
 @prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix voc:          <http://example.org/vocabulary#> .
@@ -24,15 +23,17 @@ voc:SpeedChangeIdentifierShape
                 prefix position: <http://example.org/position/>
                 prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 prefix time:     <http://example.org/time/>
-                prefix event:     <http://example.org/event/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                ?event rdf:type voc:Event.
-                ?event rdf:value ?threshold.
-                ?event voc:hasTime ?time_object.
+                ?event rdf:type voc:VelocityEvent.
+                # ?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
                 ?event voc:deltaVelocity ?deltaVelocity.
@@ -65,8 +66,9 @@ voc:SpeedChangeIdentifierShape
 
 
             BIND((?velocity-?oldVelocity) AS ?deltaVelocity). #Delta of velocities
-            BIND( IRI(CONCAT("http://example.org/event/speed/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IRI(CONCAT("http://example.org/velocityEvent/",STR(?icao24),"_",STR(?time))) as ?event).
             BIND( IF(?deltaVelocity>0,"Acceleration","Slowdown") as ?interpretation).
+            BIND( NOW() as ?now).
             }
             """ ;
       ] ;
@@ -82,15 +84,17 @@ voc:DirectionChangeIdentifierShape
                 prefix position: <http://example.org/position/>
                 prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 prefix time:     <http://example.org/time/>
-                prefix event:     <http://example.org/event/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                ?event rdf:type voc:Event.
-                ?event rdf:value ?threshold.
-                ?event voc:hasTime ?time_object.
+                ?event rdf:type voc:DirectionEvent.
+                #?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
                 ?event voc:deltaTrueTrack ?deltaTrueTrack.
@@ -124,12 +128,13 @@ voc:DirectionChangeIdentifierShape
 
 
             BIND((?trueTrack-?oldTrueTrack) AS ?deltaTrueTrack). #Delta of true Track
-            BIND( IRI(CONCAT("http://example.org/event/direction/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IRI(CONCAT("http://example.org/directionEvent/",STR(?icao24),"_",STR(?time))) as ?event).
             BIND( IF(?trueTrack<45,"North",
                     IF(?trueTrack<135,"East",
                     IF(?trueTrack<225,"South",
                     IF(?trueTrack<315,"West","North"))))
                   as ?interpretation).
+            BIND( NOW() as ?now).
             }
             """ ;
       ] ;
@@ -145,15 +150,17 @@ voc:HeightChangeIdentifierShape
                 prefix position: <http://example.org/position/>
                 prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                 prefix time:     <http://example.org/time/>
-                prefix event:     <http://example.org/event/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
                 prefix voc:      <http://example.org/vocabulary#>
                 prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                ?event rdf:type voc:Event.
-                ?event rdf:value ?threshold.
-                ?event voc:hasTime ?time_object.
+                ?event rdf:type voc:HeightEvent.
+                #?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
                 ?event voc:deltaVerticalRate ?deltaVerticalRate.
@@ -187,8 +194,9 @@ voc:HeightChangeIdentifierShape
 
 
             BIND((?verticalRate-?oldVerticalRate) AS ?deltaVerticalRate). #Delta of vertical Rate
-            BIND( IRI(CONCAT("http://example.org/event/height/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IRI(CONCAT("http://example.org/heightEvent/",STR(?icao24),"_",STR(?time))) as ?event).
             BIND( IF(?deltaVerticalRate>0,"Climbing","Descending") as ?interpretation).
+            BIND( NOW() as ?now).
             }
             """ ;
       ] ;
