@@ -14,7 +14,6 @@ public class ChangeIdentifier implements RuleExecutor{
 
     static final String START_URI = "http://example.org/";
     static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
-
     static final String VELOCITY_EVENT_URI = START_URI + "velocityEvent/";
     static final String DIRECTION_EVENT_URI = START_URI + "directionEvent/";
     static final String HEIGHT_EVENT_URI = START_URI + "heightEvent/";
@@ -79,6 +78,8 @@ public class ChangeIdentifier implements RuleExecutor{
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             //getting Response from last 2 Graphs
             responseModel = conn.query(constructQuery).execConstruct();
+
+            //create Objects for Threshold parameters
             responseModel.createResource(START_URI + "velocityThreshold").addLiteral(RDF.value, velocityThreshold);
             responseModel.createResource(START_URI + "directionThreshold").addLiteral(RDF.value, directionThreshold);
             responseModel.createResource(START_URI + "heightThreshold").addLiteral(RDF.value, heightThreshold);
@@ -96,10 +97,9 @@ public class ChangeIdentifier implements RuleExecutor{
             }
             */
 
+            //create model for Rules
             Model shapesModel = JenaUtil.createMemoryModel();
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");
-
-
             // add rules to model
             try {
                 shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
