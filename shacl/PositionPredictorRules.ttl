@@ -28,15 +28,10 @@ voc:PredictPositionShape
                 prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
 
             CONSTRUCT {
-                $this voc:old true .
-                #$this voc:oldPosition ?oldPos.
-                #$this voc:beforeOldPosition ?beforeOldPos.
-                #$this voc:avgVelo ?avgVelocity.
-                #$this voc:timeDiff ?timeDifference.
-                #$this voc:distance ?distance.
-                #$this voc:deltaLong ?deltaLong.
                 $this voc:predictedLongitude ?predictedLongitude.
                 $this voc:predictedLatitude ?predictedLatitude.
+                $this voc:old true .
+
 
             }
             WHERE {
