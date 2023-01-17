@@ -10,7 +10,7 @@ import org.topbraid.shacl.rules.RuleUtil;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-public class ChangeIdentifier implements RuleExecutor{
+public class ChangeIdentifier {
 
     static final String START_URI = "http://example.org/";
     static final String OUTPUT_NAME = "out/changeIdentifier.ttl";

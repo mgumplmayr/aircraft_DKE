@@ -55,16 +55,17 @@ public class Main {
         loadDynamicData();
         validateDynamicData();
         uploadDynamicGraph();
-
-        executeRules();
     }
 
-    private static void executeRules() {
+    public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold) {
         System.out.println("Executing SHACL-Rules for current Graph");
-        ChangeIdentifier.executeRule(5,2,1);
+
+        //Task 3
+        ChangeIdentifier.executeRule(velocityThreshold,directionThreshold,heightThreshold);
     }
 
     public static void openDatasetQuery() {
+
         try {
             URI uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
             java.awt.Desktop.getDesktop().browse(uri);
