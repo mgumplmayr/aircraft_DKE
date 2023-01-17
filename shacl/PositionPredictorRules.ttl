@@ -1,0 +1,91 @@
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
+
+voc:PredictPositionShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                $this voc:predictedLongitude ?predictedLongitude.
+                $this voc:predictedLatitude ?predictedLatitude.
+                $this voc:old true .
+
+
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:velocity ?velocity.
+                ?time_object voc:time ?time.
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVelocity ?oldTrueTrack ?oldLatitude ?oldLongitude
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:velocity ?oldVelocity.
+                    ?oldPos voc:trueTrack ?oldTrueTrack.
+                    ?oldPos voc:latitude ?oldLatitude.
+                    ?oldPos voc:longitude ?oldLongitude.
+                    }
+            }
+
+            {
+            #Query for the Position before the Position before the current Position saved on Variable ?beforeOldPos
+                SELECT ?beforeOldPos ?beforeOldTime ?beforeOldAircraft ?beforeOldVelocity
+                    WHERE{
+                    ?beforeOldPos a voc:Position.
+                    ?beforeOldPos voc:hasTime ?beforeOldTime_object.
+                    ?beforeOldTime_object voc:time ?beforeOldTime.
+                    ?beforeOldPos voc:hasAircraft ?beforeOldAircraft.
+                    ?beforeOldPos voc:velocity ?beforeOldVelocity
+                    }
+            }
+                $this voc:lastContact ?time_position.
+                FILTER(?time_position<?time &&?onGround = false &&
+                ?oldAircraft = ?aircraft && ?beforeOldAircraft = ?aircraft &&
+                ?oldTime < ?time && ?beforeOldTime < ?oldTime).
+
+
+                #Calculations with the Positions to get expected Position
+                BIND((?time_position - ?oldTime) AS ?timeDifference). #Difference between time_position of current and the time before
+                BIND(((?velocity+?oldVelocity+?beforeOldVelocity)/3) AS ?avgVelocity). #average velocity of current state, old state and the state before (linar regression?)
+                BIND((?avgVelocity * ?timeDifference) AS ?distance). #distance to be travelled in the timeDifference
+                BIND((?distance * math:sin(?oldTrueTrack)) AS ?dx).
+                BIND((?distance * math:cos(?oldTrueTrack)) AS ?dy).
+                BIND((?dx/(111320 * math:cos(?oldLatitude))) AS ?deltaLong).
+                BIND((?dy/110540) AS ?deltaLat).
+                BIND((?oldLatitude + ?deltaLat) AS ?predictedLat).
+                BIND((?oldLongitude + ?deltaLong) AS ?predictedLong).
+                BIND(STRDT(STRBEFORE(STR(?predictedLat),"e0"), xsd:float) AS ?predictedLatitude).
+                BIND(STRDT(STRBEFORE(STR(?predictedLong), "e0"), xsd:float) AS ?predictedLongitude).
+            }
+            """ ;
+      ] ;
+.
