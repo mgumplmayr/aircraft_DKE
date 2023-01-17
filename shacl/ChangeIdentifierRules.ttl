@@ -12,7 +12,7 @@
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
-voc:SpeedChangeIdentifierShape
+voc:VelocityChangeIdentifier_Shape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -73,7 +73,7 @@ voc:SpeedChangeIdentifierShape
             """ ;
       ] ;
 .
-voc:DirectionChangeIdentifierShape
+voc:DirectionChangeIdentifier_Shape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -139,7 +139,7 @@ voc:DirectionChangeIdentifierShape
             """ ;
       ] ;
 .
-voc:HeightChangeIdentifierShape
+voc:HeightChangeIdentifier_Shape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [

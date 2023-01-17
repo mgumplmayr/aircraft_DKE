@@ -15,8 +15,7 @@ import java.io.FileOutputStream;
 public class PositionPredictor {
 
     static Model responseModel = ModelFactory.createDefaultModel();
-    static Model result = ModelFactory.createDefaultModel();
-
+    static Model resultModel = ModelFactory.createDefaultModel();
     static String OUTPUT_NAME = "out/prediction_result.ttl";
 
     public static void executeRule() {
@@ -68,7 +67,7 @@ public class PositionPredictor {
                                            
                         SELECT DISTINCT ?g ?time
                             WHERE {
-                                GRAPH ?g {\s
+                                GRAPH ?g {
                         	        ?s voc:time ?time.
                         	    }
                             } ORDER BY DESC(?time)
@@ -86,7 +85,7 @@ public class PositionPredictor {
                         PREFIX voc: <http://example.org/vocabulary#>
                         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
                                                      
-                       		SELECT (COUNT(?g) AS ?graphs)
+                        	SELECT (COUNT(?g) AS ?graphs)
                                        WHERE {
                                            GRAPH ?g {
                                    	        ?s voc:time ?time.
@@ -99,8 +98,8 @@ public class PositionPredictor {
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             String graphCount = conn.query(enoughGraphsQuery).execSelect().nextSolution().get("graphs").toString();
             int graphs = Integer.parseInt(graphCount.substring(0, graphCount.indexOf("^")));
-            if(graphs < 3) {
-                System.out.println("Not enough data to predict position, only "+graphs+" Graphs: need at least 3 Graphs get a prediction");
+            if (graphs < 3) {
+                System.out.println("Not enough data to predict position, only " + graphs + " Graphs: need at least 3 Graphs to get a prediction");
                 return;
             }
 
@@ -119,25 +118,25 @@ public class PositionPredictor {
             SimpleProgressMonitor monitor = new SimpleProgressMonitor("Position Predictor");
 
             //infer Triples from rules
-            result = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
+            resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
 
 
             System.out.println("SHACL-Rule for Position Prediction executed");
-
-            System.out.println("Uploading generated Position Prediction data to endpoint " + graphURL+"/WP1");
-            conn.load(graphURL+"/WP1", result); //Main.uploadModel(result, graphURL+"/1");
+            Main.validateModel(resultModel, "PositionPredictor");
+            Main.uploadModel(resultModel, graphURL + "/Task1");
             System.out.println("Upload of Position Prediction data complete");
 
         }
-
-
     }
-    public static void writeRDF(){
+
+    public static void writeRDF() {
         try {
             //write infered triples to file
-            result.write(new FileOutputStream(OUTPUT_NAME), "TTL");
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            System.out.println("Printing " + resultModel.size() + " resources");
+            resultModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

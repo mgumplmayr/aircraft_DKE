@@ -42,6 +42,7 @@ public class GUI extends JFrame {
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
         JButton changeIdentifier = new JButton("ChangeIdentifier");
+        JButton predictPosition = new JButton("Predict Positions");
         JButton update = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
@@ -58,7 +59,8 @@ public class GUI extends JFrame {
         secondPane.add(update);
         secondPane.add(openQuery);
         secondPane.add(log);
-        //secondPane.add(changeIdentifier);
+        secondPane.add(changeIdentifier);
+        secondPane.add(predictPosition);
 
         JPanel controls = new JPanel();
         GridLayout gridLayout = new GridLayout(2,3);
@@ -75,8 +77,6 @@ public class GUI extends JFrame {
         controls.add(velocityThreshold);
         controls.add(directionThreshold);
         controls.add(heightThreshold);
-
-
         secondPane.add(controls);
 
 
@@ -107,7 +107,11 @@ public class GUI extends JFrame {
                     double t3 = (double) velocityThreshold.getValue();
                     Main.executeRules((float)t1,(float)t2, (float)t3);
                 }
-                if (isCreatFiles()) Main.writeRDF();
+                if (isCreatFiles()){
+                    Main.writeRDF();
+                    PositionPredictor.writeRDF();
+                    ChangeIdentifier.writeRDF();
+                }
             }
 
         });
@@ -141,6 +145,10 @@ public class GUI extends JFrame {
         changeIdentifier.addActionListener(e -> {
             ChangeIdentifier.executeRule(5,3,1);
             if (isCreatFiles()) ChangeIdentifier.writeRDF();
+        });
+        predictPosition.addActionListener(e -> {
+            PositionPredictor.executeRule();
+            if (isCreatFiles()) PositionPredictor.writeRDF();
         });
 
         openQuery.addActionListener(e -> Main.openDatasetQuery());

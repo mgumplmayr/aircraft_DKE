@@ -21,7 +21,7 @@ public class ChangeIdentifier {
     static Model resultModel = ModelFactory.createDefaultModel();
     static SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
 
-    public static void executeRule(float velocityThreshold, float directionThreshold, float heightThreshold ) {
+    public static void executeRule(float velocityThreshold, float directionThreshold, float heightThreshold) {
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
@@ -75,7 +75,35 @@ public class ChangeIdentifier {
                             LIMIT 1
                 """);
 
+        Query enoughGraphsQuery = QueryFactory.create(
+                """
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX aircraft: <http://example.org/aircraft/>
+                        PREFIX position: <http://example.org/position/>
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX time: <http://example.org/time/>
+                        PREFIX voc: <http://example.org/vocabulary#>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                                                     
+                        	SELECT (COUNT(?g) AS ?graphs)
+                                       WHERE {
+                                           GRAPH ?g {
+                                   	        ?s voc:time ?time.
+                                   	    }
+                                       }
+                        """
+
+        );
+
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
+            String graphCount = conn.query(enoughGraphsQuery).execSelect().nextSolution().get("graphs").toString();
+            int graphs = Integer.parseInt(graphCount.substring(0, graphCount.indexOf("^")));
+            if (graphs < 2) {
+                System.out.println("Not enough data to Identify Changes, only " + graphs + " Graph: need at least 2 Graphs to Identify Changes");
+                return;
+            }
+
             //getting Response from last 2 Graphs
             responseModel = conn.query(constructQuery).execConstruct();
 
@@ -86,7 +114,7 @@ public class ChangeIdentifier {
 
             //getting the latest Graph for Upload
             QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
-            String Endpoint = q.get("g").toString()+"/3";
+            String endpoint = q.get("g").toString() + "/Task3";
 
 
             /* print response to file
@@ -115,7 +143,8 @@ public class ChangeIdentifier {
 
 
             System.out.println("SHACL-Rule for Change Identification executed");
-            Main.uploadModel(resultModel,Endpoint);
+            Main.validateModel(resultModel, "PositionPredictor");
+            Main.uploadModel(resultModel, endpoint);
             System.out.println("Upload of Change Identification data complete");
         }
     }

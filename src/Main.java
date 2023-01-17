@@ -1,17 +1,11 @@
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdfconnection.RDFConnection;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.ShaclValidator;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.XSD;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.awt.*;
 import java.io.*;
@@ -26,7 +20,7 @@ public class Main {
     static Model dynamicModel;
     //used for saving of all graphs in RDF File
     static Model RDFFileModel = ModelFactory.createDefaultModel();
-    //used to store Category Data
+
     static final String OUTPUT_NAME = "out/RDFData.ttl";
     static final String SHAPES_NAME = "shacl/shapes.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
@@ -60,8 +54,12 @@ public class Main {
     public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold) {
         System.out.println("Executing SHACL-Rules for current Graph");
 
+        //Task 1
+        PositionPredictor.executeRule();
         //Task 3
         ChangeIdentifier.executeRule(velocityThreshold,directionThreshold,heightThreshold);
+        System.out.println("SHACL-Rules Executed");
+        System.out.println(DASHES);
     }
 
     public static void openDatasetQuery() {
@@ -77,45 +75,30 @@ public class Main {
     public static void initiateFuseki() {
         try {
             Runtime.getRuntime().exec(new String[]{"cmd.exe", "/k", "cd fuseki && start fuseki-server.bat"});
-            TimeUnit.SECONDS.sleep(4);
+            TimeUnit.SECONDS.sleep(3);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("Fuseki Server started");
-        log.append("Fuseki Server started\n");
-    }
-
-    public static void uploadGraph() {
-        //upload to Fuseki
-        uploadStaticGraph();
-        uploadDynamicGraph();
+        System.out.println(DASHES);
     }
 
     public static void uploadModel(Model model, String endpoint){
+        System.out.println("Uploading Graph data to endpoint " + endpoint);
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(endpoint, model); // put -> set content, load -> add/append
         }
+        System.out.println("Upload of Graph data complete");
+        System.out.println(DASHES);
     }
 
     public static void uploadStaticGraph() {
-        System.out.println("Uploading static Graph data to endpoint " + connectionURL + "static/");
-        log.append("Uploading static Graph data to endpoint " + connectionURL + "static/" + "\n");
-
         uploadModel(staticModel,connectionURL+"static/");
-
-        System.out.println("Upload of static Graph data complete");
-        log.append("Upload of static Graph data complete\n");
     }
 
     private static void uploadDynamicGraph() {
         String graphURL = connectionURL + "states/" + responseTime;
-        System.out.println("Uploading dynamic Graph data to endpoint " + graphURL);
-        log.append("Uploading dynamic Graph data to endpoint " + graphURL + "\n");
-
         uploadModel(dynamicModel,graphURL);
-
-        System.out.println("Upload of dynamic Graph data complete");
-        log.append("Upload of dynamic Graph data complete\n");
 
         dynamicModel.removeAll();
     }
@@ -126,11 +109,14 @@ public class Main {
     }
 
     public static void validateDynamicData() {
+        dynamicModel.add(CategoryDataModel.model);
         validateModel(dynamicModel, "Dynamic Model");
+        dynamicModel.remove(CategoryDataModel.model);
+
         RDFFileModel.add(dynamicModel);
     }
 
-    private static void validateModel(Model model, String modelName) {
+    public static void validateModel(Model model, String modelName) {
         System.out.println("Checking " + model.size() + " " + modelName + " resources");
         Graph modelGraph = model.getGraph();
         Graph shapeGraph = RDFDataMgr.loadGraph(SHAPES_NAME);
@@ -147,19 +133,19 @@ public class Main {
                 model.removeAll(null, null, model.getResource(e.focusNode().toString()));
             });
         }
+        System.out.println(DASHES);
     }
 
     public static void writeRDF() {
+        System.out.println("Printing " + RDFFileModel.size() + " resources");
         try {
-            System.out.println("Printing " + RDFFileModel.size() + " resources");
-            log.append("Printing " + RDFFileModel.size() + " resources\n");
             RDFFileModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
-            System.out.println("Printed to: " + OUTPUT_NAME);
-            log.append("Printed to: " + OUTPUT_NAME + "\n");
         } catch (
                 FileNotFoundException e) {
             e.printStackTrace();
         }
+        System.out.println("Printed to: " + OUTPUT_NAME);
+        System.out.println(DASHES);
     }
 
 }
