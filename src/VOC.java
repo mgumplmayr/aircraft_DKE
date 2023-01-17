@@ -64,6 +64,8 @@ public class VOC {
     public static final Property hasTime;
     public static final Property timestamp;
     public static final Property hasAircraft;
+    //public static final Property event;
+    public static final Property interpretation;
 
     //public static final Property focusNode;
 
@@ -141,7 +143,10 @@ public class VOC {
         positionSource= m.createProperty(vocabularyURI+"positionSource");
         hasAircraft = m.createProperty(vocabularyURI+"hasAircraft");
         hasTime = m.createProperty(vocabularyURI+"hasTime");
-        //focusNode = m.createProperty("http://www.w3.org/ns/shacl#focusNode");
+
+        //Event Vocabulary
+        //event = m.createProperty(vocabularyURI+"Event");
+        interpretation = m.createProperty(vocabularyURI+"interpretation");
 
     }
 }

@@ -1,93 +1,130 @@
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdfconnection.RDFConnectionFuseki;
+import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
+import org.apache.jena.vocabulary.RDF;
+import org.topbraid.jenax.progress.SimpleProgressMonitor;
+import org.topbraid.jenax.util.JenaUtil;
+import org.topbraid.shacl.rules.RuleUtil;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
+
 public class CollisionControl {
 
-    private static int distance = 100;
+    static final String START_URI = "http://example.org/";
+    static final String OUTPUT_NAME = "out/collisionControl.ttl";
+    static final String COLLISION_EVENT_URI = START_URI + "collisionEvent/";
+    //static final String DIRECTION_EVENT_URI = START_URI + "directionEvent/";
+    //static final String HEIGHT_EVENT_URI = START_URI + "heightEvent/";
+    static Model responseModel = ModelFactory.createDefaultModel();
+    static Model resultModel = ModelFactory.createDefaultModel();
+    static SimpleProgressMonitor monitor = new SimpleProgressMonitor("CollisionControl");
 
-    private static final String query = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-            "PREFIX aircraft: <http://example.org/aircraft/> \n" +
-            "PREFIX position: <http://example.org/position/> \n" +
-            "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n" +
-            "PREFIX time: <http://example.org/time/> \n" +
-            "PREFIX voc: <http://example.org/vocabulary#> \n" +
-            "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-            "PREFIX math: <http://www.w3.org/2005/xpath-functions/math#>\n" +
-            "\n" +
-            "\n" +
-            "SELECT ?aircraft1 ?aircraft2 ?distance ?time WHERE {\n" +
-            "  GRAPH ?graph {\n" +
-            "    ?position1 voc:hasTime ?time1.\n" +
-            "    ?position1 voc:latitude ?latitude1.\n" +
-            "    ?position1 voc:longitude ?longitude1.\n" +
-            "    ?position1 voc:velocity ?velocity1.\n" +
-            "    ?position1 voc:hasAircraft ?aircraft1.\n" +
-            "    ?position1 voc:onGround ?onGround1.\n" +
-            "    ?position1 voc:trueTrack ?true_track1.\n" +
-            "    ?time1 voc:time ?time.\n" +
-            "    ?position1 voc:lastContact ?time_position1\n" +
-            "    FILTER(?time_position1<?time &&?onGround1 = false)\n" +
-            "    ?position2 voc:hasTime ?time2.\n" +
-            "    ?position2 voc:latitude ?latitude2.\n" +
-            "    ?position2 voc:longitude ?longitude2.\n" +
-            "    ?position2 voc:velocity ?velocity2.\n" +
-            "    ?position2 voc:hasAircraft ?aircraft2.\n" +
-            "    ?position2 voc:onGround ?onGround2.\n" +
-            "    ?position2 voc:trueTrack ?true_track2.\n" +
-            "    ?time2 voc:time ?time.\n" +
-            "    ?position2 voc:lastContact ?time_position2\n" +
-            "    FILTER(?time_position2<?time &&?onGround2 = false)\n" +
-            "    FILTER(?aircraft1 != ?aircraft2)\n" +
-            "    BIND ((?latitude2 - ?latitude1) as ?dLat)\n" +
-            "    BIND ((?longitude2 - ?longitude1) as ?dLon)\n" +
-            "    BIND (math:pow(math:sin(?dLat/2), 2) + math:pow(math:sin(?dLon/2), 2) * math:cos(?latitude1) * math:cos(?latitude2) as ?a)\n" +
-            "    BIND (6378.388 * 2 * math:atan2(math:sqrt(?a), math:sqrt(1.0-?a)) as ?distance)\n" +
-            "    FILTER(?distance < 200)\n" +
-            "  }\n" +
-            "}";
+    public static void executeRule(float distanceThreshold) {
+        RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
+                .destination("http://localhost:3030/aircraft/");
+
+        Query constructQuery = QueryFactory.create("""
+                	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX aircraft: <http://example.org/aircraft/>
+                    PREFIX position: <http://example.org/position/>
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX time: <http://example.org/time/>
+                    PREFIX voc: <http://example.org/vocabulary#>
+                    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                    
+                CONSTRUCT{
+                     	?s ?p ?o}
+                         WHERE {
+                             Graph ?graph{
+                             ?s ?p ?o.
+                     		{?s a voc:Position} UNION {?s a voc:Time} UNION {?s a voc:Aircraft}
+                             }
+                             {
+                                 SELECT ?graph ?time ?timestamp WHERE {
+                                 GRAPH ?graph {
+                                       ?time rdf:type voc:Time.
+                                       ?time voc:time ?timestamp.
+                                 }
+                               }
+                 
+                           order by desc(?timestamp)
+                           limit 2
+                             }
+                     }
+                     """);
+
+        Query latestGraphQuery = QueryFactory.create("""
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                        PREFIX aircraft: <http://example.org/aircraft/>
+                        PREFIX position: <http://example.org/position/>
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX time: <http://example.org/time/>
+                        PREFIX voc: <http://example.org/vocabulary#>
+                        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+                                           
+                        SELECT DISTINCT ?g ?time
+                            WHERE {
+                                GRAPH ?g {
+                        	        ?s voc:time ?time.
+                        	    }
+                            } ORDER BY DESC(?time)
+                            LIMIT 1
+                """);
+
+        try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
+            //getting Response from last 2 Graphs
+            responseModel = conn.query(constructQuery).execConstruct();
+
+            //create Objects for Threshold parameters
+            responseModel.createResource(START_URI + "distanceThreshold").addLiteral(RDF.value, distanceThreshold);
+
+            //getting the latest Graph for Upload
+            QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
+            String Endpoint = q.get("g").toString()+"/3";
 
 
-    /* Query for use in Fuseki Server
+            /* print response to file
+            try {
+                responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            */
 
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    PREFIX aircraft: <http://example.org/aircraft/>
-    PREFIX position: <http://example.org/position/>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX time: <http://example.org/time/>
-    PREFIX voc: <http://example.org/vocabulary#>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    PREFIX math: <http://www.w3.org/2005/xpath-functions/math#>
+            //create model for Rules
+            Model shapesModel = JenaUtil.createMemoryModel();
+            shapesModel.read("shacl/CollisionControlRules.ttl");
+            // add rules to model
+            try {
+                shapesModel.write(new FileOutputStream("out/testRules.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            //infer Triples from rules
+            resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
+            resultModel.setNsPrefix("collisionEvent", COLLISION_EVENT_URI);
 
 
-    SELECT ?aircraft1 ?aircraft2 ?distance ?time WHERE {
-      GRAPH ?graph {
-        ?position1 voc:hasTime ?time1.
-        ?position1 voc:latitude ?latitude1.
-        ?position1 voc:longitude ?longitude1.
-        ?position1 voc:velocity ?velocity1.
-        ?position1 voc:hasAircraft ?aircraft1.
-        ?position1 voc:onGround ?onGround1.
-        ?position1 voc:trueTrack ?true_track1.
-        ?time1 voc:time ?time.
-        ?position1 voc:lastContact ?time_position1
-        FILTER(?time_position1<?time &&?onGround1 = false)
-        ?position2 voc:hasTime ?time2.
-        ?position2 voc:latitude ?latitude2.
-        ?position2 voc:longitude ?longitude2.
-        ?position2 voc:velocity ?velocity2.
-        ?position2 voc:hasAircraft ?aircraft2.
-        ?position2 voc:onGround ?onGround2.
-        ?position2 voc:trueTrack ?true_track2.
-        ?time2 voc:time ?time.
-        ?position2 voc:lastContact ?time_position2
-        FILTER(?time_position2<?time &&?onGround2 = false)
-        FILTER(?aircraft1 != ?aircraft2)
-        BIND ((?latitude2 - ?latitude1) as ?dLat)
-        BIND ((?longitude2 - ?longitude1) as ?dLon)
-        BIND (math:pow(math:sin(?dLat/2), 2) + math:pow(math:sin(?dLon/2), 2) * math:cos(?latitude1) * math:cos(?latitude2) as ?a)
-        BIND (6378.388 * 2 * math:atan2(math:sqrt(?a), math:sqrt(1.0-?a)) as ?distance)
-        FILTER(?distance < 200)
-      }
+            System.out.println("SHACL-Rule for Collision Control executed");
+            Main.uploadModel(resultModel,Endpoint);
+            System.out.println("Upload of Collision Control data complete");
+        }
     }
-    */
-}
 
+    public static void writeRDF() {
+        try {
+            System.out.println("Printing " + resultModel.size() + " resources");
+            resultModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
+            System.out.println("Printed to: " + OUTPUT_NAME);
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}

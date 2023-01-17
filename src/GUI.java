@@ -1,15 +1,12 @@
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URI;
 
 public class GUI extends JFrame {
     private static boolean first = true;
     private static boolean createFile = true;
+    private static boolean executeRules = true;
     private static Mode chosenMode = Mode.NONE;
 
     public enum Mode {
@@ -28,7 +25,7 @@ public class GUI extends JFrame {
         }
 
         setTitle("Aircraft Manager");
-        setSize(500,150);
+        setSize(570,180);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -37,115 +34,125 @@ public class GUI extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1,2));
         JPanel secondPane = new JPanel();
-        panel.setLayout(new GridLayout(1,5));
+        //secondPane.setLayout(new GridLayout(5,2));
 
         JButton test = new JButton("Test");
         JButton productive = new JButton("Productive");
 
         JButton startFuseki = new JButton("Start Fuseki-Server");
         JButton importStaticData = new JButton("Import Static Data");
-        JButton refresh = new JButton("Refresh States");
+        JButton changeIdentifier = new JButton("ChangeIdentifier");
+        JButton update = new JButton("Refresh States");
         JButton openQuery = new JButton("Open Query");
         JButton log = new JButton("Log");
 
         JCheckBox file = new JCheckBox("create RDF-File?", true);
+        JCheckBox rules = new JCheckBox("Execute SHACL-Rules?", true);
+
 
         panel.add(productive);
         panel.add(test);
 
         secondPane.add(startFuseki);
         secondPane.add(importStaticData);
-        secondPane.add(refresh);
+        secondPane.add(update);
         secondPane.add(openQuery);
         secondPane.add(log);
+        //secondPane.add(changeIdentifier);
+
+        JPanel controls = new JPanel();
+        GridLayout gridLayout = new GridLayout(2,3);
+        gridLayout.setHgap(10);
+        controls.setLayout(gridLayout);
+
+        JSpinner velocityThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
+        JSpinner directionThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
+        JSpinner heightThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
+        JSpinner distanceThreshold = new JSpinner(new SpinnerNumberModel(5d, 0, 100, 1));
+
+        controls.add(new Label("Velocity Threshold:"));
+        controls.add(new Label("Direction Threshold:"));
+        controls.add(new Label("Height Threshold:"));
+        controls.add(new Label("Distance Threshold:"));
+        controls.add(velocityThreshold);
+        controls.add(directionThreshold);
+        controls.add(heightThreshold);
+        controls.add(distanceThreshold);
+
+
+        secondPane.add(controls);
+
 
         central.add(panel,BorderLayout.CENTER);
-        central.add(file, BorderLayout.SOUTH);
+        JPanel boxes = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        boxes.add(file);
+        boxes.add(rules);
+        central.add(boxes,BorderLayout.SOUTH);
 
-        importStaticData.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(getFirst()){
-                    first = false;
-                    Main.loadStaticData();
-                    Main.validateStaticData();
-                    if(createFile) Main.writeRDF();
-                    Main.uploadStaticGraph();
+        importStaticData.addActionListener(e -> {
+            if(getFirst()){
+                first = false;
+                Main.loadStaticData();
+                Main.validateStaticData();
+                if(createFile) Main.writeRDF();
+                Main.uploadStaticGraph();
+            }
+        });
+
+
+        update.addActionListener(e -> {
+            if(chosenMode == Mode.NONE);
+            else {
+                Main.update();
+                if (isExecuteRules()) {
+                    double t1 = (double) velocityThreshold.getValue();
+                    double t2 = (double) velocityThreshold.getValue();
+                    double t3 = (double) velocityThreshold.getValue();
+                    double t4 = (double) distanceThreshold.getValue();
+                    Main.executeRules((float)t1,(float)t2, (float)t3, (float) t4);
                 }
+                if (isCreatFiles()) Main.writeRDF();
             }
-        });
-        refresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(chosenMode == Mode.NONE);
-                else {
-                    Main.update();
-                }
 
-            }
         });
-        test.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(first) {
-                    productive.setSelected(false);
-                    setChosenMode(Mode.TEST);
-                    central.removeAll();
-                    central.add(secondPane, BorderLayout.CENTER);
-                    central.add(file, BorderLayout.SOUTH);
-                    revalidate();
-                    repaint();
-                } else
-                    test.setSelected(false);
-            }
-        });
-        productive.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(first) {
-                    test.setSelected(false);
-                    setChosenMode(Mode.PRODUCTION);
-                    central.removeAll();
-                    central.add(secondPane, BorderLayout.CENTER);
-                    central.add(file, BorderLayout.SOUTH);
-                    revalidate();
-                    repaint();
-                } else productive.setSelected(false);
-            }
-        });
-        startFuseki.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Main.initiateFuseki();
-            }
+        test.addActionListener(e -> {
+            if(first) {
+                productive.setSelected(false);
+                setChosenMode(Mode.TEST);
+                central.removeAll();
+                central.add(secondPane, BorderLayout.CENTER);
+                central.add(boxes, BorderLayout.SOUTH);
+                revalidate();
+                repaint();
+            } else
+                test.setSelected(false);
         });
 
-        openQuery.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Desktop desktop = java.awt.Desktop.getDesktop();
-                    URI oURL = new URI("http://localhost:3030/#/dataset/aircraft/query/");
-                    desktop.browse(oURL);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+        productive.addActionListener(e -> {
+            if(first) {
+                test.setSelected(false);
+                setChosenMode(Mode.PRODUCTION);
+                central.removeAll();
+                central.add(secondPane, BorderLayout.CENTER);
+                central.add(boxes, BorderLayout.SOUTH);
+                revalidate();
+                repaint();
+            } else productive.setSelected(false);
         });
 
-        file.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setCreateFile(!getCreateFile());
-            }
+        startFuseki.addActionListener(e -> Main.initiateFuseki());
+
+        changeIdentifier.addActionListener(e -> {
+            ChangeIdentifier.executeRule(5,3,1);
+            if (isCreatFiles()) ChangeIdentifier.writeRDF();
         });
 
-        log.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new logscreen();
-            }
-        });
+        openQuery.addActionListener(e -> Main.openDatasetQuery());
+
+        file.addActionListener(e -> setCreateFile(!isCreatFiles()));
+        rules.addActionListener(e -> setExecuteRules(!isExecuteRules()));
+
+        log.addActionListener(e -> new logscreen()); //todo https://stackoverflow.com/questions/14706674/system-out-println-to-jtextarea
         //TODO SysTrayIcon für schnelles updaten
         /*if(java.awt.SystemTray.isSupported()){
             SystemTray tray = SystemTray.getSystemTray();
@@ -171,12 +178,18 @@ public class GUI extends JFrame {
         return first;
     }
 
-    public static boolean getCreateFile() {
+    public static boolean isCreatFiles() {
         return createFile;
+    }
+    public static boolean isExecuteRules() {
+        return executeRules;
     }
 
     public static void setCreateFile(boolean createFile) {
         GUI.createFile = createFile;
+    }
+    public static void setExecuteRules(boolean executeRules) {
+        GUI.executeRules = executeRules;
     }
 
     class logscreen extends JFrame {

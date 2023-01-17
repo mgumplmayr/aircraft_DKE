@@ -1,0 +1,203 @@
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
+
+voc:SpeedChangeIdentifierShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                ?event rdf:type voc:VelocityEvent.
+                # ?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaVelocity ?deltaVelocity.
+                ?event voc:interpretation ?interpretation.
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:velocity ?velocity.
+                ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
+                ?velocityThreshold rdf:value ?threshold.
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVelocity
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:velocity ?oldVelocity.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ABS(?deltaVelocity) > ?threshold).
+                FILTER(?velocityThreshold = <http://example.org/velocityThreshold>).
+
+
+            BIND((?velocity-?oldVelocity) AS ?deltaVelocity). #Delta of velocities
+            BIND( IRI(CONCAT("http://example.org/velocityEvent/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?deltaVelocity>0,"Acceleration","Slowdown") as ?interpretation).
+            BIND( NOW() as ?now).
+            }
+            """ ;
+      ] ;
+.
+voc:DirectionChangeIdentifierShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                ?event rdf:type voc:DirectionEvent.
+                #?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaTrueTrack ?deltaTrueTrack.
+                ?event voc:interpretation ?interpretation.
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:trueTrack ?trueTrack.
+                ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
+                ?directionThreshold rdf:value ?threshold.
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldTrueTrack
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:trueTrack ?oldTrueTrack.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ABS(?deltaTrueTrack) > ?threshold).
+                FILTER(?directionThreshold = <http://example.org/directionThreshold>).
+
+
+            BIND((?trueTrack-?oldTrueTrack) AS ?deltaTrueTrack). #Delta of true Track
+            BIND( IRI(CONCAT("http://example.org/directionEvent/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?trueTrack<45,"North",
+                    IF(?trueTrack<135,"East",
+                    IF(?trueTrack<225,"South",
+                    IF(?trueTrack<315,"West","North"))))
+                  as ?interpretation).
+            BIND( NOW() as ?now).
+            }
+            """ ;
+      ] ;
+.
+voc:HeightChangeIdentifierShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+                prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+                prefix aircraft: <http://example.org/aircraft/>
+                prefix position: <http://example.org/position/>
+                prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                prefix time:     <http://example.org/time/>
+                prefix velocityEvent:     <http://example.org/velocityEvent/>
+                prefix directionEvent:     <http://example.org/directionEvent/>
+                prefix heightEvent:     <http://example.org/heightEvent/>
+                prefix voc:      <http://example.org/vocabulary#>
+                prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+                prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+            CONSTRUCT {
+                ?event rdf:type voc:HeightEvent.
+                #?event rdf:value ?threshold. #Print threshold Value
+                ?event voc:timeStamp ?now.
+                ?event voc:hasPosition $this.
+                ?event voc:hasPosition ?oldPos.
+                ?event voc:deltaVerticalRate ?deltaVerticalRate.
+                ?event voc:interpretation ?interpretation.
+            }
+            WHERE {
+                $this voc:hasTime ?time_object.
+                $this voc:onGround ?onGround.
+                $this voc:hasAircraft ?aircraft.
+                $this voc:verticalRate ?verticalRate.
+                ?time_object voc:time ?time.
+                ?aircraft voc:icao24 ?icao24.
+                ?heightThreshold rdf:value ?threshold.
+
+            {
+            #Query for the Position before the current Position saved on Variable ?oldPos
+                SELECT ?oldPos ?oldTime ?oldAircraft ?oldVerticalRate
+                    WHERE{
+                    ?oldPos a voc:Position.
+                    ?oldPos voc:hasTime ?oldTime_object.
+                    ?oldTime_object voc:time ?oldTime.
+                    ?oldPos voc:hasAircraft ?oldAircraft.
+                    ?oldPos voc:verticalRate ?oldVerticalRate.
+                    }
+            }
+                FILTER(?onGround = false &&
+                ?oldAircraft = ?aircraft &&
+                ?oldTime < ?time &&
+                ABS(?deltaVerticalRate) > ?threshold).
+                FILTER(?heightThreshold = <http://example.org/heightThreshold>).
+
+
+            BIND((?verticalRate-?oldVerticalRate) AS ?deltaVerticalRate). #Delta of vertical Rate
+            BIND( IRI(CONCAT("http://example.org/heightEvent/",STR(?icao24),"_",STR(?time))) as ?event).
+            BIND( IF(?deltaVerticalRate>0,"Climbing","Descending") as ?interpretation).
+            BIND( NOW() as ?now).
+            }
+            """ ;
+      ] ;
+.
