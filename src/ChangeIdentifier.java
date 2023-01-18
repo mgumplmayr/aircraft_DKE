@@ -100,7 +100,7 @@ public class ChangeIdentifier {
             String graphCount = conn.query(enoughGraphsQuery).execSelect().nextSolution().get("graphs").toString();
             int graphs = Integer.parseInt(graphCount.substring(0, graphCount.indexOf("^")));
             if (graphs < 2) {
-                System.out.println("Not enough data to Identify Changes, only " + graphs + " Graph: need at least 2 Graphs to Identify Changes");
+                System.out.println("\033[0;31m" + "Not enough data to Identify Changes, only " + graphs + " Graph: need at least 2 Graphs to Identify Changes" + "\033[0m");
                 return;
             }
 
@@ -143,9 +143,11 @@ public class ChangeIdentifier {
 
 
             System.out.println("SHACL-Rule for Change Identification executed");
-            Main.validateModel(resultModel, "PositionPredictor");
-            Main.uploadModel(resultModel, endpoint);
-            System.out.println("Upload of Change Identification data complete");
+
+            if (resultModel.size() != 0) {
+                Main.validateModel(resultModel, "PositionPredictor");
+                Main.uploadModel(resultModel, endpoint);
+            } else System.out.println("No Resulting Data to upload for Change Identifier!");
         }
     }
 

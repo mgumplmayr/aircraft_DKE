@@ -99,7 +99,7 @@ public class PositionPredictor {
             String graphCount = conn.query(enoughGraphsQuery).execSelect().nextSolution().get("graphs").toString();
             int graphs = Integer.parseInt(graphCount.substring(0, graphCount.indexOf("^")));
             if (graphs < 3) {
-                System.out.println("Not enough data to predict position, only " + graphs + " Graphs: need at least 3 Graphs to get a prediction");
+                System.out.println("\033[0;31m" + "Not enough data to predict position, only " + graphs + " Graphs: need at least 3 Graphs to get a prediction" + "\033[0m");
                 return;
             }
 
@@ -122,9 +122,12 @@ public class PositionPredictor {
 
 
             System.out.println("SHACL-Rule for Position Prediction executed");
-            Main.validateModel(resultModel, "PositionPredictor");
-            Main.uploadModel(resultModel, graphURL + "/Task1");
-            System.out.println("Upload of Position Prediction data complete");
+
+            if (resultModel.size() != 0) {
+                Main.validateModel(resultModel, "PositionPredictor");
+                Main.uploadModel(resultModel, graphURL + "/Task1");
+            } else System.out.println("No Resulting Data to upload for Position Predictor!");
+
 
         }
     }

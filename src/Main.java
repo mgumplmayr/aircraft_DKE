@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-   //create model
+    //create model
     static Model staticModel;
     static Model dynamicModel;
     //used for saving of all graphs in RDF File
@@ -52,13 +52,17 @@ public class Main {
     }
 
     public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold) {
-        System.out.println("Executing SHACL-Rules for current Graph");
+        System.out.println("\033[0;36m" + "Executing SHACL-Rules for current Graph" + "\033[0m");
 
         //Task 1
+        System.out.println();
         PositionPredictor.executeRule();
+
         //Task 3
-        ChangeIdentifier.executeRule(velocityThreshold,directionThreshold,heightThreshold);
-        System.out.println("SHACL-Rules Executed");
+        System.out.println();
+        ChangeIdentifier.executeRule(velocityThreshold, directionThreshold, heightThreshold);
+
+        System.out.println("\033[0;36m" + "SHACL-Rules Executed" + "\033[0m");
         System.out.println(DASHES);
     }
 
@@ -83,7 +87,7 @@ public class Main {
         System.out.println(DASHES);
     }
 
-    public static void uploadModel(Model model, String endpoint){
+    public static void uploadModel(Model model, String endpoint) {
         System.out.println("Uploading Graph data to endpoint " + endpoint);
         try (RDFConnection conn = RDFConnection.connect(connectionURL)) {
             conn.put(endpoint, model); // put -> set content, load -> add/append
@@ -93,12 +97,12 @@ public class Main {
     }
 
     public static void uploadStaticGraph() {
-        uploadModel(staticModel,connectionURL+"static/");
+        uploadModel(staticModel, connectionURL + "static/");
     }
 
     private static void uploadDynamicGraph() {
         String graphURL = connectionURL + "states/" + responseTime;
-        uploadModel(dynamicModel,graphURL);
+        uploadModel(dynamicModel, graphURL);
 
         dynamicModel.removeAll();
     }

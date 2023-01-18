@@ -28,6 +28,7 @@ public class DynamicDataModel {
         dynamicModel.setNsPrefix("time", TIME_URI);
         dynamicModel.setNsPrefix("position", POSITION_URI);
         dynamicModel.setNsPrefix("aircraft", AIRCRAFT_URI);
+        dynamicModel.setNsPrefix("category", CATEGORY_URI);
 
         System.out.println("Loading Dynamic Data");
         JSONObject dynamicData;
