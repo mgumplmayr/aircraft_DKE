@@ -107,7 +107,7 @@ public class GUI extends JFrame {
                     double t3 = (double) velocityThreshold.getValue();
                     Main.executeRules((float)t1,(float)t2, (float)t3);
                 }
-                if (isCreatFiles()){
+                if (isCreateFiles()){
                     Main.writeRDF();
                     PositionPredictor.writeRDF();
                     ChangeIdentifier.writeRDF();
@@ -144,16 +144,16 @@ public class GUI extends JFrame {
 
         changeIdentifier.addActionListener(e -> {
             ChangeIdentifier.executeRule(5,3,1);
-            if (isCreatFiles()) ChangeIdentifier.writeRDF();
+            if (isCreateFiles()) ChangeIdentifier.writeRDF();
         });
         predictPosition.addActionListener(e -> {
             PositionPredictor.executeRule();
-            if (isCreatFiles()) PositionPredictor.writeRDF();
+            if (isCreateFiles()) PositionPredictor.writeRDF();
         });
 
         openQuery.addActionListener(e -> Main.openDatasetQuery());
 
-        file.addActionListener(e -> setCreateFile(!isCreatFiles()));
+        file.addActionListener(e -> setCreateFile(!isCreateFiles()));
         rules.addActionListener(e -> setExecuteRules(!isExecuteRules()));
 
         log.addActionListener(e -> new logscreen()); //todo https://stackoverflow.com/questions/14706674/system-out-println-to-jtextarea
@@ -182,7 +182,7 @@ public class GUI extends JFrame {
         return first;
     }
 
-    public static boolean isCreatFiles() {
+    public static boolean isCreateFiles() {
         return createFile;
     }
     public static boolean isExecuteRules() {
