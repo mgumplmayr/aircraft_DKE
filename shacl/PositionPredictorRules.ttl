@@ -30,7 +30,7 @@ voc:PredictPosition_Shape
             CONSTRUCT {
                 $this voc:predictedLongitude ?predictedLongitude.
                 $this voc:predictedLatitude ?predictedLatitude.
-                $this voc:old true .
+                #$this voc:old true .
 
 
             }
