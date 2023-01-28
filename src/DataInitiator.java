@@ -19,15 +19,16 @@ public class DataInitiator {
 
     public DataInitiator() {
         List<String> testFiles = new LinkedList<>();
-        testFiles.add("testData/1670000001.json");
-        testFiles.add("testData/1670000002.json");
-        testFiles.add("testData/1670000003.json");
+        testFiles.add("testData/1670000010.json");
+        testFiles.add("testData/1670000020.json");
+        testFiles.add("testData/1670000030.json");
 
         JSONParser parser = new JSONParser();
         for (String file : testFiles) {
             try (FileReader reader = new FileReader(file)) {
                 JSONObject dataObject = (JSONObject) parser.parse(reader);
                 testData.add(dataObject);
+                System.out.println("Added " + file + " to testData");
             } catch (IOException | ParseException e) {
                 throw new RuntimeException(e);
             }
@@ -38,18 +39,9 @@ public class DataInitiator {
     public List<String[]> getStaticData() {
 
         try {
-            if (GUI.getChosenMode() == GUI.Mode.TEST) {
-                CSVReader reader = new CSVReader(new FileReader("staticDataTest.csv"));
-                List<String[]> data = reader.readAll();
-                return data;
-            }
-
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
-
             List<String[]> data = reader.readAll();
-
             return data;
-
         } catch (Exception e) {
             System.out.println("Fehler beim laden der statischen Daten: ");
             e.printStackTrace();
@@ -75,9 +67,7 @@ public class DataInitiator {
         try { //dynamische Daten
             JSONObject dataObject = testData.poll();
             if(dataObject == null) throw new RuntimeException("No more Test data available!");
-
             System.out.println(dataObject);
-
             return dataObject;
         } catch (Exception e) {
             System.out.println("Error with test Data:");

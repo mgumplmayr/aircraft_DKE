@@ -67,11 +67,10 @@ voc:PredictPosition_Shape
                     ?beforeOldPos voc:velocity ?beforeOldVelocity
                     }
             }
-                $this voc:lastContact ?time_position.
-                FILTER(?time_position<?time &&?onGround = false &&
+                $this voc:timePosition ?time_position.
+                FILTER(?time_position<?time && ?onGround = false &&
                 ?oldAircraft = ?aircraft && ?beforeOldAircraft = ?aircraft &&
                 ?oldTime < ?time && ?beforeOldTime < ?oldTime).
-
 
                 #Calculations with the Positions to get expected Position
                 BIND((?time_position - ?oldTime) AS ?timeDifference). #Difference between time_position of current and the time before
