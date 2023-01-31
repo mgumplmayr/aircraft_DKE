@@ -5,3 +5,4 @@ icon.jpg
 /fuseki/run/system/tdb.lock
 .DS_Store
 .idea
+/target

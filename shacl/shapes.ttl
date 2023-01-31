@@ -198,7 +198,7 @@ voc:Manufacturer_Shape
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
-                    #sh:maxCount 1 ; #check semantics
+        #sh:maxCount 1 ; #csv has different spellings of one Name
                      sh:path     voc:manufacturerName ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;

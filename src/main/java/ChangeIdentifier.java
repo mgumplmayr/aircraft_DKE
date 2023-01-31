@@ -1,10 +1,8 @@
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdfconnection.RDFConnectionFuseki;
 import org.apache.jena.rdfconnection.RDFConnectionRemoteBuilder;
+import org.apache.jena.vocabulary.RDF;
 import org.topbraid.jenax.progress.SimpleProgressMonitor;
 import org.topbraid.jenax.util.JenaUtil;
 import org.topbraid.shacl.rules.RuleUtil;
@@ -12,18 +10,22 @@ import org.topbraid.shacl.rules.RuleUtil;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-public class PositionPredictor {
+public class ChangeIdentifier {
 
+    static final String START_URI = "http://example.org/";
+    static final String OUTPUT_NAME = "out/changeIdentifier.ttl";
+    static final String VELOCITY_EVENT_URI = START_URI + "velocityEvent/";
+    static final String DIRECTION_EVENT_URI = START_URI + "directionEvent/";
+    static final String HEIGHT_EVENT_URI = START_URI + "heightEvent/";
     static Model responseModel = ModelFactory.createDefaultModel();
     static Model resultModel = ModelFactory.createDefaultModel();
-    static String OUTPUT_NAME = "out/prediction_result.ttl";
+    static SimpleProgressMonitor monitor = new SimpleProgressMonitor("ChangeIdentifier");
 
-    public static void executeRule() {
-        System.out.println("Predicting position");
+    public static void executeRule(float velocityThreshold, float directionThreshold, float heightThreshold) {
         RDFConnectionRemoteBuilder builder = RDFConnectionFuseki.create()
                 .destination("http://localhost:3030/aircraft/");
 
-        Query resultQuery = QueryFactory.create("""
+        Query constructQuery = QueryFactory.create("""
                 	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                     PREFIX aircraft: <http://example.org/aircraft/>
@@ -38,7 +40,7 @@ public class PositionPredictor {
                          WHERE {
                              Graph ?graph{
                              ?s ?p ?o.
-                     		{?s a voc:Position} UNION {?s a voc:Time}
+                     		{?s a voc:Position} UNION {?s a voc:Time} UNION {?s a voc:Aircraft}
                              }
                              {
                                  SELECT ?graph ?time ?timestamp WHERE {
@@ -49,13 +51,12 @@ public class PositionPredictor {
                                }
                  
                            order by desc(?timestamp)
-                           limit 3
+                           limit 2
                              }
                      }
                      """);
 
-        Query latestGraphQuery = QueryFactory.create(
-                """
+        Query latestGraphQuery = QueryFactory.create("""
                         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                         PREFIX aircraft: <http://example.org/aircraft/>
@@ -71,8 +72,8 @@ public class PositionPredictor {
                         	        ?s voc:time ?time.
                         	    }
                             } ORDER BY DESC(?time)
-                            LIMIT 1"""
-        );
+                            LIMIT 1
+                """);
 
         Query enoughGraphsQuery = QueryFactory.create(
                 """
@@ -98,49 +99,62 @@ public class PositionPredictor {
         try (RDFConnectionFuseki conn = (RDFConnectionFuseki) builder.build()) {
             String graphCount = conn.query(enoughGraphsQuery).execSelect().nextSolution().get("graphs").toString();
             int graphs = Integer.parseInt(graphCount.substring(0, graphCount.indexOf("^")));
-            if (graphs < 3) {
-                System.out.println("\033[0;31m" + "Not enough data to predict position, only " + graphs + " Graphs: need at least 3 Graphs to get a prediction" + "\033[0m");
+            if (graphs < 2) {
+                System.out.println("\033[0;31m" + "Not enough data to Identify Changes, only " +
+                        graphs + " Graph: need at least 2 Graphs to Identify Changes" + "\033[0m");
                 return;
             }
 
-            //getting Response from last 3 Graphs
-            responseModel = conn.query(resultQuery).execConstruct();
+            //getting Response from last 2 Graphs
+            responseModel = conn.query(constructQuery).execConstruct();
+
+            //create Objects for Threshold parameters
+            responseModel.createResource(START_URI + "velocityThreshold").addLiteral(RDF.value, velocityThreshold);
+            responseModel.createResource(START_URI + "directionThreshold").addLiteral(RDF.value, directionThreshold);
+            responseModel.createResource(START_URI + "heightThreshold").addLiteral(RDF.value, heightThreshold);
 
             //getting the latest Graph for Upload
-            QuerySolution latestGraph = conn.query(latestGraphQuery).execSelect().nextSolution();
-            String graphURL = latestGraph.get("g").toString();
+            QuerySolution q = conn.query(latestGraphQuery).execSelect().nextSolution();
+            String endpoint = q.get("g").toString() + "/Task3";
 
 
-            //add rules to model
+            /* print response to file
+            try {
+                responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            */
+
+            //create model for Rules
             Model shapesModel = JenaUtil.createMemoryModel();
-            shapesModel.read("shacl/PositionPredictorRules.ttl");
+            shapesModel.read("shacl/ChangeIdentifierRules.ttl");
 
-            SimpleProgressMonitor monitor = new SimpleProgressMonitor("Position Predictor");
 
             //infer Triples from rules
             resultModel = RuleUtil.executeRules(responseModel, shapesModel, null, monitor);
+            resultModel.setNsPrefix("velocityEvent", VELOCITY_EVENT_URI);
+            resultModel.setNsPrefix("directionEvent", DIRECTION_EVENT_URI);
+            resultModel.setNsPrefix("heightEvent", HEIGHT_EVENT_URI);
 
 
-            System.out.println("SHACL-Rule for Position Prediction executed");
+            System.out.println("SHACL-Rule for Change Identification executed");
 
             if (resultModel.size() != 0) {
                 Main.validateModel(resultModel, "PositionPredictor");
-                Main.uploadModel(resultModel, graphURL + "/Task1");
-            } else System.out.println("No Resulting Data to upload for Position Predictor!");
-
-
+                Main.uploadModel(resultModel, endpoint);
+            } else System.out.println("No Resulting Data to upload for Change Identifier!");
         }
     }
 
     public static void writeRDF() {
         try {
-            //write infered triples to file
             System.out.println("Printing " + resultModel.size() + " resources");
             resultModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
             System.out.println("Printed to: " + OUTPUT_NAME);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (
+                FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
-
 }

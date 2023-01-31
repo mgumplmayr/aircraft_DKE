@@ -6,7 +6,7 @@ import org.apache.jena.vocabulary.XSD;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class DynamicDataModel {
+public class DynamicDataModel extends CategoryDataModel {
     static DataInitiator initiator = new DataInitiator();
     static Model dynamicModel;
     static final String START_URI = "http://example.org/";

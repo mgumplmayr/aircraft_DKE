@@ -32,7 +32,6 @@ voc:VelocityChangeIdentifier_Shape
 
             CONSTRUCT {
                 ?event rdf:type voc:VelocityEvent.
-                # ?event rdf:value ?threshold. #Print threshold Value
                 ?event voc:timeStamp ?now.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.

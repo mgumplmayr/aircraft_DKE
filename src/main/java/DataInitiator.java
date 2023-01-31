@@ -3,8 +3,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -43,7 +41,7 @@ public class DataInitiator {
             List<String[]> data = reader.readAll();
             return data;
         } catch (Exception e) {
-            System.out.println("Fehler beim laden der statischen Daten: ");
+            System.out.println("Error with static data: ");
             e.printStackTrace();
             return null;
         }
@@ -85,14 +83,6 @@ public class DataInitiator {
 
             JSONParser parser = new JSONParser(); //String zu JSON parsen
             JSONObject dataObject = (JSONObject) parser.parse(response.body());
-
-            //Patrick: für Testfile
-            /*
-            FileWriter file = new FileWriter("C:/Github/test.json");
-            file.write(dataObject.toJSONString());
-            file.close();
-            */
-
 
             return dataObject;
         } catch (Exception e) {
