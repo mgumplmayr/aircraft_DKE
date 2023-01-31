@@ -1,6 +1,7 @@
 /apache-jena-fuseki-4.6.1/
 staticRDF.ttl
-/out/
+out/*
+!out/.gitkeep
 icon.jpg
 /fuseki/run/system/tdb.lock
 .DS_Store
