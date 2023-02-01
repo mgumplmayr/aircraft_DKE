@@ -12,7 +12,7 @@
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
-voc:VelocityChangeIdentifier_Shape
+voc:SpeedChangeIdentifierShape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -32,6 +32,7 @@ voc:VelocityChangeIdentifier_Shape
 
             CONSTRUCT {
                 ?event rdf:type voc:VelocityEvent.
+                # ?event rdf:value ?threshold. #Print threshold Value
                 ?event voc:timeStamp ?now.
                 ?event voc:hasPosition $this.
                 ?event voc:hasPosition ?oldPos.
@@ -72,7 +73,7 @@ voc:VelocityChangeIdentifier_Shape
             """ ;
       ] ;
 .
-voc:DirectionChangeIdentifier_Shape
+voc:DirectionChangeIdentifierShape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [
@@ -138,7 +139,7 @@ voc:DirectionChangeIdentifier_Shape
             """ ;
       ] ;
 .
-voc:HeightChangeIdentifier_Shape
+voc:HeightChangeIdentifierShape
     a sh:NodeShape ;
     sh:targetClass voc:Position ;
     sh:rule [

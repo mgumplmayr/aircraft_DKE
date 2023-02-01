@@ -1,19 +1,16 @@
-@prefix aircraft:       <http://example.org/aircraft/> .
-@prefix category:       <http://example.org/category/> .
-@prefix manufacturer:   <http://example.org/manufacturer/> .
-@prefix model:          <http://example.org/model/> .
-@prefix operator:       <http://example.org/operator/> .
-@prefix owner:          <http://example.org/owner/> .
-@prefix time:           <http://example.org/time/> .
-@prefix position:       <http://example.org/position/> .
-@prefix directionEvent: <http://example.org/directionEvent/> .
-@prefix heightEvent:    <http://example.org/heightEvent/> .
-@prefix velocityEvent:  <http://example.org/velocityEvent/> .
-@prefix rdf:            <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix voc:            <http://example.org/vocabulary#> .
-@prefix sh:             <http://www.w3.org/ns/shacl#> .
-@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdfs:           <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
 
 voc:Aircraft_Shape
     rdf:type       sh:NodeShape ;
@@ -26,7 +23,7 @@ voc:Aircraft_Shape
                      sh:class    voc:Owner ] ;
     sh:property    [ sh:path     voc:hasCategory ;
                      sh:maxCount 1 ;
-                     sh:class    voc:Category
+                     #sh:class    voc:Category  used only if all category data is loaded in current graph
                    ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
@@ -70,7 +67,7 @@ voc:Aircraft_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:originCountry ] ;
-        sh:closed      true .
+    sh:closed      true .
 
 
 voc:Position_Shape
@@ -125,14 +122,6 @@ voc:Position_Shape
     sh:property    [ sh:datatype xsd:int ;
                      sh:maxCount 1 ;
                      sh:path     voc:positionSource ] ;
-    sh:property    [ sh:path     voc:old ;
-                     sh:maxCount 1 ] ;
-    sh:property    [ sh:path     voc:predictedLatitude ;
-                     sh:datatype xsd:float ;
-                     sh:maxCount 1 ] ;
-    sh:property    [ sh:path     voc:predictedLongitude ;
-                     sh:datatype xsd:float ;
-                     sh:maxCount 1 ] ;
     sh:targetClass voc:Position ;
     sh:closed      true .
 
@@ -148,7 +137,7 @@ voc:Model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
-        # sh:maxCount 1 ; to many typos in csv
+                     # sh:maxCount 1 ; to many typos in csv
                      sh:path     voc:model ] ;
     sh:targetClass voc:Model ;
     sh:closed      true .
@@ -198,7 +187,7 @@ voc:Manufacturer_Shape
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
-        #sh:maxCount 1 ; #csv has different spellings of one Name
+        # sh:maxCount 1 ; check semantics
                      sh:path     voc:manufacturerName ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
@@ -217,73 +206,4 @@ voc:Time_Shape
                      sh:maxCount 1 ;
                      sh:path     voc:time ] ;
     sh:targetClass voc:Time ;
-    sh:closed      true .
-
-voc:VelocityEvent_Shape
-    rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
-    sh:property    [ sh:path     rdf:type ;
-                     sh:hasValue voc:VelocityEvent ] ;
-    sh:property    [ sh:path     voc:deltaVelocity ;
-                     sh:datatype xsd:float ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:hasPosition ;
-                     sh:minCount 2 ;
-                     sh:maxCount 2 ; ] ;
-    sh:property    [ sh:path     voc:interpretation ;
-                     sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:timeStamp ;
-                     sh:datatype xsd:dateTime ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:targetClass voc:VelocityEvent ;
-    sh:closed      true .
-
-voc:DirectionEvent_Shape
-    rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
-    sh:property    [ sh:path     rdf:type ;
-                     sh:hasValue voc:DirectionEvent ] ;
-    sh:property    [ sh:path     voc:deltaTrueTrack ;
-                     sh:datatype xsd:float ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:hasPosition ;
-                     sh:minCount 2 ;
-                     sh:maxCount 2 ; ] ;
-    sh:property    [ sh:path     voc:interpretation ;
-                     sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:timeStamp ;
-                     sh:datatype xsd:dateTime ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:targetClass voc:DirectionEvent ;
-    sh:closed      true .
-
-voc:HeightEvent_Shape
-    rdf:type       sh:NodeShape ;
-    sh:nodeKind    sh:IRI ;
-    sh:property    [ sh:path     rdf:type ;
-                     sh:hasValue voc:HeightEvent ] ;
-    sh:property    [ sh:path     voc:deltaVerticalRate ;
-                     sh:datatype xsd:float ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:hasPosition ;
-                     sh:minCount 2 ;
-                     sh:maxCount 2 ; ] ;
-    sh:property    [ sh:path     voc:interpretation ;
-                     sh:datatype xsd:string ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:property    [ sh:path     voc:timeStamp ;
-                     sh:datatype xsd:dateTime ;
-                     sh:minCount 1 ;
-                     sh:maxCount 1 ; ] ;
-    sh:targetClass voc:HeightEvent ;
     sh:closed      true .
