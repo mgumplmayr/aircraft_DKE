@@ -54,14 +54,14 @@ public class Main {
     public static void update() {
         loadDynamicData();
         validateDynamicData();
-        uploadDynamicGraph();
+    uploadDynamicGraph();
     }
 
     public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold, float distanceThreshold) {
         System.out.println("Executing SHACL-Rules for current Graph");
 
         //Task 2
-        CollisionControl.executeRule(distanceThreshold);
+        CollisionControl.executeRule(100); //distance Threshold
         //Task 3
         ChangeIdentifier.executeRule(velocityThreshold,directionThreshold,heightThreshold);
     }
