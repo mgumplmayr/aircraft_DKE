@@ -64,10 +64,7 @@ public class VOC {
     public static final Property hasTime;
     public static final Property timestamp;
     public static final Property hasAircraft;
-    //public static final Property event;
     public static final Property interpretation;
-
-    //public static final Property focusNode;
 
     public VOC(){
 
@@ -145,7 +142,6 @@ public class VOC {
         hasTime = m.createProperty(vocabularyURI+"hasTime");
 
         //Event Vocabulary
-        //event = m.createProperty(vocabularyURI+"Event");
         interpretation = m.createProperty(vocabularyURI+"interpretation");
 
     }

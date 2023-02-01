@@ -14,7 +14,6 @@ import java.util.*;
 public class DataInitiator {
     Queue<JSONObject> testData = new LinkedList<>();
 
-
     public DataInitiator() {
         List<String> testFiles = new LinkedList<>();
         testFiles.add("testData/1670000010.json");

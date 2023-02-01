@@ -25,7 +25,7 @@ public class Main {
     static final String SHAPES_NAME = "shacl/shapes.ttl";
     static final String connectionURL = "http://localhost:3030/aircraft/";
     static String responseTime;
-    public static StringBuilder log = new StringBuilder(); //todo? https://stackoverflow.com/questions/14534767/how-to-append-a-newline-to-stringbuilder
+    public static StringBuilder log = new StringBuilder();
     public static final String DASHES = "--------------------------------------------";
 
     public static void main(String[] args) {
