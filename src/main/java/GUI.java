@@ -70,15 +70,17 @@ public class GUI extends JFrame {
         JSpinner velocityThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
         JSpinner directionThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
         JSpinner heightThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
+        JSpinner distanceThreshold = new JSpinner(new SpinnerNumberModel(5d, 0, 100, 1));
 
         controls.add(new Label("Velocity Threshold:"));
         controls.add(new Label("Direction Threshold:"));
         controls.add(new Label("Height Threshold:"));
+        controls.add(new Label("Distance Threshold:"));
         controls.add(velocityThreshold);
         controls.add(directionThreshold);
         controls.add(heightThreshold);
         secondPane.add(controls);
-
+        controls.add(distanceThreshold);
 
         central.add(panel,BorderLayout.CENTER);
         JPanel boxes = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -105,11 +107,13 @@ public class GUI extends JFrame {
                     double t1 = (double) velocityThreshold.getValue();
                     double t2 = (double) velocityThreshold.getValue();
                     double t3 = (double) velocityThreshold.getValue();
-                    Main.executeRules((float)t1,(float)t2, (float)t3);
+                    double t4 = (double) distanceThreshold.getValue();
+                    Main.executeRules((float)t1,(float)t2, (float)t3, (float) t4);
                 }
                 if (isCreateFiles()){
                     Main.writeRDF();
                     PositionPredictor.writeRDF();
+                    CollisionControl.writeRDF();
                     ChangeIdentifier.writeRDF();
                 }
             }

@@ -1,0 +1,92 @@
+@prefix aircraft:     <http://example.org/aircraft/> .
+@prefix category:     <http://example.org/category/> .
+@prefix manufacturer: <http://example.org/manufacturer/> .
+@prefix model:        <http://example.org/model/> .
+@prefix operator:     <http://example.org/operator/> .
+@prefix owner:        <http://example.org/owner/> .
+@prefix time:         <http://example.org/time/> .
+@prefix position:     <http://example.org/position/> .
+@prefix rdf:          <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix voc:          <http://example.org/vocabulary#> .
+@prefix sh:           <http://www.w3.org/ns/shacl#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#>.
+
+voc:CollisionControlShape
+    a sh:NodeShape ;
+    sh:targetClass voc:Position ;
+    sh:rule [
+          a sh:SPARQLRule ;
+          sh:construct """
+              prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#>
+              prefix aircraft: <http://example.org/aircraft/>
+              prefix position: <http://example.org/position/>
+              prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+              prefix time:     <http://example.org/time/>
+              prefix collisionEvent:     <http://example.org/collisionEvent/>
+              prefix voc:      <http://example.org/vocabulary#>
+              prefix xsd:      <http://www.w3.org/2001/XMLSchema#>
+              prefix math:     <http://www.w3.org/2005/xpath-functions/math#>
+
+              CONSTRUCT {
+              ?event rdf:type voc:collisionEvent.
+              ?event voc:timeStamp ?now.
+              ?event voc:hasPosition $this.
+              ?event voc:hasPosition ?otherPos.
+              ?event voc:distance ?distance.
+              #?event voc:prevDistance ?prevDistance.
+              #?event voc:distanceChange ?distanceChange.
+              #?event voc:interpretation ?interpretation.
+              }
+
+              WHERE {
+              $this voc:hasTime ?time_object.
+              $this voc:onGround ?onGroundA.
+              $this voc:hasAircraft ?aircraft.
+              $this voc:longitude ?longitude1.
+              $this voc:latitude ?latitude1.
+              ?time_object voc:time ?time.
+              ?aircraft voc:icao24 ?icao24.
+              ?distanceThreshold rdf:value ?threshold.
+
+
+
+              #other Position aircraft B
+              ?otherPos a voc:Position.
+              ?otherPos voc:hasTime ?otherTime_object.
+              ?otherPos voc:onGround ?onGroundB.
+              ?otherTime_object voc:time ?otherTime.
+              ?otherPos voc:hasAircraft ?otherAircraft.
+              ?otherPos voc:longitude ?otherLongitude.
+              ?otherPos voc:latitude ?otherLatitude.
+
+
+              FILTER(?otherAircraft != ?aircraft)
+              FILTER(?onGroundA = false).
+              FILTER(?onGroundB = false).
+              #FILTER(?oldTimeA < ?time).
+              FILTER(?time = ?otherTime).
+
+
+
+              # Distanz von aktuellen States
+              BIND ((?otherLatitude - ?latitude1) as ?dLat)
+              BIND ((?otherLongitude - ?longitude1) as ?dLon)
+              BIND (math:pow(math:sin(?dLat/2), 2) + math:pow(math:sin(?dLon/2), 2) * math:cos(?latitude1) * math:cos(?otherLatitude) as ?a)
+              BIND (6378.388 * 2 * math:atan2(math:sqrt(?a), math:sqrt(1.0-?a)) as ?distance)
+
+              FILTER (ABS(?distance) < ?threshold).
+              FILTER(?distanceThreshold = <http://example.org/distanceThreshold>).
+
+
+
+
+              # Interpretation der Ergebnisse
+              #BIND(?distance - ?prevDistance as ?distanceChange).
+              BIND( IRI(CONCAT("http://example.org/collisionEvent/",STR(?icao24),"_",STR(?time))) as ?event).
+              #BIND( IF(?distanceChange > 0, "converging", "diverging") as ?interpretation).
+              BIND( NOW() as ?now).
+              }
+          """ ;
+    ] ;
+.

@@ -51,12 +51,16 @@ public class Main {
         uploadDynamicGraph();
     }
 
-    public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold) {
+    public static void executeRules(float velocityThreshold, float directionThreshold, float heightThreshold, float distanceThreshold) {
         System.out.println("\033[0;36m" + "Executing SHACL-Rules for current Graph" + "\033[0m");
 
         //Task 1
         System.out.println();
         PositionPredictor.executeRule();
+
+        //Task 2
+        System.out.println();
+        CollisionControl.executeRule(distanceThreshold);
 
         //Task 3
         System.out.println();
