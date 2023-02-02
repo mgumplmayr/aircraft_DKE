@@ -71,7 +71,6 @@ public class Main {
     }
 
     public static void openDatasetQuery() {
-
         try {
             URI uri = new URI("http://localhost:3030/#/dataset/aircraft/query/");
             java.awt.Desktop.getDesktop().browse(uri);

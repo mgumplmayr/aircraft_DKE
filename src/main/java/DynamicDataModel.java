@@ -57,7 +57,7 @@ public class DynamicDataModel extends CategoryDataModel {
             String velocity = String.valueOf(stateToAdd.get(9));
             String trueTrack = String.valueOf(stateToAdd.get(10));
             String verticalRate = String.valueOf(stateToAdd.get(11));
-            //String sensors = String.valueOf(stateToAdd.get(12));
+            //String sensors = String.valueOf(stateToAdd.get(12));  //is always null
             String geoAltitude = String.valueOf(stateToAdd.get(13));
             String squawk = String.valueOf(stateToAdd.get(14));
             String spi = String.valueOf(stateToAdd.get(15));

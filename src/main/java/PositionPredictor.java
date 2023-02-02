@@ -135,7 +135,6 @@ public class PositionPredictor {
 
     public static void writeRDF() {
         try {
-            //write infered triples to file
             System.out.println("Printing " + resultModel.size() + " resources");
             resultModel.write(new FileOutputStream(OUTPUT_NAME), "TTL");
             System.out.println("Printed to: " + OUTPUT_NAME);

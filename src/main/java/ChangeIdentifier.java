@@ -118,14 +118,6 @@ public class ChangeIdentifier {
             String endpoint = q.get("g").toString() + "/Task3";
 
 
-            /* print response to file
-            try {
-                responseModel.write(new FileOutputStream("out/response.ttl"), "TTL");
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            */
-
             //create model for Rules
             Model shapesModel = JenaUtil.createMemoryModel();
             shapesModel.read("shacl/ChangeIdentifierRules.ttl");

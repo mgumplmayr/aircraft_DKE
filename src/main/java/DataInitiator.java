@@ -34,7 +34,6 @@ public class DataInitiator {
 
 
     public List<String[]> getStaticData() {
-
         try {
             CSVReader reader = new CSVReader(new FileReader("aircraftDatabase_statisch.csv"));
             List<String[]> data = reader.readAll();

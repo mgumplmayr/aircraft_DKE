@@ -68,9 +68,9 @@ public class GUI extends JFrame {
         controls.setLayout(gridLayout);
 
         JSpinner velocityThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
-        JSpinner directionThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
+        JSpinner directionThreshold = new JSpinner(new SpinnerNumberModel(8d,0,99,1));
         JSpinner heightThreshold = new JSpinner(new SpinnerNumberModel(5d,0,99,1));
-        JSpinner distanceThreshold = new JSpinner(new SpinnerNumberModel(5d, 0, 100, 1));
+        JSpinner distanceThreshold = new JSpinner(new SpinnerNumberModel(10d, 0, 100, 1));
 
         controls.add(new Label("Velocity Threshold:"));
         controls.add(new Label("Direction Threshold:"));
@@ -97,7 +97,6 @@ public class GUI extends JFrame {
                 Main.uploadStaticGraph();
             }
         });
-
 
         update.addActionListener(e -> {
             if(chosenMode == Mode.NONE);

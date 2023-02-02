@@ -70,7 +70,7 @@ voc:Aircraft_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
                      sh:path     voc:originCountry ] ;
-        sh:closed      true .
+    sh:closed      true .
 
 
 voc:Position_Shape
@@ -148,7 +148,7 @@ voc:Model_Shape
     sh:property    [ sh:datatype xsd:string ;
                      sh:path     voc:typecode ] ;
     sh:property    [ sh:datatype xsd:string ;
-        # sh:maxCount 1 ; to many typos in csv
+        # sh:maxCount 1 ; #to many typos in csv
                      sh:path     voc:model ] ;
     sh:targetClass voc:Model ;
     sh:closed      true .
@@ -198,7 +198,7 @@ voc:Manufacturer_Shape
     sh:property    [ sh:path     rdf:type ;
                      sh:hasValue voc:Manufacturer ] ;
     sh:property    [ sh:datatype xsd:string ;
-        #sh:maxCount 1 ; #csv has different spellings of one Name
+        #sh:maxCount 1 ; #csv has to many typos
                      sh:path     voc:manufacturerName ] ;
     sh:property    [ sh:datatype xsd:string ;
                      sh:maxCount 1 ;
