@@ -2,7 +2,8 @@
 This repository was created as part of the project of Data and Knowledge Engineering in the fall semester of 2022/2023
 
 ## Functionality
-This program is designed to analyze air traffic data using the OpenSky REST API and loads it into a knowledge graph model. 
+This program is designed to analyze air traffic data using the OpenSky REST API and loads it into a knowledge graph using Apache Jena Fuseki.
+Data can then be queried using SPARQL and there is also a basic GUI (Java Swing) provided to execute the functions.
 
 ### Features:
     Fetches real-time air traffic data from the OpenSky REST API.
